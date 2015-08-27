@@ -9,10 +9,19 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity">
 
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/thumbnail_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="vertical"
+        tools:listitem="@layout/list_item_layout" />
+
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp">
+        android:layout_marginTop="10dp"
+        >
         <ImageView
             android:id="@+id/bblogo"
             android:layout_width="wrap_content"
@@ -21,112 +30,115 @@
             android:maxWidth="100dp"
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
-            android:layout_marginLeft="@dimen/menu_margin"
+            android:layout_marginLeft="@dimen/small_margin"
+            android:layout_marginRight="@dimen/small_margin"
             android:src="@drawable/bblogo" />
-        <LinearLayout
-            android:layout_width="match_parent"
+        <HorizontalScrollView
+            android:id="@+id/menu_scroll_view"
+            android:layout_width="400dp"
             android:layout_height="wrap_content"
-            android:id="@+id/menu_layout"
             android:layout_centerVertical="true"
             android:layout_toRightOf="@id/bblogo"
             android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:scrollbars="none">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/menu_layout"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                >
 
-            <ImageView
-                android:id="@+id/playlists"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/menu_margin"
-                android:adjustViewBounds="true"
-                android:maxWidth="40dp"
-                android:layout_centerInParent="true"
-                android:src="@drawable/playlists" />
-            <ImageView
-                android:id="@+id/favorites"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/menu_margin"
-                android:adjustViewBounds="true"
-                android:maxWidth="40dp"
-                android:layout_centerInParent="true"
-                android:src="@drawable/favorites" />
-            <ImageView
-                android:id="@+id/movies"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/menu_margin"
-                android:adjustViewBounds="true"
-                android:maxWidth="35dp"
-                android:layout_centerInParent="true"
-                android:src="@drawable/movies" />
-            <ImageView
-                android:id="@+id/music"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/menu_margin"
-                android:adjustViewBounds="true"
-                android:maxWidth="45dp"
-                android:layout_centerInParent="true"
-                android:src="@drawable/music" />
-            <ImageView
-                android:id="@+id/nightlights"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/menu_margin"
-                android:adjustViewBounds="true"
-                android:maxWidth="50dp"
-                android:layout_centerInParent="true"
-                android:src="@drawable/nightlights" />
-            <ImageView
-                android:id="@+id/audiobooks"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/menu_margin"
-                android:adjustViewBounds="true"
-                android:maxWidth="45dp"
-                android:layout_centerInParent="true"
-                android:src="@drawable/audiobooks" />
+                <ImageView
+                    android:id="@+id/playlists"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="@dimen/menu_margin"
+                    android:adjustViewBounds="true"
+                    android:maxWidth="40dp"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/playlists" />
+                <ImageView
+                    android:id="@+id/favorites"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="@dimen/menu_margin"
+                    android:adjustViewBounds="true"
+                    android:maxWidth="40dp"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/favorites" />
+                <ImageView
+                    android:id="@+id/movies"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="@dimen/menu_margin"
+                    android:adjustViewBounds="true"
+                    android:maxWidth="35dp"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/movies" />
+                <ImageView
+                    android:id="@+id/music"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="@dimen/menu_margin"
+                    android:adjustViewBounds="true"
+                    android:maxWidth="45dp"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/music" />
+                <ImageView
+                    android:id="@+id/nightlights"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="@dimen/menu_margin"
+                    android:adjustViewBounds="true"
+                    android:maxWidth="50dp"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/nightlights" />
+                <ImageView
+                    android:id="@+id/audiobooks"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="@dimen/menu_margin"
+                    android:adjustViewBounds="true"
+                    android:maxWidth="45dp"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/audiobooks" />
 
-            <ImageView
-                android:id="@+id/soundboards"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/menu_margin"
-                android:adjustViewBounds="true"
-                android:maxWidth="35dp"
-                android:layout_centerInParent="true"
-                android:src="@drawable/soundboards" />
-            <ImageView
-                android:id="@+id/hearingimpaired"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/menu_margin"
-                android:adjustViewBounds="true"
-                android:maxWidth="40dp"
-                android:layout_centerInParent="true"
-                android:src="@drawable/hearingimpaired" />
-
-
-        </LinearLayout>
+                <ImageView
+                    android:id="@+id/soundboards"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="@dimen/menu_margin"
+                    android:adjustViewBounds="true"
+                    android:maxWidth="35dp"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/soundboards" />
+                <ImageView
+                    android:id="@+id/hearingimpaired"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="@dimen/menu_margin"
+                    android:adjustViewBounds="true"
+                    android:maxWidth="40dp"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/hearingimpaired" />
+            </LinearLayout>
+        </HorizontalScrollView>
         <ImageView
             android:id="@+id/settings"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="10dp"
+            android:layout_marginRight="@dimen/small_margin"
             android:adjustViewBounds="true"
             android:maxWidth="20dp"
             android:layout_centerInParent="true"
             android:layout_alignParentRight="true"
-            android:src="@drawable/settings" />
+            android:src="@drawable/settings"
+            />
     </RelativeLayout>
 
 
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/thumbnail_list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scrollbars="vertical"
-        tools:listitem="@layout/list_item_layout" />
+
 
 </RelativeLayout>
