@@ -25,6 +25,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
     private static String LOGVAR = "MainActivity";
@@ -33,6 +34,14 @@ public class MainActivity extends AppCompatActivity {
     RequestQueue queue;
     String assetsString;
     JSONArray assetsJSON;
+
+    public static JSONObject jsonData;
+    public static JSONArray movies;
+    public static JSONArray audioBooks;
+    public static JSONArray hearingImpaired;
+    public static JSONArray music;
+    public static JSONArray nightLights;
+    public static JSONArray soundBoards;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,13 +73,12 @@ public class MainActivity extends AppCompatActivity {
         float dpHeight = displayMetrics.heightPixels / displayMetrics.density;
         float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
         int density = (int) displayMetrics.density;
-
         int margin = (int) getResources().getDimension(R.dimen.small_margin)/density;//to give scroll area its own margin
         int margins = margin*4; //to account for left and right margins of logo, scroll view and settings icon
-
         int menuHorizontalRoom = (int) (dpWidth - logoView.getMaxWidth()/displayMetrics.density - settingsView.getMaxWidth()/displayMetrics.density - margins);
-
         int convertedWidth = (int) convertDpToPixel(menuHorizontalRoom, this);
+
+        //set menu width
         menuScrollView.getLayoutParams().width = convertedWidth;
 
         //TODO: create indicator when there are items to scroll to
@@ -102,19 +110,24 @@ public class MainActivity extends AppCompatActivity {
 
                 try {
 
-                    JSONArray jsonData = new JSONArray(assetsString);
-//
-//                    for (int i = 0; i < jsonData.getJSONObject(0).length(); i++) {
-//                        Log.d(LOGVAR, i + ": " + jsonData.getJSONObject(0).getJSONObject(i).toString());
-//                    }
+                    jsonData = new JSONObject(assetsString);
+                    movies = jsonData.getJSONArray("movies");
+                    audioBooks = jsonData.getJSONArray("audiobooks");
+                    hearingImpaired = jsonData.getJSONArray("hearing impaired");
+                    music = jsonData.getJSONArray("music");
+                    nightLights = jsonData.getJSONArray("night lights");
+                    soundBoards = jsonData.getJSONArray("soundboard");
+
+                    for (int i = 0; i < movies.length(); i++) {
+//                        Log.d(LOGVAR, i + ": " + movies.getJSONObject(i).toString());
+                    }
 
 //                    Log.d(LOGVAR, jsonData.getJSONObject(0).getJSONObject("0").toString());
 
-                    assetsJSON = jsonData;
+//                    assetsJSON = jsonData;
+                    configureThumbnailList(music);
 
-                    //set the thumbnail list adapter so it will display the items
-                    final ThumbnailListAdapter adapter = new ThumbnailListAdapter(getApplicationContext(), assetsJSON);
-                    thumbnailList.setAdapter(adapter);
+
                 } catch (Throwable t) {
                     Log.e(LOGVAR, "Could not parse malformed JSON");
                 }
@@ -129,6 +142,12 @@ public class MainActivity extends AppCompatActivity {
         });
 
         queue.add(stringRequest);
+    }
+
+    private void configureThumbnailList(JSONArray jsonData) {
+        //set the thumbnail list adapter so it will display the items
+        ThumbnailListAdapter adapter = new ThumbnailListAdapter(getApplicationContext(), jsonData);
+        thumbnailList.setAdapter(adapter);
     }
 
     @Override

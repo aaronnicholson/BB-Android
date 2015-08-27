@@ -29,12 +29,25 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         //pass in the application context for use in this code
         appContext = context;
         assetsJSON = jsonData;
+        int listLength = assetsJSON.length();
 
         Log.d(LOGVAR, "data: " + assetsJSON);
+        Log.d(LOGVAR, "length: " + assetsJSON.length());
 
-        elements = new ArrayList<ListItem>(20);
-        for (int i=0; i< 20; i++) {
-            elements.add(new ListItem("SAMPLE TEXT " + i, "com.babybrilliant.babybrilliant.movie_animated01.png", appContext)); //TODO: make image dynamic, and rename all to lower case
+        elements = new ArrayList<ListItem>(listLength);
+//        elements = new ArrayList<ListItem>(assetsJSON.length());
+
+        for (int i=0; i< listLength; i++) {
+            String name = "NONE";
+            String thumb = "com.babybrilliant.babybrilliant.movie_animated01.png";
+            try {
+                name = assetsJSON.getJSONObject(i).getString("name");
+                thumb = assetsJSON.getJSONObject(i).getString("thumb");
+                Log.d(LOGVAR, "name: " + name);
+            } catch (Throwable t) {
+                Log.e(LOGVAR, "Could not parse malformed JSON");
+            }
+            elements.add(new ListItem(name, thumb, appContext)); //TODO: make image dynamic, and rename all to lower case
         }
     }
 
