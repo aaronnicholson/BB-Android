@@ -3,17 +3,15 @@ package com.thecodebuilders.babysbrilliant;
 import android.content.Context;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 
@@ -73,9 +71,9 @@ public class MainActivity extends AppCompatActivity {
         float dpHeight = displayMetrics.heightPixels / displayMetrics.density;
         float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
         int density = (int) displayMetrics.density;
-        int margin = (int) getResources().getDimension(R.dimen.small_margin)/density;//to give scroll area its own margin
-        int margins = margin*4; //to account for left and right margins of logo, scroll view and settings icon
-        int menuHorizontalRoom = (int) (dpWidth - logoView.getMaxWidth()/displayMetrics.density - settingsView.getMaxWidth()/displayMetrics.density - margins);
+        int margin = (int) getResources().getDimension(R.dimen.small_margin) / density;//to give scroll area its own margin
+        int margins = margin * 4; //to account for left and right margins of logo, scroll view and settings icon
+        int menuHorizontalRoom = (int) (dpWidth - logoView.getMaxWidth() / displayMetrics.density - settingsView.getMaxWidth() / displayMetrics.density - margins);
         int convertedWidth = (int) convertDpToPixel(menuHorizontalRoom, this);
 
         //set menu width
@@ -106,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(String response) {
 
                 assetsString = Uri.decode(response);
-                Log.d(LOGVAR, "RESPONSE:" + assetsString);
+//                Log.d(LOGVAR, "RESPONSE:" + assetsString);
 
                 try {
 
@@ -118,13 +116,6 @@ public class MainActivity extends AppCompatActivity {
                     nightLights = jsonData.getJSONArray("night lights");
                     soundBoards = jsonData.getJSONArray("soundboard");
 
-                    for (int i = 0; i < movies.length(); i++) {
-//                        Log.d(LOGVAR, i + ": " + movies.getJSONObject(i).toString());
-                    }
-
-//                    Log.d(LOGVAR, jsonData.getJSONObject(0).getJSONObject("0").toString());
-
-//                    assetsJSON = jsonData;
                     configureThumbnailList(music);
 
 
@@ -173,14 +164,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //TODO: move these to a utils class
+
     /**
      * This method converts dp unit to equivalent pixels, depending on device density.
      *
-     * @param dp A value in dp (density independent pixels) unit. Which we need to convert into pixels
+     * @param dp      A value in dp (density independent pixels) unit. Which we need to convert into pixels
      * @param context Context to get resources and device specific display metrics
      * @return A float value to represent px equivalent to dp depending on device density
      */
-    public static float convertDpToPixel(float dp, Context context){
+    public static float convertDpToPixel(float dp, Context context) {
         Resources resources = context.getResources();
         DisplayMetrics metrics = resources.getDisplayMetrics();
         float px = dp * (metrics.densityDpi / 160f);
@@ -190,11 +182,11 @@ public class MainActivity extends AppCompatActivity {
     /**
      * This method converts device specific pixels to density independent pixels.
      *
-     * @param px A value in px (pixels) unit. Which we need to convert into db
+     * @param px      A value in px (pixels) unit. Which we need to convert into db
      * @param context Context to get resources and device specific display metrics
      * @return A float value to represent dp equivalent to px value
      */
-    public static float convertPixelsToDp(float px, Context context){
+    public static float convertPixelsToDp(float px, Context context) {
         Resources resources = context.getResources();
         DisplayMetrics metrics = resources.getDisplayMetrics();
         float dp = px / (metrics.densityDpi / 160f);
