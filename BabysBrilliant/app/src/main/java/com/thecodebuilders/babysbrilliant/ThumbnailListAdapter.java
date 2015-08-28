@@ -22,27 +22,28 @@ import java.util.ArrayList;
  */
 public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdapter.ElementViewHolder> {
     private final String LOGVAR = "ThumbnailListAdapter";
-    private final ArrayList<ListItem> elements;
-    private final Context appContext;
+    private ArrayList<ListItem> elements;
+    private final Context appContext = ApplicationContextProvider.getContext();
     ArrayList<JSONArray> products = new ArrayList<JSONArray>();
-    ThumbnailView customView;
     JSONArray assetsJSON;
     Boolean isSubcategory = false;
-    String category = "";
 
-    public ThumbnailListAdapter(Context context, JSONArray jsonData) {
-        //pass in the application context for use in this code
-        appContext = context;
+    public ThumbnailListAdapter(JSONArray jsonData) {
         assetsJSON = jsonData;
-        int listLength = assetsJSON.length();
 
+        configureListItems(assetsJSON.length());
+    }
+
+    private void configureListItems(int listLength) {
         elements = new ArrayList<ListItem>(listLength);
 
         for (int i=0; i< listLength; i++) {
             String name = "";
-            String thumb = "com.babybrilliant.babybrilliant.movie_animated01.png";
+            String thumb = "";
             String category = "";
+
             try {
+                //subcategories have a title field instead of a name field. We use that difference to determine if it is a product or subcategory item.
                 if(assetsJSON.getJSONObject(i).isNull("name")) {
                     name = assetsJSON.getJSONObject(i).getString("title");
                     isSubcategory = false;
@@ -58,10 +59,12 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
             } catch (Throwable t) {
                 Log.e(LOGVAR, "Could not parse malformed JSON");
             }
+
             elements.add(new ListItem(name, thumb, category, isSubcategory, appContext)); //TODO: make image dynamic, and rename all to lower case
         }
     }
 
+    //attaches the xml layout doc to each menu item to configure it visually.
     @Override
     public ElementViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
 
@@ -71,12 +74,35 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         return new ElementViewHolder(rowView);
     }
 
+    //this happens when a new list is set up. The views are configured with the specific data for each menu item and click listeners are configured.
     @Override
     public void onBindViewHolder(ElementViewHolder viewHolder, final int position) {
         final ListItem rowData = elements.get(position);
 
+        configureListItemLook(viewHolder, rowData);
+
+        configureListItemListeners(viewHolder, position);
+
+    }
+
+    private void configureListItemListeners(ElementViewHolder viewHolder, final int position) {
+        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(isSubcategory) {
+                    MainActivity.configureThumbnailList(products.get(position));
+                }
+                else {
+                    Log.d(LOGVAR, "PRODUCT TAP");
+                }
+            }
+        });
+    }
+
+    private void configureListItemLook(ElementViewHolder viewHolder, ListItem rowData) {
         viewHolder.titleText.setText(rowData.getTitle());
 
+        //set font
         Typeface typeFace=Typeface.createFromAsset(appContext.getAssets(), "fonts/ProximaNovaSoft-Bold.otf");
         viewHolder.titleText.setTypeface(typeFace);
 
@@ -108,20 +134,6 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         }
 
         viewHolder.itemView.setTag(rowData);
-
-
-        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(isSubcategory) {
-                    MainActivity.displayProducts(products.get(position));
-                }
-                else {
-                    Log.d(LOGVAR, "PRODUCT TAP");
-                }
-            }
-        });
-
     }
 
     @Override
@@ -129,6 +141,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         return elements.size();
     }
 
+    //just gets java handles for the layout items configured in the xml doc.
     public class ElementViewHolder extends RecyclerView.ViewHolder {
         private final TextView titleText;
         private final ImageView thumbnailImage;

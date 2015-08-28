@@ -24,13 +24,14 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity {
     private static String LOGVAR = "MainActivity";
     private static String assetsURL;
     private static RecyclerView thumbnailList;
     RequestQueue queue;
     String assetsString;
-    JSONArray assetsJSON;
 
     public static JSONObject jsonData;
     public static JSONArray movies;
@@ -40,18 +41,19 @@ public class MainActivity extends AppCompatActivity {
     public static JSONArray nightLights;
     public static JSONArray soundBoards;
 
+    public static ArrayList<JSONObject> favorites;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        setMenuWidth();
+        assetsURL = getString(R.string.assets_url);
 
         //do not show the action bar
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
 
-        assetsURL = getString(R.string.assets_url);
+        setMenuWidth();
 
         getJSON();
 
@@ -128,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
         //TODO: create indicator when there are items to scroll to
     }
 
+    //initial configuration of the list
     private void setUpThumbnailList() {
         //setup recycler view
         thumbnailList = (RecyclerView) findViewById(R.id.thumbnail_list);
@@ -138,14 +141,16 @@ public class MainActivity extends AppCompatActivity {
         thumbnailListLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         thumbnailListLayoutManager.scrollToPosition(0); //the index of the list item to start at
         thumbnailList.setLayoutManager(thumbnailListLayoutManager);
-
-
     }
 
-    public static void displayProducts(JSONArray jsonData) {
-        configureThumbnailList(jsonData);
+    //this is called when tapping on a menu item or subcategory and sets the list to the new content.
+    public static void configureThumbnailList(JSONArray jsonData) {
+        //set the thumbnail list adapter so it will display the items
+        ThumbnailListAdapter adapter = new ThumbnailListAdapter(jsonData);
+        thumbnailList.setAdapter(adapter);
     }
 
+    //retreive the data model from the server
     public void getJSON() {
         queue = Volley.newRequestQueue(this);
 
@@ -185,14 +190,6 @@ public class MainActivity extends AppCompatActivity {
         queue.add(stringRequest);
     }
 
-    private static void configureThumbnailList(JSONArray jsonData) {
-        //set the thumbnail list adapter so it will display the items
-        ThumbnailListAdapter adapter = new ThumbnailListAdapter(ApplicationContextProvider.getContext(), jsonData);
-        thumbnailList.setAdapter(adapter);
-    }
-
-
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -214,6 +211,4 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
-
 }
