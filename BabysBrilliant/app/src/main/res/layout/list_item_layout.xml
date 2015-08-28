@@ -2,9 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
-    android:padding="10dp"
     android:layout_gravity="bottom"
-    >
+    android:padding="10dp">
 
 
     <!--ratio is .56-->
@@ -16,26 +15,32 @@
         >
 
         <ImageView
+            android:id="@+id/thumbnailImage"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/thumbnailImage"
-            android:scaleType="fitXY"
-            />
+            android:scaleType="fitXY" />
 
-
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/text_area_height"
+            android:layout_alignBottom="@id/thumbnailImage"
+            android:background="#f00"
+            android:id="@+id/textBackground"
+            >
+        </RelativeLayout>
         <TextView
             android:id="@+id/titleText"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:text="@string/sample_text"
-            android:paddingLeft="10dp"
-            android:textColor="#ffffff"
-            android:background="#f00"
-            android:textSize="20sp"
+            android:layout_width="220dp"
+            android:layout_height="@dimen/text_area_height"
             android:layout_alignBottom="@id/thumbnailImage"
-            />
-    </RelativeLayout>
+            android:gravity="center_vertical"
+            android:paddingLeft="10dp"
+            android:text="@string/sample_text"
+            android:textAllCaps="true"
+            android:textColor="#ffffff"
+            android:textSize="16sp" />
 
+    </RelativeLayout>
 
 
 </RelativeLayout>

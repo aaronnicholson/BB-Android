@@ -1,7 +1,5 @@
 package com.thecodebuilders.babysbrilliant;
 
-import android.content.Context;
-import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -13,10 +11,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -43,6 +39,9 @@ public class MainActivity extends AppCompatActivity {
     public static JSONArray music;
     public static JSONArray nightLights;
     public static JSONArray soundBoards;
+
+    public static Boolean showSubcategoryThumbBackground = true;
+    public static Boolean showProductThumbBackground = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,36 +75,48 @@ public class MainActivity extends AppCompatActivity {
 
         moviesButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                showSubcategoryThumbBackground = true;
+                showProductThumbBackground = true;
                 configureThumbnailList(movies);
             }
         });
 
         musicButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                showSubcategoryThumbBackground = false;
+                showProductThumbBackground = false;
                 configureThumbnailList(music);
             }
         });
 
         nightLightsButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                showSubcategoryThumbBackground = true;
+                showProductThumbBackground = true;
                 configureThumbnailList(nightLights);
             }
         });
 
         audioBooksButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                showSubcategoryThumbBackground = true;
+                showProductThumbBackground = true;
                 configureThumbnailList(audioBooks);
             }
         });
 
         soundBoardsButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                showSubcategoryThumbBackground = true;
+                showProductThumbBackground = false;
                 configureThumbnailList(soundBoards);
             }
         });
 
         hearingImpairedButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                showSubcategoryThumbBackground = true;
+                showProductThumbBackground = true;
                 configureThumbnailList(hearingImpaired);
             }
         });
@@ -144,6 +155,10 @@ public class MainActivity extends AppCompatActivity {
         thumbnailList.setLayoutManager(thumbnailListLayoutManager);
 
 
+    }
+
+    public static void displayProducts(JSONArray jsonData) {
+        configureThumbnailList(jsonData);
     }
 
     public void getJSON() {
@@ -191,9 +206,7 @@ public class MainActivity extends AppCompatActivity {
         thumbnailList.setAdapter(adapter);
     }
 
-    public static void displayProducts(JSONArray jsonData) {
-        configureThumbnailList(jsonData);
-    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

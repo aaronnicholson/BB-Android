@@ -16,13 +16,15 @@ import java.io.InputStream;
  */
 public class ListItem extends View {
 
-    private String title = "TITLE";
+    private String title;
     private String imageResource;
+    private String category;
 
-    public ListItem(String title, String imageResource, Context context) {
+    public ListItem(String title, String imageResource, String category, Context context) {
         super(context);
         this.title = title;
         this.imageResource = imageResource;
+        this.category = category;
 
 
     }
@@ -32,6 +34,9 @@ public class ListItem extends View {
     }
     public String getImageResource() {
         return imageResource;
+    }
+    public String getCategory() {
+        return category;
     }
     @Override
     public String toString() {

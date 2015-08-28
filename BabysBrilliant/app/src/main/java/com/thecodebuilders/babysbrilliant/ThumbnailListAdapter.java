@@ -1,6 +1,7 @@
 package com.thecodebuilders.babysbrilliant;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -8,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -26,6 +28,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
     ThumbnailView customView;
     JSONArray assetsJSON;
     Boolean isSubcategory = false;
+    String category = "";
 
     public ThumbnailListAdapter(Context context, JSONArray jsonData) {
         //pass in the application context for use in this code
@@ -33,15 +36,12 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         assetsJSON = jsonData;
         int listLength = assetsJSON.length();
 
-//        Log.d(LOGVAR, "data: " + assetsJSON);
-//        Log.d(LOGVAR, "length: " + assetsJSON.length());
-
         elements = new ArrayList<ListItem>(listLength);
-//        elements = new ArrayList<ListItem>(assetsJSON.length());
 
         for (int i=0; i< listLength; i++) {
             String name = "";
             String thumb = "com.babybrilliant.babybrilliant.movie_animated01.png";
+            String category = "";
             try {
                 if(assetsJSON.getJSONObject(i).isNull("name")) {
                     name = assetsJSON.getJSONObject(i).getString("title");
@@ -49,17 +49,18 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
                 } else {
                     name = assetsJSON.getJSONObject(i).getString("name");
                     products.add(assetsJSON.getJSONObject(i).getJSONArray("products"));
-                    Log.d(LOGVAR, "name: " + name);
-                    Log.d(LOGVAR, "products: " + products);
+//                    Log.d(LOGVAR, "name: " + name);
+//                    Log.d(LOGVAR, "products: " + products);
                     isSubcategory = true;
                 }
 
                 thumb = assetsJSON.getJSONObject(i).getString("thumb");
+                category = assetsJSON.getJSONObject(i).getString("cat");
 
             } catch (Throwable t) {
                 Log.e(LOGVAR, "Could not parse malformed JSON");
             }
-            elements.add(new ListItem(name, thumb, appContext)); //TODO: make image dynamic, and rename all to lower case
+            elements.add(new ListItem(name, thumb, category, appContext)); //TODO: make image dynamic, and rename all to lower case
         }
     }
 
@@ -69,7 +70,6 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         View rowView = LayoutInflater.from(viewGroup.getContext())
                 .inflate(R.layout.list_item_layout, viewGroup, false);
 
-
         return new ElementViewHolder(rowView);
     }
 
@@ -78,6 +78,19 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         final ListItem rowData = elements.get(position);
 
         viewHolder.titleText.setText(rowData.getTitle());
+
+        Typeface typeFace=Typeface.createFromAsset(appContext.getAssets(), "fonts/ProximaNovaSoft-Bold.otf");
+        viewHolder.titleText.setTypeface(typeFace);
+
+        //hide text background for certain sections
+        if(!MainActivity.showSubcategoryThumbBackground && isSubcategory) {
+            viewHolder.textBackground.setVisibility(View.INVISIBLE);
+        }
+
+        if (!MainActivity.showProductThumbBackground && !isSubcategory) {
+            viewHolder.textBackground.setVisibility(View.INVISIBLE);
+            viewHolder.titleText.setVisibility(View.INVISIBLE);
+        }
 
         //TODO: Some how fix rounded corners. These were used to accomplish it through a custom view drawn but it created a memory leak.
 //        customView = new ThumbnailView(appContext);
@@ -117,11 +130,14 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
     public class ElementViewHolder extends RecyclerView.ViewHolder {
         private final TextView titleText;
         private final ImageView thumbnailImage;
+        private final RelativeLayout textBackground;
 
         public ElementViewHolder(View itemView) {
             super(itemView);
             thumbnailImage = (ImageView) itemView.findViewById(R.id.thumbnailImage);
             titleText = (TextView) itemView.findViewById(R.id.titleText);
+            textBackground = (RelativeLayout) itemView.findViewById(R.id.textBackground);
+
         }
 
     }
