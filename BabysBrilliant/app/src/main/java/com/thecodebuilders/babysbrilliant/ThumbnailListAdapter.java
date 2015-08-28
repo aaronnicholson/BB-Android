@@ -98,9 +98,8 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //TODO: get index and use it to select products
                 if(isSubcategory) {
-                    MainActivity.displayProducts(products.get(1));
+                    MainActivity.displayProducts(products.get(position));
                 }
                 else {
                     Log.d(LOGVAR, "PRODUCT TAP");
