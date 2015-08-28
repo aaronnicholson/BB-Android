@@ -40,9 +40,6 @@ public class MainActivity extends AppCompatActivity {
     public static JSONArray nightLights;
     public static JSONArray soundBoards;
 
-    public static Boolean showSubcategoryThumbBackground = true;
-    public static Boolean showProductThumbBackground = true;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,48 +72,36 @@ public class MainActivity extends AppCompatActivity {
 
         moviesButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                showSubcategoryThumbBackground = true;
-                showProductThumbBackground = true;
                 configureThumbnailList(movies);
             }
         });
 
         musicButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                showSubcategoryThumbBackground = false;
-                showProductThumbBackground = false;
                 configureThumbnailList(music);
             }
         });
 
         nightLightsButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                showSubcategoryThumbBackground = true;
-                showProductThumbBackground = true;
                 configureThumbnailList(nightLights);
             }
         });
 
         audioBooksButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                showSubcategoryThumbBackground = true;
-                showProductThumbBackground = true;
                 configureThumbnailList(audioBooks);
             }
         });
 
         soundBoardsButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                showSubcategoryThumbBackground = true;
-                showProductThumbBackground = false;
                 configureThumbnailList(soundBoards);
             }
         });
 
         hearingImpairedButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                showSubcategoryThumbBackground = true;
-                showProductThumbBackground = true;
                 configureThumbnailList(hearingImpaired);
             }
         });

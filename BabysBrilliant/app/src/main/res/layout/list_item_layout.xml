@@ -30,7 +30,7 @@
         </RelativeLayout>
         <TextView
             android:id="@+id/titleText"
-            android:layout_width="220dp"
+            android:layout_width="300dp"
             android:layout_height="@dimen/text_area_height"
             android:layout_alignBottom="@id/thumbnailImage"
             android:gravity="center_vertical"
@@ -38,7 +38,7 @@
             android:text="@string/sample_text"
             android:textAllCaps="true"
             android:textColor="#ffffff"
-            android:textSize="16sp" />
+            android:textSize="14sp" />
 
     </RelativeLayout>
 

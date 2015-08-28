@@ -49,8 +49,6 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
                 } else {
                     name = assetsJSON.getJSONObject(i).getString("name");
                     products.add(assetsJSON.getJSONObject(i).getJSONArray("products"));
-//                    Log.d(LOGVAR, "name: " + name);
-//                    Log.d(LOGVAR, "products: " + products);
                     isSubcategory = true;
                 }
 
@@ -60,7 +58,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
             } catch (Throwable t) {
                 Log.e(LOGVAR, "Could not parse malformed JSON");
             }
-            elements.add(new ListItem(name, thumb, category, appContext)); //TODO: make image dynamic, and rename all to lower case
+            elements.add(new ListItem(name, thumb, category, isSubcategory, appContext)); //TODO: make image dynamic, and rename all to lower case
         }
     }
 
@@ -83,18 +81,22 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         viewHolder.titleText.setTypeface(typeFace);
 
         //hide text background for certain sections
-        if(!MainActivity.showSubcategoryThumbBackground && isSubcategory) {
+        //for music, hide subcategory and product text background
+        if(!rowData.doShowBackground()) {
             viewHolder.textBackground.setVisibility(View.INVISIBLE);
         }
 
-        if (!MainActivity.showProductThumbBackground && !isSubcategory) {
-            viewHolder.textBackground.setVisibility(View.INVISIBLE);
+        //for soundboards, hide product footer entirely
+        if (!rowData.doShowText()) {
             viewHolder.titleText.setVisibility(View.INVISIBLE);
         }
 
-        //TODO: Some how fix rounded corners. These were used to accomplish it through a custom view drawn but it created a memory leak.
-//        customView = new ThumbnailView(appContext);
-//        viewHolder.thumbnailImage.addView(customView);
+        //set text size differently if it is a subcategory
+        if(isSubcategory) {
+            viewHolder.titleText.setTextSize(16);
+        } else {
+            viewHolder.titleText.setTextSize(13);
+        }
 
         //load image from assets folder
         try {
