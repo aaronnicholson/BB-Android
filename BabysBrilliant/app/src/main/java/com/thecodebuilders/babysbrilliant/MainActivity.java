@@ -31,7 +31,7 @@ import org.json.JSONObject;
 public class MainActivity extends AppCompatActivity {
     private static String LOGVAR = "MainActivity";
     private static String assetsURL;
-    private RecyclerView thumbnailList;
+    private static RecyclerView thumbnailList;
     RequestQueue queue;
     String assetsString;
     JSONArray assetsJSON;
@@ -109,8 +109,6 @@ public class MainActivity extends AppCompatActivity {
                 configureThumbnailList(hearingImpaired);
             }
         });
-
-
     }
 
     private void setMenuWidth() {
@@ -187,10 +185,14 @@ public class MainActivity extends AppCompatActivity {
         queue.add(stringRequest);
     }
 
-    private void configureThumbnailList(JSONArray jsonData) {
+    private static void configureThumbnailList(JSONArray jsonData) {
         //set the thumbnail list adapter so it will display the items
-        ThumbnailListAdapter adapter = new ThumbnailListAdapter(getApplicationContext(), jsonData);
+        ThumbnailListAdapter adapter = new ThumbnailListAdapter(ApplicationContextProvider.getContext(), jsonData);
         thumbnailList.setAdapter(adapter);
+    }
+
+    public static void displayProducts(JSONArray jsonData) {
+        configureThumbnailList(jsonData);
     }
 
     @Override

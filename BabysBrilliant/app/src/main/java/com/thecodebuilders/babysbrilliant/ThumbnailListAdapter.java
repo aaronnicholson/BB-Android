@@ -22,8 +22,10 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
     private final String LOGVAR = "ThumbnailListAdapter";
     private final ArrayList<ListItem> elements;
     private final Context appContext;
+    ArrayList<JSONArray> products = new ArrayList<JSONArray>();
     ThumbnailView customView;
     JSONArray assetsJSON;
+    Boolean isSubcategory = false;
 
     public ThumbnailListAdapter(Context context, JSONArray jsonData) {
         //pass in the application context for use in this code
@@ -31,19 +33,29 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         assetsJSON = jsonData;
         int listLength = assetsJSON.length();
 
-        Log.d(LOGVAR, "data: " + assetsJSON);
-        Log.d(LOGVAR, "length: " + assetsJSON.length());
+//        Log.d(LOGVAR, "data: " + assetsJSON);
+//        Log.d(LOGVAR, "length: " + assetsJSON.length());
 
         elements = new ArrayList<ListItem>(listLength);
 //        elements = new ArrayList<ListItem>(assetsJSON.length());
 
         for (int i=0; i< listLength; i++) {
-            String name = "NONE";
+            String name = "";
             String thumb = "com.babybrilliant.babybrilliant.movie_animated01.png";
             try {
-                name = assetsJSON.getJSONObject(i).getString("name");
+                if(assetsJSON.getJSONObject(i).isNull("name")) {
+                    name = assetsJSON.getJSONObject(i).getString("title");
+                    isSubcategory = false;
+                } else {
+                    name = assetsJSON.getJSONObject(i).getString("name");
+                    products.add(assetsJSON.getJSONObject(i).getJSONArray("products"));
+                    Log.d(LOGVAR, "name: " + name);
+                    Log.d(LOGVAR, "products: " + products);
+                    isSubcategory = true;
+                }
+
                 thumb = assetsJSON.getJSONObject(i).getString("thumb");
-                Log.d(LOGVAR, "name: " + name);
+
             } catch (Throwable t) {
                 Log.e(LOGVAR, "Could not parse malformed JSON");
             }
@@ -86,7 +98,13 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d("recycler", "touched: " + position);
+                //TODO: get index and use it to select products
+                if(isSubcategory) {
+                    MainActivity.displayProducts(products.get(1));
+                }
+                else {
+                    Log.d(LOGVAR, "PRODUCT TAP");
+                }
             }
         });
 
