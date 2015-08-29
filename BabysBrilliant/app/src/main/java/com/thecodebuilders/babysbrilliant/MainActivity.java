@@ -1,5 +1,7 @@
 package com.thecodebuilders.babysbrilliant;
 
+import android.content.Context;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -27,11 +29,14 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
+    public final static Context appContext = ApplicationContextProvider.getContext();
     private static String LOGVAR = "MainActivity";
     private static String assetsURL;
     private static RecyclerView thumbnailList;
     RequestQueue queue;
     String assetsString;
+
+    public static Typeface proximaBold=Typeface.createFromAsset(appContext.getAssets(), appContext.getString(R.string.proxima_bold));
 
     public static JSONObject jsonData;
     public static JSONArray movies;
@@ -41,7 +46,9 @@ public class MainActivity extends AppCompatActivity {
     public static JSONArray nightLights;
     public static JSONArray soundBoards;
 
-    public static ArrayList<JSONObject> favorites;
+    public static JSONArray favorites = new JSONArray();
+    //TODO: fetch and populated pre-purchased items from user db
+    public static JSONArray purchasedItems = new JSONArray();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,12 +72,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setUpListeners() {
+
+        ImageView homeButton = (ImageView) findViewById(R.id.bblogo);
         ImageView moviesButton = (ImageView) findViewById(R.id.movies);
         ImageView musicButton = (ImageView) findViewById(R.id.music);
         ImageView nightLightsButton = (ImageView) findViewById(R.id.nightlights);
         ImageView audioBooksButton = (ImageView) findViewById(R.id.audiobooks);
         ImageView soundBoardsButton = (ImageView) findViewById(R.id.soundboards);
         ImageView hearingImpairedButton = (ImageView) findViewById(R.id.hearingimpaired);
+
+        homeButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                configureThumbnailList(purchasedItems);
+            }
+        });
 
         moviesButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -148,6 +163,13 @@ public class MainActivity extends AppCompatActivity {
         //set the thumbnail list adapter so it will display the items
         ThumbnailListAdapter adapter = new ThumbnailListAdapter(jsonData);
         thumbnailList.setAdapter(adapter);
+    }
+
+    public static void addToPurchased(JSONObject productJSON) {
+        //TODO: run through actual app store purchase routine
+        //TODO: check for duplicate purchase
+        //TODO: save to user database
+        purchasedItems.put(productJSON);
     }
 
     //retreive the data model from the server

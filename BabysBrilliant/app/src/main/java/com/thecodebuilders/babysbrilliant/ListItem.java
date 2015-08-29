@@ -9,6 +9,8 @@ import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.View;
 
+import org.json.JSONObject;
+
 import java.io.InputStream;
 
 /**
@@ -22,16 +24,25 @@ public class ListItem extends View {
     private Boolean showBackground = true;
     private Boolean showText = true;
     private Boolean isSubcategory;
+    private Boolean isPurchased;
+    private String price;
+    private JSONObject rawJSON;
 
 
-    public ListItem(String title, String imageResource, String category, Boolean isSubcategory, Context context) {
+
+    public ListItem(JSONObject rawJSON, String title, String imageResource, String price, String category, Boolean isSubcategory, Boolean isPurchased, Context context) {
         super(context);
+        this.rawJSON = rawJSON;
         this.title = title;
         this.imageResource = imageResource;
+        this.price = price;
         this.category = category;
         this.isSubcategory = isSubcategory;
+        this.isPurchased = isPurchased;
     }
-
+    public JSONObject getRawJSON() {
+        return rawJSON;
+    }
     public String getTitle() {
         return title;
     }
@@ -41,7 +52,12 @@ public class ListItem extends View {
     public String getCategory() {
         return category;
     }
-
+    public String getPrice() {
+        return price;
+    }
+    public Boolean isPurchased() {
+        return isPurchased;
+    }
     public Boolean doShowBackground() {
         if(category.equals("1")) {
             showBackground = false;
@@ -57,6 +73,7 @@ public class ListItem extends View {
         }
         return showText;
     }
+
 
     @Override
     public String toString() {

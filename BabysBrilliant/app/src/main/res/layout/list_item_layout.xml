@@ -39,6 +39,33 @@
             android:textAllCaps="true"
             android:textColor="#ffffff"
             android:textSize="14sp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/playlist_icon"
+
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/favorites_icon"
+
+            />
+
+        <TextView
+            android:id="@+id/priceText"
+            android:layout_width="140dp"
+            android:layout_height="wrap_content"
+            android:background="#00ff00"
+            android:textColor="#333333"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:gravity="center_horizontal"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="-40dp"
+            android:layout_marginTop="10dp"
+            android:textSize="22sp"
+            android:rotation="45"/>
 
     </RelativeLayout>
 
