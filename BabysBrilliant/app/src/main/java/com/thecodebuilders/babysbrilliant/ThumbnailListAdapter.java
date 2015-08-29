@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.InputStream;
@@ -27,20 +28,37 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
     private ArrayList<ListItem> elements;
     private final Context appContext = ApplicationContextProvider.getContext();
     ArrayList<JSONArray> products = new ArrayList<JSONArray>();
-    JSONArray assetsJSON;
+    ArrayList<JSONObject> assetsList;
 
 
-    public ThumbnailListAdapter(JSONArray jsonData) {
-        assetsJSON = jsonData;
+//    public ThumbnailListAdapter(JSONArray jsonData) {
+//        assetsList = new ArrayList<>();
+//
+//        try {
+//            for (int i=0; i<jsonData.length(); i++) {
+//                JSONObject itemToAdd = jsonData.getJSONObject(i);
+//                assetsList.add(itemToAdd);
+//            }
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//
+//        configureListItems(assetsList.size());
+//    }
 
-        configureListItems(assetsJSON.length());
+    public ThumbnailListAdapter(ArrayList listData) {
+        assetsList = listData;
+
+        configureListItems(assetsList.size());
     }
 
     private void configureListItems(int listLength) {
         elements = new ArrayList<ListItem>(listLength);
         products = new ArrayList<JSONArray>();
 
-        for (int i=0; i< listLength; i++) {
+        Log.d(LOGVAR, "length: " + listLength);
+
+        for (int i=0; i < listLength; i++) {
             JSONObject rawJSON;
             String name;
             String thumb;
@@ -53,14 +71,14 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
             try {
                 //subcategories have a title field instead of a name field. We use that difference to determine if it is a product or subcategory item.
                 //if it is a list of products
-                if(assetsJSON.getJSONObject(i).isNull("name")) {
-                    name = assetsJSON.getJSONObject(i).getString("title");
+                if(assetsList.get(i).isNull("name")) {
+                    name = assetsList.get(i).getString("title");
                     isSubcategory = false;
 
                 //if it is a list of subcategories
                 } else {
-                    name = assetsJSON.getJSONObject(i).getString("name");
-                    products.add(assetsJSON.getJSONObject(i).getJSONArray("products"));
+                    name = assetsList.get(i).getString("name");
+                    products.add(assetsList.get(i).getJSONArray("products"));
                     isSubcategory = true;
 
                 }
@@ -69,8 +87,8 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
                 //if this item is in there, mark it as purchased
                 for (int purchasedIndex = 0; purchasedIndex < MainActivity.purchasedItems.length(); purchasedIndex++) {
                     //if it has no SKU, skip it
-                    if(!assetsJSON.getJSONObject(purchasedIndex).isNull("SKU")) {
-                        if(assetsJSON.getJSONObject(i).getString("SKU").equals(MainActivity.purchasedItems.getJSONObject(purchasedIndex).getString("SKU"))) {
+                    if(!assetsList.get(i).isNull("SKU")) {
+                        if(assetsList.get(i).getString("SKU").equals(MainActivity.purchasedItems.getJSONObject(purchasedIndex).getString("SKU"))) {
                             isPurchased = true;
                         }
                     }
@@ -81,22 +99,21 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
                 //if this item is in there, mark it as favorite
                 for (int favoriteIndex = 0; favoriteIndex < MainActivity.favoriteItems.size(); favoriteIndex++) {
                     //if it has no SKU, skip it
-                    if(!assetsJSON.getJSONObject(favoriteIndex).isNull("SKU")) {
-                        if(assetsJSON.getJSONObject(i).getString("SKU").equals(MainActivity.favoriteItems.get(favoriteIndex).getString("SKU"))) {
+                    if(!assetsList.get(i).isNull("SKU")) {
+                        if(assetsList.get(i).getString("SKU").equals(MainActivity.favoriteItems.get(favoriteIndex).getString("SKU"))) {
                             isFavorite = true;
                         }
                     }
-
                 }
 
-                rawJSON = assetsJSON.getJSONObject(i);
-                thumb = assetsJSON.getJSONObject(i).getString("thumb");
-                category = assetsJSON.getJSONObject(i).getString("cat");
-
+                rawJSON = assetsList.get(i);
+                thumb = assetsList.get(i).getString("thumb");
+                category = assetsList.get(i).getString("cat");
 
                 elements.add(new ListItem(rawJSON, name, thumb, price, category, isSubcategory, isPurchased, isFavorite, appContext)); //TODO: make image dynamic, and rename all to lower case
-            } catch (Throwable t) {
-                Log.e(LOGVAR, "Could not parse malformed JSON");
+            }
+            catch (Throwable t) {
+                Log.e(LOGVAR, "JSON Error " + t.getMessage() + assetsList);
             }
         }
 

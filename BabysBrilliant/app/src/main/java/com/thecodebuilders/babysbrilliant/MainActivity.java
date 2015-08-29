@@ -179,8 +179,18 @@ public class MainActivity extends AppCompatActivity {
 
     //this is called when tapping on a menu item or subcategory and sets the list to the new content.
     public static void configureThumbnailList(JSONArray jsonData) {
+        //convert JSONArray to ArrayList
+        ArrayList<JSONObject> listData = new ArrayList<>();
+        try {
+            for (int i=0; i<jsonData.length(); i++) {
+                JSONObject itemToAdd = jsonData.getJSONObject(i);
+                listData.add(itemToAdd);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         //set the thumbnail list adapter so it will display the items
-        ThumbnailListAdapter adapter = new ThumbnailListAdapter(jsonData);
+        ThumbnailListAdapter adapter = new ThumbnailListAdapter(listData);
         thumbnailList.setAdapter(adapter);
     }
 
@@ -199,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
     public static void removeFromFavorites(JSONObject rawJSON) {
 
         try {
-            Log.d(LOGVAR, "FAV START: " + favoriteItems);
+            Log.d(LOGVAR, "FAV START: " + favoriteItems.size());
             for (int favoriteIndex = 0; favoriteIndex < favoriteItems.size(); favoriteIndex++) {
                 //if it has no SKU, skip it
                 if(!rawJSON.isNull("SKU") || favoriteItems.get(favoriteIndex).isNull("SKU")) {
@@ -209,12 +219,12 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
-            Log.d(LOGVAR, "FAV END: " + new JSONArray(favoriteItems));
+            Log.d(LOGVAR, "FAV END: " + favoriteItems.size());
 
             //TODO: make favorites menu refresh when removing one
-//            if (currentMenu.equals("favoriteItems")) {
-//                configureThumbnailList(new JSONArray(favoriteItems));
-//            }
+            if (currentMenu.equals("favoriteItems")) {
+                configureThumbnailList(new JSONArray(favoriteItems));
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
