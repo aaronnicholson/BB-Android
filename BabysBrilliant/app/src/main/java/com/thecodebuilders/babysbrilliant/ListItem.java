@@ -24,6 +24,9 @@ public class ListItem extends View {
     private Boolean showBackground = true;
     private Boolean showText = true;
     private Boolean isSubcategory;
+
+
+
     private Boolean isPurchased;
     private String price;
     private JSONObject rawJSON;
@@ -58,6 +61,9 @@ public class ListItem extends View {
     public Boolean isPurchased() {
         return isPurchased;
     }
+    public void setIsPurchased(Boolean isPurchased) {
+        this.isPurchased = isPurchased;
+    }
     public Boolean doShowBackground() {
         if(category.equals("1")) {
             showBackground = false;
@@ -67,6 +73,7 @@ public class ListItem extends View {
         }
         return showBackground;
     }
+
     public Boolean doShowText() {
         if(category.equals("5") && !isSubcategory) {
             showText = false;

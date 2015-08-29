@@ -87,28 +87,8 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         }
     }
 
-    //attaches the xml layout doc to each menu item to configure it visually.
-    @Override
-    public ElementViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-
-        View rowView = LayoutInflater.from(viewGroup.getContext())
-                .inflate(R.layout.list_item_layout, viewGroup, false);
-
-        return new ElementViewHolder(rowView);
-    }
-
-    //this happens when a new list is set up. The views are configured with the specific data for each menu item and click listeners are configured.
-    @Override
-    public void onBindViewHolder(ElementViewHolder viewHolder, final int position) {
-        final ListItem rowData = elements.get(position);
-
-        configureListItemLook(viewHolder, rowData);
-
-        configureListItemListeners(viewHolder, position);
-
-    }
-
     private void configureListItemListeners(ElementViewHolder viewHolder, final int position) {
+        final ElementViewHolder thisViewHolder = viewHolder;
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -121,8 +101,10 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
                     //if it has been purchased already
                     if (productItem.isPurchased()) {
                         Toast.makeText(appContext, "That item has already been purchased", Toast.LENGTH_SHORT).show();
-                    //if it has not been purchased already
+                        //if it has not been purchased already
                     } else {
+                        productItem.setIsPurchased(true);
+                        thisViewHolder.priceText.setVisibility(View.INVISIBLE);
                         MainActivity.addToPurchased(productItem.getRawJSON());
                     }
 
@@ -180,12 +162,34 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         viewHolder.itemView.setTag(rowData);
     }
 
+
+    //attaches the xml layout doc to each menu item to configure it visually.
+    @Override
+    public ElementViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+
+        View rowView = LayoutInflater.from(viewGroup.getContext())
+                .inflate(R.layout.list_item_layout, viewGroup, false);
+
+        return new ElementViewHolder(rowView);
+    }
+
+    //this happens when a new list is set up. The views are configured with the specific data for each menu item and click listeners are configured.
+    @Override
+    public void onBindViewHolder(ElementViewHolder viewHolder, final int position) {
+        final ListItem rowData = elements.get(position);
+
+        configureListItemLook(viewHolder, rowData);
+
+        configureListItemListeners(viewHolder, position);
+
+    }
+
     @Override
     public int getItemCount() {
         return elements.size();
     }
 
-    //just gets java handles for the layout items configured in the xml doc.
+    //just sets java handles for the layout items configured in the xml doc.
     public class ElementViewHolder extends RecyclerView.ViewHolder {
         private final TextView titleText;
         private final ImageView thumbnailImage;
