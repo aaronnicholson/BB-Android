@@ -1,7 +1,7 @@
 package com.thecodebuilders.babysbrilliant;
 
 import android.content.Context;
-import android.graphics.Typeface;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -47,6 +47,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
             String price = appContext.getString(R.string.price_hard_coded);
             String category;
             Boolean isPurchased = false;
+            Boolean isFavorite = false;
             Boolean isSubcategory;
 
             try {
@@ -64,7 +65,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
 
                 }
 
-                //look through items in the purchased list
+                //look through items in the PURCHASED list
                 //if this item is in there, mark it as purchased
                 for (int purchasedIndex = 0; purchasedIndex < MainActivity.purchasedItems.length(); purchasedIndex++) {
                     //if it has no SKU, skip it
@@ -76,12 +77,24 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
 
                 }
 
+                //look through items in the FAVORITES list
+                //if this item is in there, mark it as favorite
+                for (int favoriteIndex = 0; favoriteIndex < MainActivity.favoriteItems.size(); favoriteIndex++) {
+                    //if it has no SKU, skip it
+                    if(!assetsJSON.getJSONObject(favoriteIndex).isNull("SKU")) {
+                        if(assetsJSON.getJSONObject(i).getString("SKU").equals(MainActivity.favoriteItems.get(favoriteIndex).getString("SKU"))) {
+                            isFavorite = true;
+                        }
+                    }
+
+                }
+
                 rawJSON = assetsJSON.getJSONObject(i);
                 thumb = assetsJSON.getJSONObject(i).getString("thumb");
                 category = assetsJSON.getJSONObject(i).getString("cat");
 
 
-                elements.add(new ListItem(rawJSON, name, thumb, price, category, isSubcategory, isPurchased, appContext)); //TODO: make image dynamic, and rename all to lower case
+                elements.add(new ListItem(rawJSON, name, thumb, price, category, isSubcategory, isPurchased, isFavorite, appContext)); //TODO: make image dynamic, and rename all to lower case
             } catch (Throwable t) {
                 Log.e(LOGVAR, "Could not parse malformed JSON");
             }
@@ -91,15 +104,35 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
 
     private void configureListItemListeners(ElementViewHolder viewHolder, final int position) {
         final ElementViewHolder thisViewHolder = viewHolder;
-        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+        viewHolder.thumbnailImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                listItemClicked(position, thisViewHolder);
+                thumbnailClicked(position, thisViewHolder);
+            }
+        });
+
+        viewHolder.favoritesIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                favoritesClicked(position, thisViewHolder);
             }
         });
     }
 
-    private void listItemClicked(int position, ElementViewHolder thisViewHolder) {
+    private void favoritesClicked(int position, ElementViewHolder thisViewHolder) {
+        ListItem listItem = elements.get(position);
+
+        if(listItem.isFavorite()) {
+            //TODO: remove from favorites
+            MainActivity.removeFromFavorites(listItem.getRawJSON());
+            setLookToNotFavorite(thisViewHolder);
+        } else {
+            MainActivity.addToFavorites(listItem.getRawJSON());
+            setLookToFavorite(thisViewHolder);
+        }
+    }
+
+    private void thumbnailClicked(int position, ElementViewHolder thisViewHolder) {
         ListItem listItem = elements.get(position);
 
         //TODO: Handle for soundboard items
@@ -111,13 +144,27 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
                 //if it has not been purchased already
             } else {
                 listItem.setIsPurchased(true);
-                thisViewHolder.priceText.setVisibility(View.INVISIBLE);
+                setLookToPurchased(thisViewHolder);
                 MainActivity.addToPurchased(listItem.getRawJSON());
             }
         } else {
             //send the list of products for the clicked subcategory to make a new view showing them
             playOrOpen(position, listItem);
         }
+    }
+
+    private void setLookToFavorite(ElementViewHolder viewHolder) {
+        viewHolder.favoritesIcon.setColorFilter(Color.YELLOW);
+    }
+
+    private void setLookToNotFavorite(ElementViewHolder viewHolder) {
+        viewHolder.favoritesIcon.setColorFilter(Color.WHITE);
+    }
+
+    private void setLookToPurchased(ElementViewHolder viewHolder) {
+        viewHolder.priceText.setVisibility(View.INVISIBLE);
+        viewHolder.favoritesIcon.setVisibility(View.VISIBLE);
+        viewHolder.playlistIcon.setVisibility(View.VISIBLE);
     }
 
     private void playOrOpen(int position, ListItem listItem) {
@@ -134,6 +181,11 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
     }
 
     private void configureListItemLook(ElementViewHolder viewHolder, ListItem listItem) {
+        viewHolder.favoritesIcon.setVisibility(View.INVISIBLE);
+        viewHolder.playlistIcon.setVisibility(View.INVISIBLE);
+
+
+
         //set text
         viewHolder.titleText.setText(listItem.getTitle());
         viewHolder.priceText.setText(listItem.getPrice());
@@ -167,8 +219,17 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
 
         //if it has been purchased already
         if (listItem.isPurchased()) {
-            viewHolder.priceText.setVisibility(View.INVISIBLE);
+            setLookToPurchased(viewHolder);
+
         }
+
+        if(listItem.isFavorite()) {
+            setLookToFavorite(viewHolder);
+        } else {
+            setLookToNotFavorite(viewHolder);
+        }
+
+        viewHolder.playlistIcon.setColorFilter(Color.WHITE);
 
         //load image from assets folder
         try {
@@ -214,6 +275,8 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         private final ImageView thumbnailImage;
         private final TextView priceText;
         private final RelativeLayout textBackground;
+        private final ImageView favoritesIcon;
+        private final ImageView playlistIcon;
 
         public ElementViewHolder(View itemView) {
             super(itemView);
@@ -221,7 +284,8 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
             titleText = (TextView) itemView.findViewById(R.id.titleText);
             priceText = (TextView) itemView.findViewById(R.id.priceText);
             textBackground = (RelativeLayout) itemView.findViewById(R.id.textBackground);
-
+            favoritesIcon = (ImageView) itemView.findViewById(R.id.favorites_icon);
+            playlistIcon = (ImageView) itemView.findViewById(R.id.playlist_icon);
         }
 
     }

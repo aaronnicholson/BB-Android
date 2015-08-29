@@ -24,6 +24,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -46,7 +47,9 @@ public class MainActivity extends AppCompatActivity {
     public static JSONArray nightLights;
     public static JSONArray soundBoards;
 
-    public static JSONArray favorites = new JSONArray();
+    public static String currentMenu = "";
+
+    public static ArrayList<JSONObject> favoriteItems = new ArrayList<>();
     //TODO: fetch and populated pre-purchased items from user db
     public static JSONArray purchasedItems = new JSONArray();
 
@@ -69,11 +72,13 @@ public class MainActivity extends AppCompatActivity {
         setUpThumbnailList();
 
 
+
     }
 
     private void setUpListeners() {
 
         ImageView homeButton = (ImageView) findViewById(R.id.bblogo);
+        ImageView favoritesButton = (ImageView) findViewById(R.id.favorites);
         ImageView moviesButton = (ImageView) findViewById(R.id.movies);
         ImageView musicButton = (ImageView) findViewById(R.id.music);
         ImageView nightLightsButton = (ImageView) findViewById(R.id.nightlights);
@@ -84,42 +89,56 @@ public class MainActivity extends AppCompatActivity {
         homeButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 configureThumbnailList(purchasedItems);
+                currentMenu = "purchasedItems";
+            }
+        });
+
+        favoritesButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                configureThumbnailList(new JSONArray(favoriteItems));
+                currentMenu = "favoriteItems";
             }
         });
 
         moviesButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 configureThumbnailList(movies);
+                currentMenu = "movies";
             }
         });
 
         musicButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 configureThumbnailList(music);
+                currentMenu = "music";
             }
         });
 
         nightLightsButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 configureThumbnailList(nightLights);
+                currentMenu = "nightLights";
             }
         });
 
         audioBooksButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 configureThumbnailList(audioBooks);
+                currentMenu = "audioBooks";
             }
         });
 
         soundBoardsButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 configureThumbnailList(soundBoards);
+                currentMenu = "soundBoards";
             }
         });
 
         hearingImpairedButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 configureThumbnailList(hearingImpaired);
+                currentMenu = "hearingImpaired";
             }
         });
     }
@@ -172,7 +191,37 @@ public class MainActivity extends AppCompatActivity {
         purchasedItems.put(productJSON);
     }
 
-    //retreive the data model from the server
+    public static void addToFavorites(JSONObject productJSON) {
+        //TODO: save to user database
+        favoriteItems.add(productJSON);
+    }
+
+    public static void removeFromFavorites(JSONObject rawJSON) {
+
+        try {
+            Log.d(LOGVAR, "FAV START: " + favoriteItems);
+            for (int favoriteIndex = 0; favoriteIndex < favoriteItems.size(); favoriteIndex++) {
+                //if it has no SKU, skip it
+                if(!rawJSON.isNull("SKU") || favoriteItems.get(favoriteIndex).isNull("SKU")) {
+                    if (rawJSON.getString("SKU").equals(favoriteItems.get(favoriteIndex).getString("SKU"))) {
+                        favoriteItems.remove(favoriteIndex);
+                    }
+                }
+            }
+
+            Log.d(LOGVAR, "FAV END: " + new JSONArray(favoriteItems));
+
+            //TODO: make favorites menu refresh when removing one
+//            if (currentMenu.equals("favoriteItems")) {
+//                configureThumbnailList(new JSONArray(favoriteItems));
+//            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    //retrieve the data model from the server
     public void getJSON() {
         queue = Volley.newRequestQueue(this);
 
