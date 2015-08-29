@@ -23,11 +23,10 @@ public class ListItem extends View {
     private String category;
     private Boolean showBackground = true;
     private Boolean showText = true;
+
     private Boolean isSubcategory;
-
-
-
     private Boolean isPurchased;
+    private Boolean isPurchasable = false;
     private String price;
     private JSONObject rawJSON;
 
@@ -42,6 +41,8 @@ public class ListItem extends View {
         this.category = category;
         this.isSubcategory = isSubcategory;
         this.isPurchased = isPurchased;
+
+        setIsPurchasable();
     }
     public JSONObject getRawJSON() {
         return rawJSON;
@@ -64,6 +65,28 @@ public class ListItem extends View {
     public void setIsPurchased(Boolean isPurchased) {
         this.isPurchased = isPurchased;
     }
+    public Boolean isSubcategory() {
+        return isSubcategory;
+    }
+    public Boolean isPurchasable() {
+        return isPurchasable;
+    }
+
+    private void setIsPurchasable() {
+        isPurchasable = false;
+
+        //sound board groups are purchasable
+        if(category.equals("5") && isSubcategory) {
+            isPurchasable = true;
+        }
+
+        //products that are not sound board items are purchasable
+        if(!category.equals("5") && !isSubcategory) {
+            isPurchasable = true;
+        }
+
+    }
+
     public Boolean doShowBackground() {
         if(category.equals("1")) {
             showBackground = false;
@@ -73,7 +96,6 @@ public class ListItem extends View {
         }
         return showBackground;
     }
-
     public Boolean doShowText() {
         if(category.equals("5") && !isSubcategory) {
             showText = false;

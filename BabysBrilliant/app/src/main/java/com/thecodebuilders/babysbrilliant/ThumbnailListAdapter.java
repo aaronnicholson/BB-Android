@@ -28,7 +28,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
     private final Context appContext = ApplicationContextProvider.getContext();
     ArrayList<JSONArray> products = new ArrayList<JSONArray>();
     JSONArray assetsJSON;
-    Boolean isSubcategory = false;
+
 
     public ThumbnailListAdapter(JSONArray jsonData) {
         assetsJSON = jsonData;
@@ -44,47 +44,49 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
             JSONObject rawJSON;
             String name;
             String thumb;
-            String price;
+            String price = appContext.getString(R.string.price_hard_coded);
             String category;
             Boolean isPurchased = false;
+            Boolean isSubcategory;
 
             try {
                 //subcategories have a title field instead of a name field. We use that difference to determine if it is a product or subcategory item.
                 //if it is a list of products
                 if(assetsJSON.getJSONObject(i).isNull("name")) {
                     name = assetsJSON.getJSONObject(i).getString("title");
-                    price = appContext.getString(R.string.price_hard_coded);
                     isSubcategory = false;
 
-                    //look through items in the purchased list
-                    //if this item is in there, mark it as purchased
-                    Log.d(LOGVAR, "purchased length: " + MainActivity.purchasedItems.length());
-                    for (int purchasedIndex = 0; purchasedIndex < MainActivity.purchasedItems.length(); purchasedIndex++) {
-                        if(!assetsJSON.getJSONObject(purchasedIndex).isNull("SKU")) {
-                            if(assetsJSON.getJSONObject(i).getString("SKU").equals(MainActivity.purchasedItems.getJSONObject(purchasedIndex).getString("SKU"))) {
-                                isPurchased = true;
-                            }
-                        }
-
-                    }
                 //if it is a list of subcategories
                 } else {
                     name = assetsJSON.getJSONObject(i).getString("name");
-                    price = "";
                     products.add(assetsJSON.getJSONObject(i).getJSONArray("products"));
                     isSubcategory = true;
+
+                }
+
+                //look through items in the purchased list
+                //if this item is in there, mark it as purchased
+                for (int purchasedIndex = 0; purchasedIndex < MainActivity.purchasedItems.length(); purchasedIndex++) {
+                    //if it has no SKU, skip it
+                    if(!assetsJSON.getJSONObject(purchasedIndex).isNull("SKU")) {
+                        if(assetsJSON.getJSONObject(i).getString("SKU").equals(MainActivity.purchasedItems.getJSONObject(purchasedIndex).getString("SKU"))) {
+                            isPurchased = true;
+                        }
+                    }
+
                 }
 
                 rawJSON = assetsJSON.getJSONObject(i);
                 thumb = assetsJSON.getJSONObject(i).getString("thumb");
                 category = assetsJSON.getJSONObject(i).getString("cat");
 
+
                 elements.add(new ListItem(rawJSON, name, thumb, price, category, isSubcategory, isPurchased, appContext)); //TODO: make image dynamic, and rename all to lower case
             } catch (Throwable t) {
                 Log.e(LOGVAR, "Could not parse malformed JSON");
             }
-
         }
+
     }
 
     private void configureListItemListeners(ElementViewHolder viewHolder, final int position) {
@@ -92,31 +94,49 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                if (isSubcategory) {
-                    //send the list of products for the clicked subcategory to make a new view showing them
-                    MainActivity.configureThumbnailList(products.get(position));
-                } else {
-                    ListItem productItem = elements.get(position);
-                    //if it has been purchased already
-                    if (productItem.isPurchased()) {
-                        Toast.makeText(appContext, "That item has already been purchased", Toast.LENGTH_SHORT).show();
-                        //if it has not been purchased already
-                    } else {
-                        productItem.setIsPurchased(true);
-                        thisViewHolder.priceText.setVisibility(View.INVISIBLE);
-                        MainActivity.addToPurchased(productItem.getRawJSON());
-                    }
-
-                }
+                listItemClicked(position, thisViewHolder);
             }
         });
     }
 
-    private void configureListItemLook(ElementViewHolder viewHolder, ListItem rowData) {
+    private void listItemClicked(int position, ElementViewHolder thisViewHolder) {
+        ListItem listItem = elements.get(position);
+
+        //TODO: Handle for soundboard items
+
+        if (listItem.isPurchasable()) {
+            //if it has been purchased already
+            if (listItem.isPurchased()) {
+                playOrOpen(position, listItem);
+                //if it has not been purchased already
+            } else {
+                listItem.setIsPurchased(true);
+                thisViewHolder.priceText.setVisibility(View.INVISIBLE);
+                MainActivity.addToPurchased(listItem.getRawJSON());
+            }
+        } else {
+            //send the list of products for the clicked subcategory to make a new view showing them
+            playOrOpen(position, listItem);
+        }
+    }
+
+    private void playOrOpen(int position, ListItem listItem) {
+        //if it's a soundboard category
+        if(listItem.isSubcategory()) {
+            updateThumbnailList(position);
+        } else {
+            Toast.makeText(appContext, "That item has already been purchased", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void updateThumbnailList(int position) {
+        MainActivity.configureThumbnailList(products.get(position));
+    }
+
+    private void configureListItemLook(ElementViewHolder viewHolder, ListItem listItem) {
         //set text
-        viewHolder.titleText.setText(rowData.getTitle());
-        viewHolder.priceText.setText(rowData.getPrice());
+        viewHolder.titleText.setText(listItem.getTitle());
+        viewHolder.priceText.setText(listItem.getPrice());
 
         //set font
         viewHolder.titleText.setTypeface(MainActivity.proximaBold);
@@ -124,44 +144,43 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
 
         //hide text background for certain sections
         //for music, hide subcategory and product text background
-        if (!rowData.doShowBackground()) {
+        if (!listItem.doShowBackground()) {
             viewHolder.textBackground.setVisibility(View.INVISIBLE);
         }
 
         //for soundboards, hide product footer entirely
-        if (!rowData.doShowText()) {
+        if (!listItem.doShowText()) {
             viewHolder.titleText.setVisibility(View.INVISIBLE);
         }
 
         //set text size differently if it is a subcategory
-        if (isSubcategory) {
+        if (listItem.isSubcategory()) {
             viewHolder.titleText.setTextSize(16);
         } else {
             viewHolder.titleText.setTextSize(13);
         }
 
         //hide price on subcategories
-        if (isSubcategory) {
+        if (!listItem.isPurchasable()) {
             viewHolder.priceText.setVisibility(View.INVISIBLE);
         }
 
         //if it has been purchased already
-        if (rowData.isPurchased()) {
+        if (listItem.isPurchased()) {
             viewHolder.priceText.setVisibility(View.INVISIBLE);
         }
 
         //load image from assets folder
         try {
-            InputStream stream = appContext.getAssets().open(rowData.getImageResource());
+            InputStream stream = appContext.getAssets().open(listItem.getImageResource());
             Drawable drawable = Drawable.createFromStream(stream, null);
             viewHolder.thumbnailImage.setImageDrawable(drawable);
         } catch (Exception e) {
             Log.e("ListItem", e.getMessage());
         }
 
-        viewHolder.itemView.setTag(rowData);
+        viewHolder.itemView.setTag(listItem);
     }
-
 
     //attaches the xml layout doc to each menu item to configure it visually.
     @Override
