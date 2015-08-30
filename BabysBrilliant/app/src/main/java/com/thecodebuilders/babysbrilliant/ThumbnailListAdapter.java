@@ -8,6 +8,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -30,25 +32,8 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
     ArrayList<JSONArray> products = new ArrayList<JSONArray>();
     ArrayList<JSONObject> assetsList;
 
-
-//    public ThumbnailListAdapter(JSONArray jsonData) {
-//        assetsList = new ArrayList<>();
-//
-//        try {
-//            for (int i=0; i<jsonData.length(); i++) {
-//                JSONObject itemToAdd = jsonData.getJSONObject(i);
-//                assetsList.add(itemToAdd);
-//            }
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//
-//        configureListItems(assetsList.size());
-//    }
-
     public ThumbnailListAdapter(ArrayList listData) {
         assetsList = listData;
-
         configureListItems(assetsList.size());
     }
 
@@ -61,9 +46,10 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         for (int i=0; i < listLength; i++) {
             JSONObject rawJSON;
             String name;
-            String thumb;
+            String imageResource;
             String price = appContext.getString(R.string.price_hard_coded);
             String category;
+            String mediaFile = "";
             Boolean isPurchased = false;
             Boolean isFavorite = false;
             Boolean isSubcategory;
@@ -78,7 +64,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
                 //if it is a list of subcategories
                 } else {
                     name = assetsList.get(i).getString("name");
-                    products.add(assetsList.get(i).getJSONArray("products"));
+                    if(!assetsList.get(i).isNull("products")) products.add(assetsList.get(i).getJSONArray("products"));
                     isSubcategory = true;
 
                 }
@@ -107,10 +93,14 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
                 }
 
                 rawJSON = assetsList.get(i);
-                thumb = assetsList.get(i).getString("thumb");
+                imageResource = assetsList.get(i).getString("thumb");
                 category = assetsList.get(i).getString("cat");
 
-                elements.add(new ListItem(rawJSON, name, thumb, price, category, isSubcategory, isPurchased, isFavorite, appContext)); //TODO: make image dynamic, and rename all to lower case
+                if(!assetsList.get(i).isNull("file")) {
+                    mediaFile = assetsList.get(i).getString("file");
+                }
+
+                elements.add(new ListItem(rawJSON, name, imageResource, mediaFile, price, category, isSubcategory, isPurchased, isFavorite, appContext)); //TODO: make image dynamic, and rename all to lower case
             }
             catch (Throwable t) {
                 Log.e(LOGVAR, "JSON Error " + t.getMessage() + assetsList);
@@ -189,7 +179,8 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         if(listItem.isSubcategory()) {
             updateThumbnailList(position);
         } else {
-            Toast.makeText(appContext, "That item has already been purchased", Toast.LENGTH_SHORT).show();
+            //if it has a file name, play it
+            if(!listItem.getMediaFile().equals("")) MainActivity.playVideo(listItem.getMediaFile());
         }
     }
 
@@ -273,6 +264,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
     //this happens when a new list is set up. The views are configured with the specific data for each menu item and click listeners are configured.
     @Override
     public void onBindViewHolder(ElementViewHolder viewHolder, final int position) {
+
         final ListItem rowData = elements.get(position);
 
         configureListItemLook(viewHolder, rowData);
@@ -294,6 +286,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         private final RelativeLayout textBackground;
         private final ImageView favoritesIcon;
         private final ImageView playlistIcon;
+        private final RelativeLayout listItemContainer;
 
         public ElementViewHolder(View itemView) {
             super(itemView);
@@ -303,6 +296,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
             textBackground = (RelativeLayout) itemView.findViewById(R.id.textBackground);
             favoritesIcon = (ImageView) itemView.findViewById(R.id.favorites_icon);
             playlistIcon = (ImageView) itemView.findViewById(R.id.playlist_icon);
+            listItemContainer = (RelativeLayout) itemView.findViewById(R.id.list_item_container);
         }
 
     }

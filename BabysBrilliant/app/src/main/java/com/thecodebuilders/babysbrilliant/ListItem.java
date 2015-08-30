@@ -20,6 +20,7 @@ public class ListItem extends View {
 
     private String title;
     private String imageResource;
+    private String mediaFile;
     private String category;
     private Boolean showBackground = true;
     private Boolean showText = true;
@@ -33,11 +34,12 @@ public class ListItem extends View {
 
 
 
-    public ListItem(JSONObject rawJSON, String title, String imageResource, String price, String category, Boolean isSubcategory, Boolean isPurchased, Boolean isFavorite, Context context) {
+    public ListItem(JSONObject rawJSON, String title, String imageResource, String mediaFile, String price, String category, Boolean isSubcategory, Boolean isPurchased, Boolean isFavorite, Context context) {
         super(context);
         this.rawJSON = rawJSON;
         this.title = title;
         this.imageResource = imageResource;
+        this.mediaFile = mediaFile;
         this.price = price;
         this.category = category;
         this.isSubcategory = isSubcategory;
@@ -54,6 +56,9 @@ public class ListItem extends View {
     }
     public String getImageResource() {
         return imageResource;
+    }
+    public String getMediaFile() {
+        return mediaFile;
     }
     public String getCategory() {
         return category;

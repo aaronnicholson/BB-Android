@@ -2,14 +2,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginLeft="@dimen/activity_horizontal_margin"
     android:background="@drawable/bg_gradient"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    android:layout_marginLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity">
 
 
+    <!--<RelativeLayout-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content">-->
+    <!-- -->
+    <!--</RelativeLayout>-->
     <android.support.v7.widget.RecyclerView
         android:id="@+id/thumbnail_list"
         android:layout_width="match_parent"
@@ -20,19 +25,20 @@
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        >
+        android:layout_marginTop="10dp">
+
         <ImageView
             android:id="@+id/bblogo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:adjustViewBounds="true"
-            android:maxWidth="100dp"
-            android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
             android:layout_marginLeft="@dimen/small_margin"
             android:layout_marginRight="@dimen/small_margin"
+            android:adjustViewBounds="true"
+            android:maxWidth="100dp"
             android:src="@drawable/bblogo" />
+
         <HorizontalScrollView
             android:id="@+id/menu_scroll_view"
             android:layout_width="400dp"
@@ -41,103 +47,136 @@
             android:layout_toRightOf="@id/bblogo"
             android:gravity="center_vertical"
             android:scrollbars="none">
+
             <LinearLayout
+                android:id="@+id/menu_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/menu_layout"
-                android:orientation="horizontal"
                 android:gravity="center_vertical"
-                >
+                android:orientation="horizontal">
 
                 <ImageView
                     android:id="@+id/playlists"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
                     android:layout_marginRight="@dimen/menu_margin"
                     android:adjustViewBounds="true"
                     android:maxWidth="40dp"
-                    android:layout_centerInParent="true"
                     android:src="@drawable/playlists" />
+
                 <ImageView
                     android:id="@+id/favorites"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
                     android:layout_marginRight="@dimen/menu_margin"
                     android:adjustViewBounds="true"
                     android:maxWidth="40dp"
-                    android:layout_centerInParent="true"
                     android:src="@drawable/favorites" />
+
                 <ImageView
                     android:id="@+id/movies"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
                     android:layout_marginRight="@dimen/menu_margin"
                     android:adjustViewBounds="true"
                     android:maxWidth="35dp"
-                    android:layout_centerInParent="true"
                     android:src="@drawable/movies" />
+
                 <ImageView
                     android:id="@+id/music"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
                     android:layout_marginRight="@dimen/menu_margin"
                     android:adjustViewBounds="true"
                     android:maxWidth="45dp"
-                    android:layout_centerInParent="true"
                     android:src="@drawable/music" />
+
                 <ImageView
                     android:id="@+id/nightlights"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
                     android:layout_marginRight="@dimen/menu_margin"
                     android:adjustViewBounds="true"
                     android:maxWidth="50dp"
-                    android:layout_centerInParent="true"
                     android:src="@drawable/nightlights" />
+
                 <ImageView
                     android:id="@+id/audiobooks"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
                     android:layout_marginRight="@dimen/menu_margin"
                     android:adjustViewBounds="true"
                     android:maxWidth="45dp"
-                    android:layout_centerInParent="true"
                     android:src="@drawable/audiobooks" />
 
                 <ImageView
                     android:id="@+id/soundboards"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
                     android:layout_marginRight="@dimen/menu_margin"
                     android:adjustViewBounds="true"
                     android:maxWidth="35dp"
-                    android:layout_centerInParent="true"
                     android:src="@drawable/soundboards" />
+
                 <ImageView
                     android:id="@+id/hearingimpaired"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
                     android:layout_marginRight="@dimen/menu_margin"
                     android:adjustViewBounds="true"
                     android:maxWidth="40dp"
-                    android:layout_centerInParent="true"
                     android:src="@drawable/hearingimpaired" />
             </LinearLayout>
         </HorizontalScrollView>
+
         <ImageView
             android:id="@+id/settings"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerInParent="true"
             android:layout_marginRight="@dimen/small_margin"
             android:adjustViewBounds="true"
             android:maxWidth="20dp"
-            android:layout_centerInParent="true"
-            android:layout_alignParentRight="true"
-            android:src="@drawable/settings"
-            />
+            android:src="@drawable/settings" />
     </RelativeLayout>
 
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/video_layout"
+        android:background="#000"
+        android:gravity="center_horizontal">
+
+        <VideoView
+            android:id="@+id/video_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerHorizontal="true"
+            />
+        <Button
+            android:id="@+id/video_toggle_button"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:text="@string/video_pause"/>
+
+        <Button
+            android:id="@+id/video_close_button"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:text="CLOSE"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"/>
+    </RelativeLayout>
 
 
 

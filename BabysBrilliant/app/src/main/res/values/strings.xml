@@ -7,4 +7,6 @@
     <string name="assets_url">http://new.babysbrilliant.com/app/?a=pDBstandard</string>
     <string name="proxima_bold">fonts/ProximaNovaSoft-Bold.otf</string>
     <string name="price_hard_coded">$0.99</string>
+    <string name="media_url">https://s3-us-west-1.amazonaws.com/babysbrilliant-media/</string>
+    <string name="video_pause">PAUSE</string>
 </resources>

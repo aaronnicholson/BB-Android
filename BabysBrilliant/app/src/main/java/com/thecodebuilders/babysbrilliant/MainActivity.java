@@ -2,6 +2,7 @@ package com.thecodebuilders.babysbrilliant;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -13,8 +14,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.VideoView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -37,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
     RequestQueue queue;
     String assetsString;
 
-    public static Typeface proximaBold=Typeface.createFromAsset(appContext.getAssets(), appContext.getString(R.string.proxima_bold));
+    public static Typeface proximaBold = Typeface.createFromAsset(appContext.getAssets(), appContext.getString(R.string.proxima_bold));
 
     public static JSONObject jsonData;
     public static JSONArray movies;
@@ -49,14 +53,27 @@ public class MainActivity extends AppCompatActivity {
 
     public static String currentMenu = "";
 
+    public static String mediaURL = appContext.getString(R.string.media_url);
+
     public static ArrayList<JSONObject> favoriteItems = new ArrayList<>();
     //TODO: fetch and populated pre-purchased items from user db
     public static JSONArray purchasedItems = new JSONArray();
+
+    private static RelativeLayout videoLayout;
+    private static VideoView videoView;
+    private static Button videoToggleButton;
+    private static Button videoCloseButton;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        videoView = (VideoView) findViewById(R.id.video_view);
+        videoLayout = (RelativeLayout) findViewById(R.id.video_layout);
+        videoLayout.setVisibility(View.INVISIBLE);
+
         assetsURL = getString(R.string.assets_url);
 
         //do not show the action bar
@@ -71,8 +88,6 @@ public class MainActivity extends AppCompatActivity {
 
         setUpThumbnailList();
 
-
-
     }
 
     private void setUpListeners() {
@@ -86,10 +101,14 @@ public class MainActivity extends AppCompatActivity {
         ImageView soundBoardsButton = (ImageView) findViewById(R.id.soundboards);
         ImageView hearingImpairedButton = (ImageView) findViewById(R.id.hearingimpaired);
 
+        videoToggleButton = (Button) findViewById(R.id.video_toggle_button);
+        videoCloseButton = (Button) findViewById(R.id.video_close_button);
+
         homeButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 configureThumbnailList(purchasedItems);
                 currentMenu = "purchasedItems";
+//                hideList();
             }
         });
 
@@ -141,6 +160,49 @@ public class MainActivity extends AppCompatActivity {
                 currentMenu = "hearingImpaired";
             }
         });
+
+        videoToggleButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                if (videoView.isPlaying()) {
+                    videoView.pause();
+                    videoToggleButton.setText("PLAY");
+                } else {
+                    videoView.start();
+                    videoToggleButton.setText("PAUSE");
+                }
+            }
+        });
+
+        videoCloseButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                if (videoView.isPlaying()) {
+                    videoView.stopPlayback();
+                    videoToggleButton.setText("PAUSE");
+                }
+                videoLayout.setVisibility(View.INVISIBLE);
+            }
+        });
+
+        videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+
+                //show the video after a short delay to allow previous video image to clear out
+                new android.os.Handler().postDelayed(
+                        new Runnable() {
+                            public void run() {
+                                videoView.setAlpha(1);
+                            }
+                        },
+                        300);
+            }
+        });
+
+        videoLayout.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                //nothing, just stop thumbnail list from being clicked
+            }
+        });
     }
 
     private void setMenuWidth() {
@@ -182,7 +244,7 @@ public class MainActivity extends AppCompatActivity {
         //convert JSONArray to ArrayList
         ArrayList<JSONObject> listData = new ArrayList<>();
         try {
-            for (int i=0; i<jsonData.length(); i++) {
+            for (int i = 0; i < jsonData.length(); i++) {
                 JSONObject itemToAdd = jsonData.getJSONObject(i);
                 listData.add(itemToAdd);
             }
@@ -192,7 +254,10 @@ public class MainActivity extends AppCompatActivity {
         //set the thumbnail list adapter so it will display the items
         ThumbnailListAdapter adapter = new ThumbnailListAdapter(listData);
         thumbnailList.setAdapter(adapter);
+
+
     }
+
 
     public static void addToPurchased(JSONObject productJSON) {
         //TODO: run through actual app store purchase routine
@@ -212,7 +277,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d(LOGVAR, "FAV START: " + favoriteItems.size());
             for (int favoriteIndex = 0; favoriteIndex < favoriteItems.size(); favoriteIndex++) {
                 //if it has no SKU, skip it
-                if(!rawJSON.isNull("SKU") || favoriteItems.get(favoriteIndex).isNull("SKU")) {
+                if (!rawJSON.isNull("SKU") || favoriteItems.get(favoriteIndex).isNull("SKU")) {
                     if (rawJSON.getString("SKU").equals(favoriteItems.get(favoriteIndex).getString("SKU"))) {
                         favoriteItems.remove(favoriteIndex);
                     }
@@ -229,6 +294,20 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+    }
+
+    public static void playVideo(String videoURL) {
+        String url = mediaURL + videoURL; // your URL here
+
+
+        videoToggleButton.setText("PAUSE");
+        videoLayout.setVisibility(View.VISIBLE);
+        videoView.setVideoPath(url);
+        videoView.requestFocus();
+        videoView.start();
+
+        videoView.setAlpha(0); //hide prior to media being ready
+        //TODO: show preloader
     }
 
     //retrieve the data model from the server
