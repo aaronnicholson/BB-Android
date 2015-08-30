@@ -1,6 +1,7 @@
 package com.thecodebuilders.babysbrilliant;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -35,6 +36,17 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     public final static Context appContext = ApplicationContextProvider.getContext();
+
+    public final static String PURCHASED_ITEMS = "purchasedItems";
+    public final static String PLAYLISTS = "playlists";
+    public final static String FAVORITE_ITEMS = "favoriteItems";
+    public static final String MOVIES = "movies";
+    public static final String MUSIC = "music";
+    public static final String NIGHT_LIGHTS = "nightLights";
+    public static final String AUDIO_BOOKS = "audioBooks";
+    public static final String SOUND_BOARDS = "soundBoards";
+    public static final String HEARING_IMPAIRED = "hearingImpaired";
+
     private static String LOGVAR = "MainActivity";
     private static String assetsURL;
     private static RecyclerView thumbnailList;
@@ -64,17 +76,45 @@ public class MainActivity extends AppCompatActivity {
     private static Button videoToggleButton;
     private static Button videoCloseButton;
 
+    ImageView homeButton;
+    ImageView playListButton;
+    ImageView favoritesButton;
+    ImageView moviesButton;
+    ImageView musicButton;
+    ImageView nightLightsButton;
+    ImageView audioBooksButton;
+    ImageView soundBoardsButton;
+    ImageView hearingImpairedButton;
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        assetsURL = getString(R.string.assets_url);
+
+        homeButton = (ImageView) findViewById(R.id.bblogo);
+        playListButton = (ImageView) findViewById(R.id.playlists);
+        favoritesButton = (ImageView) findViewById(R.id.favorites);
+        moviesButton = (ImageView) findViewById(R.id.movies);
+        musicButton = (ImageView) findViewById(R.id.music);
+        nightLightsButton = (ImageView) findViewById(R.id.nightlights);
+        audioBooksButton = (ImageView) findViewById(R.id.audiobooks);
+        soundBoardsButton = (ImageView) findViewById(R.id.soundboards);
+        hearingImpairedButton = (ImageView) findViewById(R.id.hearingimpaired);
+
+        videoToggleButton = (Button) findViewById(R.id.video_toggle_button);
+        videoCloseButton = (Button) findViewById(R.id.video_close_button);
 
         videoView = (VideoView) findViewById(R.id.video_view);
         videoLayout = (RelativeLayout) findViewById(R.id.video_layout);
         videoLayout.setVisibility(View.INVISIBLE);
 
-        assetsURL = getString(R.string.assets_url);
+
 
         //do not show the action bar
         ActionBar actionBar = getSupportActionBar();
@@ -92,72 +132,75 @@ public class MainActivity extends AppCompatActivity {
 
     private void setUpListeners() {
 
-        ImageView homeButton = (ImageView) findViewById(R.id.bblogo);
-        ImageView favoritesButton = (ImageView) findViewById(R.id.favorites);
-        ImageView moviesButton = (ImageView) findViewById(R.id.movies);
-        ImageView musicButton = (ImageView) findViewById(R.id.music);
-        ImageView nightLightsButton = (ImageView) findViewById(R.id.nightlights);
-        ImageView audioBooksButton = (ImageView) findViewById(R.id.audiobooks);
-        ImageView soundBoardsButton = (ImageView) findViewById(R.id.soundboards);
-        ImageView hearingImpairedButton = (ImageView) findViewById(R.id.hearingimpaired);
-
-        videoToggleButton = (Button) findViewById(R.id.video_toggle_button);
-        videoCloseButton = (Button) findViewById(R.id.video_close_button);
-
         homeButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 configureThumbnailList(purchasedItems);
-                currentMenu = "purchasedItems";
-//                hideList();
+                currentMenu = PURCHASED_ITEMS;
+                toggleMenuButton(currentMenu);
             }
         });
 
         favoritesButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 configureThumbnailList(new JSONArray(favoriteItems));
-                currentMenu = "favoriteItems";
+                currentMenu = FAVORITE_ITEMS;
+                toggleMenuButton(currentMenu);
+            }
+        });
+
+        playListButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+//                configureThumbnailList(new JSONArray(favoriteItems));
+                currentMenu = PLAYLISTS;
+                toggleMenuButton(currentMenu);
             }
         });
 
         moviesButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 configureThumbnailList(movies);
-                currentMenu = "movies";
+                currentMenu = MOVIES;
+                toggleMenuButton(currentMenu);
             }
         });
 
         musicButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 configureThumbnailList(music);
-                currentMenu = "music";
+                currentMenu = MUSIC;
+                toggleMenuButton(currentMenu);
             }
         });
 
         nightLightsButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 configureThumbnailList(nightLights);
-                currentMenu = "nightLights";
+                currentMenu = NIGHT_LIGHTS;
+                toggleMenuButton(currentMenu);
             }
         });
 
         audioBooksButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 configureThumbnailList(audioBooks);
-                currentMenu = "audioBooks";
+                currentMenu = AUDIO_BOOKS;
+                toggleMenuButton(currentMenu);
             }
         });
 
         soundBoardsButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 configureThumbnailList(soundBoards);
-                currentMenu = "soundBoards";
+                currentMenu = SOUND_BOARDS;
+                toggleMenuButton(currentMenu);
             }
         });
 
         hearingImpairedButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 configureThumbnailList(hearingImpaired);
-                currentMenu = "hearingImpaired";
+                currentMenu = HEARING_IMPAIRED;
+                toggleMenuButton(currentMenu);
             }
         });
 
@@ -203,6 +246,52 @@ public class MainActivity extends AppCompatActivity {
                 //nothing, just stop thumbnail list from being clicked
             }
         });
+    }
+
+    private void toggleMenuButton(String clickedItem) {
+        //default all to dark grey
+        final int menuDarkGrey = Color.parseColor(getString(R.string.menu_dark_grey));
+        favoritesButton.setColorFilter(menuDarkGrey);
+        playListButton.setColorFilter(menuDarkGrey);
+        moviesButton.setColorFilter(menuDarkGrey);
+        musicButton.setColorFilter(menuDarkGrey);
+        nightLightsButton.setColorFilter(menuDarkGrey);
+        audioBooksButton.setColorFilter(menuDarkGrey);
+        soundBoardsButton.setColorFilter(menuDarkGrey);
+        hearingImpairedButton.setColorFilter(menuDarkGrey);
+
+        //then set the tapped one to red
+        switch (clickedItem) {
+            case PURCHASED_ITEMS:
+
+                return;
+            case PLAYLISTS:
+                playListButton.setColorFilter(Color.RED);
+                return;
+            case FAVORITE_ITEMS:
+                favoritesButton.setColorFilter(Color.RED);
+                return;
+            case MOVIES:
+                moviesButton.setColorFilter(Color.RED);
+                return;
+            case MUSIC:
+                musicButton.setColorFilter(Color.RED);
+                return;
+            case NIGHT_LIGHTS:
+                nightLightsButton.setColorFilter(Color.RED);
+                return;
+            case AUDIO_BOOKS:
+                audioBooksButton.setColorFilter(Color.RED);
+                return;
+            case SOUND_BOARDS:
+                soundBoardsButton.setColorFilter(Color.RED);
+                return;
+            case HEARING_IMPAIRED:
+                hearingImpairedButton.setColorFilter(Color.RED);
+                return;
+            default:
+        }
+
     }
 
     private void setMenuWidth() {
@@ -287,7 +376,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d(LOGVAR, "FAV END: " + favoriteItems.size());
 
             //TODO: make favorites menu refresh when removing one
-            if (currentMenu.equals("favoriteItems")) {
+            if (currentMenu.equals(FAVORITE_ITEMS)) {
                 configureThumbnailList(new JSONArray(favoriteItems));
             }
         } catch (JSONException e) {
@@ -327,7 +416,7 @@ public class MainActivity extends AppCompatActivity {
                     movies = jsonData.getJSONArray("movies");
                     audioBooks = jsonData.getJSONArray("audiobooks");
                     hearingImpaired = jsonData.getJSONArray("hearing impaired");
-                    music = jsonData.getJSONArray("music");
+                    music = jsonData.getJSONArray(MUSIC);
                     nightLights = jsonData.getJSONArray("night lights");
                     soundBoards = jsonData.getJSONArray("soundboard");
 
