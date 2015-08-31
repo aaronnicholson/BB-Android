@@ -12,4 +12,5 @@
     <string name="video_rew">\uf049</string>
     <string name="menu_dark_grey">#676767</string>
     <string name="font_awesome">fonts/FontAwesome.otf</string>
+    <string name="video_close"></string>
 </resources>

@@ -6,6 +6,7 @@ import android.graphics.Typeface;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -76,7 +77,9 @@ public class MainActivity extends AppCompatActivity {
     private static RelativeLayout videoLayout;
     private static VideoView videoView;
     private static TextView videoToggleButton;
-    private static Button videoCloseButton;
+    private static TextView videoCloseButton;
+    private static TextView videoFFButton;
+    private static TextView videoRewButton;
 
     ImageView homeButton;
     ImageView playListButton;
@@ -87,6 +90,10 @@ public class MainActivity extends AppCompatActivity {
     ImageView audioBooksButton;
     ImageView soundBoardsButton;
     ImageView hearingImpairedButton;
+
+    static Handler controlsHandler = new Handler();
+    static Runnable delayedHide = null;
+    static Boolean doHide = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,13 +114,18 @@ public class MainActivity extends AppCompatActivity {
         hearingImpairedButton = (ImageView) findViewById(R.id.hearingimpaired);
 
         videoToggleButton = (TextView) findViewById(R.id.video_toggle_button);
-        videoCloseButton = (Button) findViewById(R.id.video_close_button);
+        videoCloseButton = (TextView) findViewById(R.id.video_close_button);
+        videoFFButton = (TextView) findViewById(R.id.video_ff_button);
+        videoRewButton = (TextView) findViewById(R.id.video_rew_button);
 
         videoView = (VideoView) findViewById(R.id.video_view);
         videoLayout = (RelativeLayout) findViewById(R.id.video_layout);
         videoLayout.setVisibility(View.INVISIBLE);
 
         videoToggleButton.setTypeface(MainActivity.fontAwesome);
+        videoCloseButton.setTypeface(MainActivity.fontAwesome);
+        videoFFButton.setTypeface(MainActivity.fontAwesome);
+        videoRewButton.setTypeface(MainActivity.fontAwesome);
 
         //do not show the action bar
         ActionBar actionBar = getSupportActionBar();
@@ -212,6 +224,7 @@ public class MainActivity extends AppCompatActivity {
                     videoView.start();
                     videoToggleButton.setText(getString(R.string.video_pause));
                 }
+                showControls();
             }
         });
 
@@ -222,6 +235,20 @@ public class MainActivity extends AppCompatActivity {
                     videoToggleButton.setText(getString(R.string.video_pause));
                 }
                 videoLayout.setVisibility(View.INVISIBLE);
+            }
+        });
+
+        videoFFButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                //TODO: Make forward func
+                showControls();
+            }
+        });
+
+        videoRewButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                //TODO: Make backward func
+                showControls();
             }
         });
 
@@ -238,12 +265,14 @@ public class MainActivity extends AppCompatActivity {
                             }
                         },
                         500);
+                showControls();
             }
         });
 
         videoLayout.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 //nothing, just stop thumbnail list from being clicked
+                showControls();
             }
         });
     }
@@ -261,6 +290,9 @@ public class MainActivity extends AppCompatActivity {
         soundBoardsButton.setColorFilter(menuDarkGrey);
         hearingImpairedButton.setColorFilter(menuDarkGrey);
 
+//        videoFFButton.setVisibility(View.INVISIBLE);
+//        videoRewButton.setVisibility(View.INVISIBLE);
+
         //then set the tapped one to red
         switch (clickedItem) {
             case PURCHASED_ITEMS:
@@ -268,6 +300,8 @@ public class MainActivity extends AppCompatActivity {
                 return;
             case PLAYLISTS:
                 playListButton.setColorFilter(menuBlue);
+                videoFFButton.setVisibility(View.VISIBLE);
+                videoRewButton.setVisibility(View.VISIBLE);
                 return;
             case FAVORITE_ITEMS:
                 favoritesButton.setColorFilter(menuBlue);
@@ -398,8 +432,7 @@ public class MainActivity extends AppCompatActivity {
     public static void playVideo(String videoURL) {
         String url = mediaURL + videoURL; // your URL here
 
-
-//        videoToggleButton.setText(appContext.getString(R.string.video_pause));
+        videoToggleButton.setText(appContext.getString(R.string.video_pause));
         videoLayout.setVisibility(View.VISIBLE);
         videoView.setVideoPath(url);
         videoView.requestFocus();
@@ -407,6 +440,40 @@ public class MainActivity extends AppCompatActivity {
 
         videoView.setAlpha(0); //hide prior to media being ready
         //TODO: show preloader
+
+        showControls();
+    }
+
+    private static void showControls() {
+        videoFFButton.setVisibility(View.VISIBLE);
+        videoRewButton.setVisibility(View.VISIBLE);
+        videoToggleButton.setVisibility(View.VISIBLE);
+        videoCloseButton.setVisibility(View.VISIBLE);
+
+        doHide = true;
+
+        //hide again after x sec, after clearing previous hide actions
+        delayedHide = new Runnable() {
+            public void run() {
+                if(doHide) {
+                    hideControls();
+                }
+            }
+        };
+
+        controlsHandler.removeCallbacks(delayedHide);
+
+        controlsHandler.postDelayed(delayedHide, 10000);
+    }
+
+    private static void hideControls() {
+        Log.d(LOGVAR, "HIDE");
+        videoFFButton.setVisibility(View.INVISIBLE);
+        videoRewButton.setVisibility(View.INVISIBLE);
+        videoToggleButton.setVisibility(View.INVISIBLE);
+        videoCloseButton.setVisibility(View.INVISIBLE);
+
+        doHide = false;
     }
 
     //retrieve the data model from the server
