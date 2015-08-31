@@ -23,6 +23,7 @@
         tools:listitem="@layout/list_item_layout" />
 
     <RelativeLayout
+        android:id="@+id/menu_group"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp">
@@ -38,6 +39,8 @@
             android:adjustViewBounds="true"
             android:maxWidth="100dp"
             android:src="@drawable/bblogo" />
+
+
 
         <HorizontalScrollView
             android:id="@+id/menu_scroll_view"
@@ -148,6 +151,17 @@
             android:maxWidth="20dp"
             android:src="@drawable/settings" />
     </RelativeLayout>
+
+    <TextView
+        android:id="@+id/section_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textAllCaps="true"
+        android:textColor="@color/gray"
+        android:layout_below="@id/menu_group"
+        android:layout_marginLeft="@dimen/small_margin"
+        />
 
 
     <RelativeLayout

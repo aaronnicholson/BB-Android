@@ -41,13 +41,13 @@ public class MainActivity extends AppCompatActivity {
 
     public final static String PURCHASED_ITEMS = "purchasedItems";
     public final static String PLAYLISTS = "playlists";
-    public final static String FAVORITE_ITEMS = "favoriteItems";
+    public final static String FAVORITE_ITEMS = "favorite items";
     public static final String MOVIES = "movies";
     public static final String MUSIC = "music";
-    public static final String NIGHT_LIGHTS = "nightLights";
-    public static final String AUDIO_BOOKS = "audioBooks";
-    public static final String SOUND_BOARDS = "soundBoards";
-    public static final String HEARING_IMPAIRED = "hearingImpaired";
+    public static final String NIGHT_LIGHTS = "night lights";
+    public static final String AUDIO_BOOKS = "audiobooks";
+    public static final String SOUND_BOARDS = "soundboard";
+    public static final String HEARING_IMPAIRED = "hearing impaired";
 
     private static String LOGVAR = "MainActivity";
     private static String assetsURL;
@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
     public static JSONArray nightLights;
     public static JSONArray soundBoards;
 
-    public static String currentMenu = "";
+    public static String currentMenu = MOVIES;
 
     public static String mediaURL = appContext.getString(R.string.media_url);
 
@@ -90,6 +90,8 @@ public class MainActivity extends AppCompatActivity {
     ImageView audioBooksButton;
     ImageView soundBoardsButton;
     ImageView hearingImpairedButton;
+
+    static TextView sectionTitle;
 
     static Handler controlsHandler = new Handler();
     static Runnable delayedHide = null;
@@ -122,10 +124,14 @@ public class MainActivity extends AppCompatActivity {
         videoLayout = (RelativeLayout) findViewById(R.id.video_layout);
         videoLayout.setVisibility(View.INVISIBLE);
 
+        sectionTitle = (TextView) findViewById(R.id.section_title);
+
         videoToggleButton.setTypeface(MainActivity.fontAwesome);
         videoCloseButton.setTypeface(MainActivity.fontAwesome);
         videoFFButton.setTypeface(MainActivity.fontAwesome);
         videoRewButton.setTypeface(MainActivity.fontAwesome);
+        sectionTitle.setTypeface(MainActivity.proximaBold);
+
 
         //do not show the action bar
         ActionBar actionBar = getSupportActionBar();
@@ -231,7 +237,9 @@ public class MainActivity extends AppCompatActivity {
         videoCloseButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if (videoView.isPlaying()) {
+                    videoView.pause();
                     videoView.stopPlayback();
+                    videoView.suspend();
                     videoToggleButton.setText(getString(R.string.video_pause));
                 }
                 videoLayout.setVisibility(View.INVISIBLE);
@@ -290,39 +298,44 @@ public class MainActivity extends AppCompatActivity {
         soundBoardsButton.setColorFilter(menuDarkGrey);
         hearingImpairedButton.setColorFilter(menuDarkGrey);
 
-//        videoFFButton.setVisibility(View.INVISIBLE);
-//        videoRewButton.setVisibility(View.INVISIBLE);
-
         //then set the tapped one to red
         switch (clickedItem) {
             case PURCHASED_ITEMS:
-
+                setSectionTitle(getString(R.string.title_purchased));
                 return;
             case PLAYLISTS:
                 playListButton.setColorFilter(menuBlue);
                 videoFFButton.setVisibility(View.VISIBLE);
                 videoRewButton.setVisibility(View.VISIBLE);
+                setSectionTitle(getString(R.string.title_playlists));
                 return;
             case FAVORITE_ITEMS:
                 favoritesButton.setColorFilter(menuBlue);
+                setSectionTitle(getString(R.string.title_favorites));
                 return;
             case MOVIES:
                 moviesButton.setColorFilter(menuBlue);
+                setSectionTitle(getString(R.string.title_movies));
                 return;
             case MUSIC:
                 musicButton.setColorFilter(menuBlue);
+                setSectionTitle(getString(R.string.title_music));
                 return;
             case NIGHT_LIGHTS:
                 nightLightsButton.setColorFilter(menuBlue);
+                setSectionTitle(getString(R.string.title_night_lights));
                 return;
             case AUDIO_BOOKS:
                 audioBooksButton.setColorFilter(menuBlue);
+                setSectionTitle(getString(R.string.title_audio_books));
                 return;
             case SOUND_BOARDS:
                 soundBoardsButton.setColorFilter(menuBlue);
+                setSectionTitle(getString(R.string.title_sound_boards));
                 return;
             case HEARING_IMPAIRED:
                 hearingImpairedButton.setColorFilter(menuBlue);
+                setSectionTitle(getString(R.string.title_hearing_impaired));
                 return;
             default:
         }
@@ -391,7 +404,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
     public static void addToPurchased(JSONObject productJSON) {
         //TODO: run through actual app store purchase routine
         //TODO: check for duplicate purchase
@@ -430,7 +442,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static void playVideo(String videoURL) {
-        String url = mediaURL + videoURL; // your URL here
+        String url = mediaURL + videoURL;
 
         videoToggleButton.setText(appContext.getString(R.string.video_pause));
         videoLayout.setVisibility(View.VISIBLE);
@@ -455,7 +467,7 @@ public class MainActivity extends AppCompatActivity {
         //hide again after x sec, after clearing previous hide actions
         delayedHide = new Runnable() {
             public void run() {
-                if(doHide) {
+                if (doHide) {
                     hideControls();
                 }
             }
@@ -476,6 +488,10 @@ public class MainActivity extends AppCompatActivity {
         doHide = false;
     }
 
+    public static void setSectionTitle(String title) {
+        sectionTitle.setText(title);
+    }
+
     //retrieve the data model from the server
     public void getJSON() {
         queue = Volley.newRequestQueue(this);
@@ -490,14 +506,15 @@ public class MainActivity extends AppCompatActivity {
                 try {
 
                     jsonData = new JSONObject(assetsString);
-                    movies = jsonData.getJSONArray("movies");
-                    audioBooks = jsonData.getJSONArray("audiobooks");
-                    hearingImpaired = jsonData.getJSONArray("hearing impaired");
+                    movies = jsonData.getJSONArray(MOVIES);
+                    audioBooks = jsonData.getJSONArray(AUDIO_BOOKS);
+                    hearingImpaired = jsonData.getJSONArray(HEARING_IMPAIRED);
                     music = jsonData.getJSONArray(MUSIC);
-                    nightLights = jsonData.getJSONArray("night lights");
-                    soundBoards = jsonData.getJSONArray("soundboard");
+                    nightLights = jsonData.getJSONArray(NIGHT_LIGHTS);
+                    soundBoards = jsonData.getJSONArray(SOUND_BOARDS);
 
-                    configureThumbnailList(music);
+                    //TODO: add preloader
+                    configureThumbnailList(jsonData.getJSONArray(currentMenu));
 
 
                 } catch (Throwable t) {
@@ -509,7 +526,7 @@ public class MainActivity extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.d(LOGVAR, "VOLLEY ERROR: " + error.getMessage());
+                Log.e(LOGVAR, "VOLLEY ERROR: " + error.getMessage());
             }
         });
 

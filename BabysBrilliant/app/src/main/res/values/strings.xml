@@ -13,4 +13,13 @@
     <string name="menu_dark_grey">#676767</string>
     <string name="font_awesome">fonts/FontAwesome.otf</string>
     <string name="video_close"></string>
+    <string name="title_playlists">playlists</string>
+    <string name="title_favorites">favorites</string>
+    <string name="title_movies">movies</string>
+    <string name="title_music">music</string>
+    <string name="title_night_lights">night lights</string>
+    <string name="title_audio_books">audio books</string>
+    <string name="title_sound_boards">sound boards</string>
+    <string name="title_hearing_impaired">hearing impaired</string>
+    <string name="title_purchased">purchased items</string>
 </resources>

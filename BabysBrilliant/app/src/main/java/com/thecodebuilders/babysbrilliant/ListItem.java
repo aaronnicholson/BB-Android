@@ -8,6 +8,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.View;
+import android.widget.VideoView;
 
 import org.json.JSONObject;
 
@@ -17,25 +18,26 @@ import java.io.InputStream;
  * Created by aaronnicholson on 8/17/15.
  */
 public class ListItem extends View {
-
     private String title;
     private String imageResource;
     private String mediaFile;
     private String category;
+    private String sectionTitle;
+    private String price;
     private Boolean showBackground = true;
     private Boolean showText = true;
-
     private Boolean isSubcategory;
     private Boolean isPurchased;
     private Boolean isFavorite;
+    private Boolean playInline;
     private Boolean isPurchasable = false;
-    private String price;
     private JSONObject rawJSON;
 
-    public ListItem(JSONObject rawJSON, String title, String imageResource, String mediaFile, String price, String category, Boolean isSubcategory, Boolean isPurchased, Boolean isFavorite, Context context) {
+    public ListItem(JSONObject rawJSON, String title, Boolean playInline, String imageResource, String mediaFile, String price, String category, Boolean isSubcategory, Boolean isPurchased, Boolean isFavorite, Context context) {
         super(context);
         this.rawJSON = rawJSON;
         this.title = title;
+        this.playInline = playInline;
         this.imageResource = imageResource;
         this.mediaFile = mediaFile;
         this.price = price;
@@ -45,12 +47,17 @@ public class ListItem extends View {
         this.isFavorite = isFavorite;
 
         setIsPurchasable();
+
     }
+
     public JSONObject getRawJSON() {
         return rawJSON;
     }
     public String getTitle() {
         return title;
+    }
+    public String getSectionTitle() {
+        return sectionTitle;
     }
     public String getImageResource() {
         return imageResource;
@@ -63,6 +70,9 @@ public class ListItem extends View {
     }
     public String getPrice() {
         return price;
+    }
+    public Boolean playInline() {
+        return playInline;
     }
     public Boolean isPurchased() {
         return isPurchased;
@@ -110,7 +120,6 @@ public class ListItem extends View {
         }
         return showText;
     }
-
 
     @Override
     public String toString() {

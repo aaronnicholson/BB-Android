@@ -8,17 +8,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.VideoView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -42,11 +39,10 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         elements = new ArrayList<ListItem>(listLength);
         products = new ArrayList<JSONArray>();
 
-        Log.d(LOGVAR, "length: " + listLength);
-
         for (int i=0; i < listLength; i++) {
             JSONObject rawJSON;
             String name;
+            Boolean playInline = false;
             String imageResource;
             String price = appContext.getString(R.string.price_hard_coded);
             String category;
@@ -56,7 +52,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
             Boolean isSubcategory;
 
             try {
-                //subcategories have a title field instead of a name field. We use that difference to determine if it is a product or subcategory item.
+                //subcategories have a name field instead of a title field. We use that difference to determine if it is a product or subcategory item.
                 //if it is a list of products
                 if(assetsList.get(i).isNull("name")) {
                     name = assetsList.get(i).getString("title");
@@ -68,6 +64,11 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
                     if(!assetsList.get(i).isNull("products")) products.add(assetsList.get(i).getJSONArray("products"));
                     isSubcategory = true;
 
+                }
+
+                //soundboards are meant to play inside their thumbnail. Anything marked with the playInline attribute in the JSON will do so.
+                if(!assetsList.get(i).isNull("playInline")) {
+                    if(assetsList.get(i).getString("playInline").equals("true")) playInline = true;
                 }
 
                 //look through items in the PURCHASED list
@@ -97,13 +98,16 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
                 imageResource = assetsList.get(i).getString("thumb");
                 category = assetsList.get(i).getString("cat");
 
+                //for products, use the file attribute. For subcategories, use the preview attribute.
                 if(!assetsList.get(i).isNull("file")) {
                     mediaFile = assetsList.get(i).getString("file");
                 } else if(!assetsList.get(i).isNull("preview")) {
                     mediaFile = assetsList.get(i).getString("preview");
                 }
 
-                elements.add(new ListItem(rawJSON, name, imageResource, mediaFile, price, category, isSubcategory, isPurchased, isFavorite, appContext)); //TODO: make image dynamic, and rename all to lower case
+                ListItem listItem = new ListItem(rawJSON, name, playInline, imageResource, mediaFile, price, category, isSubcategory, isPurchased, isFavorite, appContext);
+
+                elements.add(listItem);//TODO: make image dynamic
             }
             catch (Throwable t) {
                 Log.e(LOGVAR, "JSON Error " + t.getMessage() + assetsList);
@@ -137,6 +141,9 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
     }
 
     private void configureListItemLook(ElementViewHolder viewHolder, ListItem listItem) {
+
+        viewHolder.videoView.setVisibility(View.INVISIBLE);
+
         viewHolder.favoritesIcon.setVisibility(View.INVISIBLE);
         viewHolder.playlistIcon.setVisibility(View.INVISIBLE);
 
@@ -185,7 +192,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         }
 
         //TODO: Add check for null string of file name
-        if(listItem.isSubcategory()) {
+        if(listItem.isSubcategory() && !listItem.isPurchasable()) {
             viewHolder.previewIcon.setVisibility(View.VISIBLE);
         } else {
             viewHolder.previewIcon.setVisibility(View.INVISIBLE);
@@ -232,7 +239,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         if (listItem.isPurchasable()) {
             //if it has been purchased already
             if (listItem.isPurchased()) {
-                playOrOpen(position, listItem);
+                playOrOpen(position, listItem, thisViewHolder);
                 //if it has not been purchased already
             } else {
                 listItem.setIsPurchased(true);
@@ -241,7 +248,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
             }
         } else {
             //send the list of products for the clicked subcategory to make a new view showing them
-            playOrOpen(position, listItem);
+            playOrOpen(position, listItem, thisViewHolder);
         }
     }
 
@@ -255,18 +262,50 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
 
     private void setLookToPurchased(ElementViewHolder viewHolder) {
         viewHolder.priceText.setVisibility(View.INVISIBLE);
+
+        //TODO: hide these on soundboards?
         viewHolder.favoritesIcon.setVisibility(View.VISIBLE);
         viewHolder.playlistIcon.setVisibility(View.VISIBLE);
     }
 
-    private void playOrOpen(int position, ListItem listItem) {
+    private void playOrOpen(int position, ListItem listItem, ElementViewHolder viewHolder) {
         //if it's a soundboard category
         if(listItem.isSubcategory()) {
+            //set up section title
+            if(!assetsList.get(position).isNull("name")) {
+                try {
+                    MainActivity.setSectionTitle(assetsList.get(position).getString("name"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
             updateThumbnailList(position);
         } else {
             //if it has a file name, play it
-            if(!listItem.getMediaFile().equals("")) MainActivity.playVideo(listItem.getMediaFile());
+            if(!listItem.getMediaFile().equals("")) {
+                if(listItem.playInline()) {
+                    //play inside the thumbnail
+                    playInlineVideo(listItem.getMediaFile(), viewHolder);
+                } else {
+                    //play in the main player
+                    MainActivity.playVideo(listItem.getMediaFile());
+                }
+            }
         }
+    }
+
+    public void playInlineVideo(String videoURL, ElementViewHolder viewHolder) {
+        String url = MainActivity.mediaURL + videoURL;
+
+        viewHolder.videoView.setZOrderOnTop(true);
+        viewHolder.videoView.setVisibility(View.VISIBLE);
+        viewHolder.videoView.setVideoPath(url);
+        viewHolder.videoView.requestFocus();
+        viewHolder.videoView.start();
+
+//        videoView.setAlpha(0); //hide prior to media being ready
+        //TODO: show preloader
+
     }
 
     private void updateThumbnailList(int position) {
@@ -309,6 +348,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         private final ImageView favoritesIcon;
         private final ImageView playlistIcon;
         private final TextView previewIcon;
+        private final VideoView videoView;
         private final RelativeLayout listItemContainer;
 
         public ElementViewHolder(View itemView) {
@@ -320,10 +360,9 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
             favoritesIcon = (ImageView) itemView.findViewById(R.id.favorites_icon);
             playlistIcon = (ImageView) itemView.findViewById(R.id.playlist_icon);
             previewIcon = (TextView) itemView.findViewById(R.id.preview_icon);
+            videoView = (VideoView) itemView.findViewById(R.id.video_view_inline);
             listItemContainer = (RelativeLayout) itemView.findViewById(R.id.list_item_container);
         }
 
     }
-
-
 }
