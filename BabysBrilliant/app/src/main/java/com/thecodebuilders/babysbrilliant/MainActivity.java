@@ -19,6 +19,7 @@ import android.widget.Button;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.VideoView;
 
 import com.android.volley.Request;
@@ -74,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static RelativeLayout videoLayout;
     private static VideoView videoView;
-    private static Button videoToggleButton;
+    private static TextView videoToggleButton;
     private static Button videoCloseButton;
 
     ImageView homeButton;
@@ -105,12 +106,14 @@ public class MainActivity extends AppCompatActivity {
         soundBoardsButton = (ImageView) findViewById(R.id.soundboards);
         hearingImpairedButton = (ImageView) findViewById(R.id.hearingimpaired);
 
-        videoToggleButton = (Button) findViewById(R.id.video_toggle_button);
+        videoToggleButton = (TextView) findViewById(R.id.video_toggle_button);
         videoCloseButton = (Button) findViewById(R.id.video_close_button);
 
         videoView = (VideoView) findViewById(R.id.video_view);
         videoLayout = (RelativeLayout) findViewById(R.id.video_layout);
         videoLayout.setVisibility(View.INVISIBLE);
+
+        videoToggleButton.setTypeface(MainActivity.fontAwesome);
 
         //do not show the action bar
         ActionBar actionBar = getSupportActionBar();
@@ -204,10 +207,10 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (videoView.isPlaying()) {
                     videoView.pause();
-                    videoToggleButton.setText("PLAY");
+                    videoToggleButton.setText(getString(R.string.video_play));
                 } else {
                     videoView.start();
-                    videoToggleButton.setText("PAUSE");
+                    videoToggleButton.setText(getString(R.string.video_pause));
                 }
             }
         });
@@ -216,7 +219,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (videoView.isPlaying()) {
                     videoView.stopPlayback();
-                    videoToggleButton.setText("PAUSE");
+                    videoToggleButton.setText(getString(R.string.video_pause));
                 }
                 videoLayout.setVisibility(View.INVISIBLE);
             }
@@ -248,6 +251,7 @@ public class MainActivity extends AppCompatActivity {
     private void toggleMenuButton(String clickedItem) {
         //default all to dark grey
         final int menuDarkGrey = Color.parseColor(getString(R.string.menu_dark_grey));
+        final int menuBlue = Color.parseColor(getString(R.string.menu_blue));
         favoritesButton.setColorFilter(menuDarkGrey);
         playListButton.setColorFilter(menuDarkGrey);
         moviesButton.setColorFilter(menuDarkGrey);
@@ -263,28 +267,28 @@ public class MainActivity extends AppCompatActivity {
 
                 return;
             case PLAYLISTS:
-                playListButton.setColorFilter(Color.RED);
+                playListButton.setColorFilter(menuBlue);
                 return;
             case FAVORITE_ITEMS:
-                favoritesButton.setColorFilter(Color.RED);
+                favoritesButton.setColorFilter(menuBlue);
                 return;
             case MOVIES:
-                moviesButton.setColorFilter(Color.RED);
+                moviesButton.setColorFilter(menuBlue);
                 return;
             case MUSIC:
-                musicButton.setColorFilter(Color.RED);
+                musicButton.setColorFilter(menuBlue);
                 return;
             case NIGHT_LIGHTS:
-                nightLightsButton.setColorFilter(Color.RED);
+                nightLightsButton.setColorFilter(menuBlue);
                 return;
             case AUDIO_BOOKS:
-                audioBooksButton.setColorFilter(Color.RED);
+                audioBooksButton.setColorFilter(menuBlue);
                 return;
             case SOUND_BOARDS:
-                soundBoardsButton.setColorFilter(Color.RED);
+                soundBoardsButton.setColorFilter(menuBlue);
                 return;
             case HEARING_IMPAIRED:
-                hearingImpairedButton.setColorFilter(Color.RED);
+                hearingImpairedButton.setColorFilter(menuBlue);
                 return;
             default:
         }
@@ -395,7 +399,7 @@ public class MainActivity extends AppCompatActivity {
         String url = mediaURL + videoURL; // your URL here
 
 
-        videoToggleButton.setText("PAUSE");
+//        videoToggleButton.setText(appContext.getString(R.string.video_pause));
         videoLayout.setVisibility(View.VISIBLE);
         videoView.setVideoPath(url);
         videoView.requestFocus();

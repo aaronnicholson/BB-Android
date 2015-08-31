@@ -136,11 +136,6 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         });
     }
 
-    private void previewClicked(int position) {
-        ListItem listItem = elements.get(position);
-        if(!listItem.getMediaFile().equals("")) MainActivity.playVideo(listItem.getMediaFile());
-    }
-
     private void configureListItemLook(ElementViewHolder viewHolder, ListItem listItem) {
         viewHolder.favoritesIcon.setVisibility(View.INVISIBLE);
         viewHolder.playlistIcon.setVisibility(View.INVISIBLE);
@@ -209,6 +204,11 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         }
 
         viewHolder.itemView.setTag(listItem);
+    }
+
+    private void previewClicked(int position) {
+        ListItem listItem = elements.get(position);
+        if(!listItem.getMediaFile().equals("")) MainActivity.playVideo(listItem.getMediaFile());
     }
 
     private void favoritesClicked(int position, ElementViewHolder thisViewHolder) {

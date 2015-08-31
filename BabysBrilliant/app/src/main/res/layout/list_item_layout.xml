@@ -36,7 +36,6 @@
             android:layout_alignBottom="@id/thumbnailImage"
             android:gravity="center_vertical"
             android:paddingLeft="10dp"
-            android:text="@string/sample_text"
             android:textAllCaps="true"
             android:textColor="#ffffff"
             android:textSize="14sp" />
