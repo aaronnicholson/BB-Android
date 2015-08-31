@@ -18,6 +18,7 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -98,6 +99,8 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
 
                 if(!assetsList.get(i).isNull("file")) {
                     mediaFile = assetsList.get(i).getString("file");
+                } else if(!assetsList.get(i).isNull("preview")) {
+                    mediaFile = assetsList.get(i).getString("preview");
                 }
 
                 elements.add(new ListItem(rawJSON, name, imageResource, mediaFile, price, category, isSubcategory, isPurchased, isFavorite, appContext)); //TODO: make image dynamic, and rename all to lower case
@@ -124,6 +127,88 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
                 favoritesClicked(position, thisViewHolder);
             }
         });
+
+        viewHolder.previewIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                previewClicked(position);
+            }
+        });
+    }
+
+    private void previewClicked(int position) {
+        ListItem listItem = elements.get(position);
+        if(!listItem.getMediaFile().equals("")) MainActivity.playVideo(listItem.getMediaFile());
+    }
+
+    private void configureListItemLook(ElementViewHolder viewHolder, ListItem listItem) {
+        viewHolder.favoritesIcon.setVisibility(View.INVISIBLE);
+        viewHolder.playlistIcon.setVisibility(View.INVISIBLE);
+
+        //set text
+        viewHolder.titleText.setText(listItem.getTitle());
+        viewHolder.priceText.setText(listItem.getPrice());
+
+        //set font
+        viewHolder.titleText.setTypeface(MainActivity.proximaBold);
+        viewHolder.priceText.setTypeface(MainActivity.proximaBold);
+        viewHolder.previewIcon.setTypeface(MainActivity.fontAwesome);
+
+        //hide text background for certain sections
+        //for music, hide subcategory and product text background
+        if (!listItem.doShowBackground()) {
+            viewHolder.textBackground.setVisibility(View.INVISIBLE);
+        }
+
+        //for soundboards, hide product footer entirely
+        if (!listItem.doShowText()) {
+            viewHolder.titleText.setVisibility(View.INVISIBLE);
+        }
+
+        //set text size differently if it is a subcategory
+        if (listItem.isSubcategory()) {
+            viewHolder.titleText.setTextSize(16);
+        } else {
+            viewHolder.titleText.setTextSize(13);
+        }
+
+        //hide price on subcategories
+        if (!listItem.isPurchasable()) {
+            viewHolder.priceText.setVisibility(View.INVISIBLE);
+        }
+
+        //if it has been purchased already
+        if (listItem.isPurchased()) {
+            setLookToPurchased(viewHolder);
+
+        }
+
+        if(listItem.isFavorite()) {
+            setLookToFavorite(viewHolder);
+        } else {
+            setLookToNotFavorite(viewHolder);
+        }
+
+        //TODO: Add check for null string of file name
+        if(listItem.isSubcategory()) {
+            viewHolder.previewIcon.setVisibility(View.VISIBLE);
+        } else {
+            viewHolder.previewIcon.setVisibility(View.INVISIBLE);
+
+        }
+
+        viewHolder.playlistIcon.setColorFilter(Color.WHITE);
+
+        //load image from assets folder
+        try {
+            InputStream stream = appContext.getAssets().open(listItem.getImageResource());
+            Drawable drawable = Drawable.createFromStream(stream, null);
+            viewHolder.thumbnailImage.setImageDrawable(drawable);
+        } catch (Exception e) {
+            Log.e("ListItem", e.getMessage());
+        }
+
+        viewHolder.itemView.setTag(listItem);
     }
 
     private void favoritesClicked(int position, ElementViewHolder thisViewHolder) {
@@ -188,69 +273,6 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         MainActivity.configureThumbnailList(products.get(position));
     }
 
-    private void configureListItemLook(ElementViewHolder viewHolder, ListItem listItem) {
-        viewHolder.favoritesIcon.setVisibility(View.INVISIBLE);
-        viewHolder.playlistIcon.setVisibility(View.INVISIBLE);
-
-
-
-        //set text
-        viewHolder.titleText.setText(listItem.getTitle());
-        viewHolder.priceText.setText(listItem.getPrice());
-
-        //set font
-        viewHolder.titleText.setTypeface(MainActivity.proximaBold);
-        viewHolder.priceText.setTypeface(MainActivity.proximaBold);
-
-        //hide text background for certain sections
-        //for music, hide subcategory and product text background
-        if (!listItem.doShowBackground()) {
-            viewHolder.textBackground.setVisibility(View.INVISIBLE);
-        }
-
-        //for soundboards, hide product footer entirely
-        if (!listItem.doShowText()) {
-            viewHolder.titleText.setVisibility(View.INVISIBLE);
-        }
-
-        //set text size differently if it is a subcategory
-        if (listItem.isSubcategory()) {
-            viewHolder.titleText.setTextSize(16);
-        } else {
-            viewHolder.titleText.setTextSize(13);
-        }
-
-        //hide price on subcategories
-        if (!listItem.isPurchasable()) {
-            viewHolder.priceText.setVisibility(View.INVISIBLE);
-        }
-
-        //if it has been purchased already
-        if (listItem.isPurchased()) {
-            setLookToPurchased(viewHolder);
-
-        }
-
-        if(listItem.isFavorite()) {
-            setLookToFavorite(viewHolder);
-        } else {
-            setLookToNotFavorite(viewHolder);
-        }
-
-        viewHolder.playlistIcon.setColorFilter(Color.WHITE);
-
-        //load image from assets folder
-        try {
-            InputStream stream = appContext.getAssets().open(listItem.getImageResource());
-            Drawable drawable = Drawable.createFromStream(stream, null);
-            viewHolder.thumbnailImage.setImageDrawable(drawable);
-        } catch (Exception e) {
-            Log.e("ListItem", e.getMessage());
-        }
-
-        viewHolder.itemView.setTag(listItem);
-    }
-
     //attaches the xml layout doc to each menu item to configure it visually.
     @Override
     public ElementViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
@@ -286,6 +308,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         private final RelativeLayout textBackground;
         private final ImageView favoritesIcon;
         private final ImageView playlistIcon;
+        private final TextView previewIcon;
         private final RelativeLayout listItemContainer;
 
         public ElementViewHolder(View itemView) {
@@ -296,6 +319,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
             textBackground = (RelativeLayout) itemView.findViewById(R.id.textBackground);
             favoritesIcon = (ImageView) itemView.findViewById(R.id.favorites_icon);
             playlistIcon = (ImageView) itemView.findViewById(R.id.playlist_icon);
+            previewIcon = (TextView) itemView.findViewById(R.id.preview_icon);
             listItemContainer = (RelativeLayout) itemView.findViewById(R.id.list_item_container);
         }
 

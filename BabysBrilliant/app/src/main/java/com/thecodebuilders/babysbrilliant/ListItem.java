@@ -32,8 +32,6 @@ public class ListItem extends View {
     private String price;
     private JSONObject rawJSON;
 
-
-
     public ListItem(JSONObject rawJSON, String title, String imageResource, String mediaFile, String price, String category, Boolean isSubcategory, Boolean isPurchased, Boolean isFavorite, Context context) {
         super(context);
         this.rawJSON = rawJSON;

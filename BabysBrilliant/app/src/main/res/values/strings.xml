@@ -10,4 +10,5 @@
     <string name="media_url">https://s3-us-west-1.amazonaws.com/babysbrilliant-media/</string>
     <string name="video_pause">PAUSE</string>
     <string name="menu_dark_grey">#676767</string>
+    <string name="font_awesome">fonts/FontAwesome.otf</string>
 </resources>

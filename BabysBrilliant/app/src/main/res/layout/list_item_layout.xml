@@ -70,6 +70,21 @@
                 />
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/preview_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:maxWidth="@dimen/product_icon_width"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_margin="7dp"
+            android:text="\uf06e"
+            android:textSize="26sp"
+            android:textColor="#fff"
+            />
+
 
         <TextView
             android:id="@+id/priceText"

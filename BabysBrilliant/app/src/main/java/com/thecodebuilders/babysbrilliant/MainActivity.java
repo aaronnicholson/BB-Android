@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
     RequestQueue queue;
     String assetsString;
 
+    public static Typeface fontAwesome = Typeface.createFromAsset(appContext.getAssets(), appContext.getString(R.string.font_awesome));
     public static Typeface proximaBold = Typeface.createFromAsset(appContext.getAssets(), appContext.getString(R.string.proxima_bold));
 
     public static JSONObject jsonData;
@@ -86,9 +87,6 @@ public class MainActivity extends AppCompatActivity {
     ImageView soundBoardsButton;
     ImageView hearingImpairedButton;
 
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -113,8 +111,6 @@ public class MainActivity extends AppCompatActivity {
         videoView = (VideoView) findViewById(R.id.video_view);
         videoLayout = (RelativeLayout) findViewById(R.id.video_layout);
         videoLayout.setVisibility(View.INVISIBLE);
-
-
 
         //do not show the action bar
         ActionBar actionBar = getSupportActionBar();
@@ -142,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
 
         favoritesButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                configureThumbnailList(new JSONArray(favoriteItems));
+                configureThumbnailList(favoriteItems);
                 currentMenu = FAVORITE_ITEMS;
                 toggleMenuButton(currentMenu);
             }
@@ -230,6 +226,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPrepared(MediaPlayer mp) {
 
+                //TODO: come up with more accurate solution to hide previous video image before playback starts
                 //show the video after a short delay to allow previous video image to clear out
                 new android.os.Handler().postDelayed(
                         new Runnable() {
@@ -237,7 +234,7 @@ public class MainActivity extends AppCompatActivity {
                                 videoView.setAlpha(1);
                             }
                         },
-                        300);
+                        500);
             }
         });
 
@@ -328,7 +325,7 @@ public class MainActivity extends AppCompatActivity {
         thumbnailList.setLayoutManager(thumbnailListLayoutManager);
     }
 
-    //this is called when tapping on a menu item or subcategory and sets the list to the new content.
+    //this is called when tapping on a menu item or subcategory and sets the list to the new content. JSONArray version.
     public static void configureThumbnailList(JSONArray jsonData) {
         //convert JSONArray to ArrayList
         ArrayList<JSONObject> listData = new ArrayList<>();
@@ -340,6 +337,15 @@ public class MainActivity extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        //set the thumbnail list adapter so it will display the items
+        ThumbnailListAdapter adapter = new ThumbnailListAdapter(listData);
+        thumbnailList.setAdapter(adapter);
+
+
+    }
+
+    //overloaded version for passing ArrayLists directly
+    public static void configureThumbnailList(ArrayList listData) {
         //set the thumbnail list adapter so it will display the items
         ThumbnailListAdapter adapter = new ThumbnailListAdapter(listData);
         thumbnailList.setAdapter(adapter);
