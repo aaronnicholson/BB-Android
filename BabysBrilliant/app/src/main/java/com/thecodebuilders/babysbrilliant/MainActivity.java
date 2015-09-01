@@ -16,7 +16,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -139,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
 
         setMenuWidth();
 
-        getJSON();
+        getRemoteJSON();
 
         setUpListeners();
 
@@ -493,30 +492,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //retrieve the data model from the server
-    public void getJSON() {
+    public void getRemoteJSON() {
         queue = Volley.newRequestQueue(this);
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, assetsURL, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
 
-                assetsString = Uri.decode(response);
-//                Log.d(LOGVAR, "RESPONSE:" + assetsString);
 
                 try {
+                    processJSON(response);
 
-                    jsonData = new JSONObject(assetsString);
-                    movies = jsonData.getJSONArray(MOVIES);
-                    audioBooks = jsonData.getJSONArray(AUDIO_BOOKS);
-                    hearingImpaired = jsonData.getJSONArray(HEARING_IMPAIRED);
-                    music = jsonData.getJSONArray(MUSIC);
-                    nightLights = jsonData.getJSONArray(NIGHT_LIGHTS);
-                    soundBoards = jsonData.getJSONArray(SOUND_BOARDS);
-
-                    initApp();
+                    //TODO: Save remote JSON to local JSON
 
                 } catch (Throwable t) {
-                    Log.e(LOGVAR, "Could not parse malformed JSON");
+                    Log.e(LOGVAR, "Reverting to LOCAL JSON");
+                    getLocalJSON();
                 }
 
                 //TODO: handle for no internet connection
@@ -524,12 +515,37 @@ public class MainActivity extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e(LOGVAR, "VOLLEY ERROR: " + error.getMessage());
+                Log.e(LOGVAR, "Reverting to LOCAL JSON. VOLLEY ERROR: " + error.getMessage());
+                getLocalJSON();
             }
         });
 
         queue.add(stringRequest);
     }
+
+    private void processJSON(String response) throws JSONException {
+        assetsString = Uri.decode(response);
+
+        jsonData = new JSONObject(assetsString);
+        movies = jsonData.getJSONArray(MOVIES);
+        audioBooks = jsonData.getJSONArray(AUDIO_BOOKS);
+        hearingImpaired = jsonData.getJSONArray(HEARING_IMPAIRED);
+        music = jsonData.getJSONArray(MUSIC);
+        nightLights = jsonData.getJSONArray(NIGHT_LIGHTS);
+        soundBoards = jsonData.getJSONArray(SOUND_BOARDS);
+
+        initApp();
+    }
+
+    private void getLocalJSON() {
+        try {
+            processJSON(getString(R.string.raw_json));
+
+        } catch (Throwable t) {
+            Log.e(LOGVAR, "Could not parse LOCAL malformed JSON");
+        }
+    }
+
 
     private void initApp() throws JSONException {
         //TODO: add preloader
