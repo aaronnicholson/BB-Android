@@ -513,9 +513,7 @@ public class MainActivity extends AppCompatActivity {
                     nightLights = jsonData.getJSONArray(NIGHT_LIGHTS);
                     soundBoards = jsonData.getJSONArray(SOUND_BOARDS);
 
-                    //TODO: add preloader
-                    configureThumbnailList(jsonData.getJSONArray(currentMenu));
-
+                    initApp();
 
                 } catch (Throwable t) {
                     Log.e(LOGVAR, "Could not parse malformed JSON");
@@ -531,6 +529,12 @@ public class MainActivity extends AppCompatActivity {
         });
 
         queue.add(stringRequest);
+    }
+
+    private void initApp() throws JSONException {
+        //TODO: add preloader
+        configureThumbnailList(jsonData.getJSONArray(currentMenu));
+        toggleMenuButton(MOVIES);
     }
 
     @Override

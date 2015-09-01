@@ -2,10 +2,15 @@ package com.thecodebuilders.babysbrilliant;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.SurfaceTexture;
 import android.graphics.drawable.Drawable;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Surface;
+import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -17,6 +22,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
@@ -29,6 +35,8 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
     private final Context appContext = ApplicationContextProvider.getContext();
     ArrayList<JSONArray> products = new ArrayList<JSONArray>();
     ArrayList<JSONObject> assetsList;
+
+    private MediaPlayer mediaPlayer;
 
     public ThumbnailListAdapter(ArrayList listData) {
         assetsList = listData;
@@ -285,6 +293,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
             if(!listItem.getMediaFile().equals("")) {
                 if(listItem.playInline()) {
                     //play inside the thumbnail
+//                    MainActivity.playVideo(listItem.getMediaFile());
                     playInlineVideo(listItem.getMediaFile(), viewHolder);
                 } else {
                     //play in the main player
@@ -294,19 +303,82 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         }
     }
 
-    public void playInlineVideo(String videoURL, ElementViewHolder viewHolder) {
+    public void playInlineVideo(String videoURL, final ElementViewHolder viewHolder) {
         String url = MainActivity.mediaURL + videoURL;
-
-        viewHolder.videoView.setZOrderOnTop(true);
+        viewHolder.videoView.setAlpha(0);
         viewHolder.videoView.setVisibility(View.VISIBLE);
-        viewHolder.videoView.setVideoPath(url);
-        viewHolder.videoView.requestFocus();
-        viewHolder.videoView.start();
 
-//        videoView.setAlpha(0); //hide prior to media being ready
+        mediaPlayer = new MediaPlayer();
+        try {
+            mediaPlayer.setDataSource(url); //this triggers the listener, which plays the video
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         //TODO: show preloader
 
+        //TODO: put this on a separate thread
+        //TODO: download the video to local storage, then play
+        viewHolder.videoView.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
+            @Override
+            public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+                Surface s = new Surface(surface);
+
+                try {
+                    mediaPlayer.setSurface(s);
+                    mediaPlayer.prepare();
+//                    mediaPlayer.setOnBufferingUpdateListener(this);
+                    mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                        @Override
+                        public void onCompletion(MediaPlayer mp) {
+                            viewHolder.videoView.setAlpha(1);
+                            viewHolder.videoView.setVisibility(View.INVISIBLE);
+                        }
+                    });
+                    mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                        @Override
+                        public void onPrepared(MediaPlayer mp) {
+                            viewHolder.videoView.setAlpha(1);
+                        }
+                    });
+//                    mediaPlayer.setOnVideoSizeChangedListener(this);
+                    mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                    mediaPlayer.start();
+                } catch (IllegalArgumentException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (SecurityException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (IllegalStateException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+
+
+            @Override
+            public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+
+            }
+
+            @Override
+            public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+                return false;
+            }
+
+            @Override
+            public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+
+            }
+        });
+
+
     }
+
 
     private void updateThumbnailList(int position) {
         MainActivity.configureThumbnailList(products.get(position));
@@ -348,7 +420,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         private final ImageView favoritesIcon;
         private final ImageView playlistIcon;
         private final TextView previewIcon;
-        private final VideoView videoView;
+        private final TextureView videoView;
         private final RelativeLayout listItemContainer;
 
         public ElementViewHolder(View itemView) {
@@ -360,7 +432,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
             favoritesIcon = (ImageView) itemView.findViewById(R.id.favorites_icon);
             playlistIcon = (ImageView) itemView.findViewById(R.id.playlist_icon);
             previewIcon = (TextView) itemView.findViewById(R.id.preview_icon);
-            videoView = (VideoView) itemView.findViewById(R.id.video_view_inline);
+            videoView = (TextureView) itemView.findViewById(R.id.video_view_inline);
             listItemContainer = (RelativeLayout) itemView.findViewById(R.id.list_item_container);
         }
 
