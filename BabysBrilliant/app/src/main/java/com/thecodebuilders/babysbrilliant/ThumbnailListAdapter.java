@@ -16,7 +16,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.VideoView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,6 +34,8 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
     private final Context appContext = ApplicationContextProvider.getContext();
     ArrayList<JSONArray> products = new ArrayList<JSONArray>();
     ArrayList<JSONObject> assetsList;
+
+    int listIncrement = 0; //for testing only
 
     private MediaPlayer mediaPlayer;
 
@@ -58,6 +59,8 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
             Boolean isPurchased = false;
             Boolean isFavorite = false;
             Boolean isSubcategory;
+            Boolean isPlaylistItem = false;
+            Boolean isPlaylist = false;
 
             try {
                 //subcategories have a name field instead of a title field. We use that difference to determine if it is a product or subcategory item.
@@ -113,7 +116,17 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
                     mediaFile = assetsList.get(i).getString("preview");
                 }
 
-                ListItem listItem = new ListItem(rawJSON, name, playInline, imageResource, mediaFile, price, category, isSubcategory, isPurchased, isFavorite, appContext);
+                //isPlaylistItem
+                if(!assetsList.get(i).isNull("isPlaylistItem") && assetsList.get(i).getString("isPlaylistItem").equals("true")) {
+                    isPlaylistItem = true;
+                }
+
+                //isPlaylist
+                if(!assetsList.get(i).isNull("isPlaylist") && assetsList.get(i).getString("isPlaylist").equals("true")) {
+                    isPlaylist = true;
+                }
+
+                ListItem listItem = new ListItem(rawJSON, name, playInline, imageResource, mediaFile, price, category, isSubcategory, isPurchased, isPlaylistItem, isPlaylist, isFavorite, appContext);
 
                 elements.add(listItem);//TODO: make image dynamic
             }
@@ -218,13 +231,21 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
 
         viewHolder.playlistIcon.setColorFilter(Color.WHITE);
 
+        if(listItem.isPlaylistItem()) {
+            setLookToPlaylistItem(viewHolder);
+        }
+
+        if(listItem.isPlaylist()) {
+            setLookToPlaylist(viewHolder);
+        }
+
         //load image from assets folder
         try {
             InputStream stream = appContext.getAssets().open(listItem.getImageResource());
             Drawable drawable = Drawable.createFromStream(stream, null);
             viewHolder.thumbnailImage.setImageDrawable(drawable);
         } catch (Exception e) {
-            Log.e("ListItem", e.getMessage());
+            Log.e(LOGVAR, e.getMessage());
         }
 
         viewHolder.itemView.setTag(listItem);
@@ -250,8 +271,9 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
 
     private void playlistClicked(int position, ElementViewHolder thisViewHolder) {
         ListItem listItem = elements.get(position);
-
-        MainActivity.addToPlaylist("test list", listItem.getRawJSON());
+        //remove listIncrement and replace with playlist chooser
+        listIncrement++;
+        MainActivity.addToPlaylist("test list " + listIncrement, listItem.getRawJSON());
     }
 
     private void thumbnailClicked(int position, ElementViewHolder thisViewHolder) {
@@ -289,6 +311,17 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         //TODO: hide these on soundboards?
         viewHolder.favoritesIcon.setVisibility(View.VISIBLE);
         viewHolder.playlistIcon.setVisibility(View.VISIBLE);
+        Log.d(LOGVAR, "set to visible");
+    }
+
+    private void setLookToPlaylistItem(ElementViewHolder viewHolder) {
+        viewHolder.priceText.setVisibility(View.INVISIBLE);
+        viewHolder.favoritesIcon.setVisibility(View.INVISIBLE);
+        viewHolder.playlistIcon.setVisibility(View.INVISIBLE);
+    }
+
+    private void setLookToPlaylist(ElementViewHolder viewHolder) {
+        viewHolder.previewIcon.setVisibility(View.INVISIBLE);
     }
 
     private void playOrOpen(int position, ListItem listItem, ElementViewHolder viewHolder) {

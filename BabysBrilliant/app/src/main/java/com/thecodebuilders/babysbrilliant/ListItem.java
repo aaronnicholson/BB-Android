@@ -29,11 +29,13 @@ public class ListItem extends View {
     private Boolean isSubcategory;
     private Boolean isPurchased;
     private Boolean isFavorite;
+    private Boolean isPlaylistItem;
+    private Boolean isPlaylist;
+
     private Boolean playInline;
     private Boolean isPurchasable = false;
     private JSONObject rawJSON;
-
-    public ListItem(JSONObject rawJSON, String title, Boolean playInline, String imageResource, String mediaFile, String price, String category, Boolean isSubcategory, Boolean isPurchased, Boolean isFavorite, Context context) {
+    public ListItem(JSONObject rawJSON, String title, Boolean playInline, String imageResource, String mediaFile, String price, String category, Boolean isSubcategory, Boolean isPurchased, Boolean isPlaylistItem, Boolean isPlaylist, Boolean isFavorite, Context context) {
         super(context);
         this.rawJSON = rawJSON;
         this.title = title;
@@ -45,6 +47,8 @@ public class ListItem extends View {
         this.isSubcategory = isSubcategory;
         this.isPurchased = isPurchased;
         this.isFavorite = isFavorite;
+        this.isPlaylistItem = isPlaylistItem;
+        this.isPlaylist = isPlaylist;
 
         setIsPurchasable();
 
@@ -53,9 +57,11 @@ public class ListItem extends View {
     public JSONObject getRawJSON() {
         return rawJSON;
     }
+
     public String getTitle() {
         return title;
     }
+
     public String getSectionTitle() {
         return sectionTitle;
     }
@@ -79,6 +85,12 @@ public class ListItem extends View {
     }
     public Boolean isFavorite() {
         return isFavorite;
+    }
+    public Boolean isPlaylistItem() {
+        return isPlaylistItem;
+    }
+    public Boolean isPlaylist() {
+        return isPlaylist;
     }
     public void setIsPurchased(Boolean isPurchased) {
         this.isPurchased = isPurchased;

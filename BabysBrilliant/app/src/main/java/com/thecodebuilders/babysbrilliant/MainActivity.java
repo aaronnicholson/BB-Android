@@ -167,35 +167,22 @@ public class MainActivity extends AppCompatActivity {
 
         playListButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                //loop through playlists and return the first item from each
-                //compile those into an arraylist for configureThumbnailList
-
-                //jsonarray (or arraylist once converted) of jsonobjects, each of which contains "thumb", "name" and "products" nodes. The "products " node is a JSONArray of the product items
-
-                //"products" maps to "getPlaylistItems()". "name" maps to "name". "thumb" maps to the thumb of the first item in the list.
-
+                //create a list of JSONObjects that the list adapter can understand
                 ArrayList<JSONObject> playlistItems = new ArrayList<>();
 
                 for (int i = 0; i < playlists.size(); i++) {
                     JSONObject playlistObject = new JSONObject();
                     try {
                         playlistObject.put("name", playlists.get(i).getName());
+                        playlistObject.put("isPlaylist", "true");
                         playlistObject.put("thumb", playlists.get(i).getPlaylistItems().get(0).getString("thumb"));
                         playlistObject.put("products", new JSONArray(playlists.get(i).getPlaylistItems()));
-
-
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
 
-
                     playlistItems.add(playlistObject);
-                    Log.d(LOGVAR, "playlistObject " + i + ": " + playlistObject.toString());
                 }
-
-                Log.d(LOGVAR, "playlistItems: " + playlistItems);
-                Log.d(LOGVAR, "movies: " + movies);
-
 
                 configureThumbnailList(playlistItems);
                 currentMenu = PLAYLISTS;
@@ -473,6 +460,13 @@ public class MainActivity extends AppCompatActivity {
     public static void addToPlaylist(String playlistName, JSONObject productJSON) {
         Playlist existingPlaylist = null;
 
+        //mark it so the parser can handle it as a playlist item
+        try {
+            productJSON.put("isPlaylistItem", "true");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
         //search for existing name. If it exists, add to that list. If not, create a new list.
         for (int i = 0; i < playlists.size(); i++) {
             Playlist playlist = playlists.get(i);
@@ -487,7 +481,7 @@ public class MainActivity extends AppCompatActivity {
         if(existingPlaylist != null) {
             //don't make a new list. add to existing list
             existingPlaylist.addPlaylistItem(productJSON);
-            Log.d(LOGVAR, "EXISTING LIST: " + existingPlaylist.getPlaylistItems());
+//            Log.d(LOGVAR, "EXISTING LIST: " + existingPlaylist.getPlaylistItems());
         } else {
             //prepare a list to be added
             final ArrayList<JSONObject> newList = new ArrayList<JSONObject>();
@@ -496,9 +490,11 @@ public class MainActivity extends AppCompatActivity {
             Playlist addedPlayList = new Playlist(playlistName, newList);
             //add the playlist
             playlists.add(addedPlayList);
-            Log.d(LOGVAR, "PLAYLIST ADDED: " + addedPlayList.getPlaylistItems());
+//            Log.d(LOGVAR, "PLAYLIST ADDED: " + addedPlayList.getPlaylistItems());
 
         }
+
+        //change
 
         //TODO: convert the ArrayList of PlayList objects to an ArrayList of JSONObjects
     }
