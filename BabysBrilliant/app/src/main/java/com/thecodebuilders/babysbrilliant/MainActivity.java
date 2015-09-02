@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
     public static ArrayList<JSONObject> favoriteItems = new ArrayList<>();
     //TODO: fetch and populated pre-purchased items from user db
     public static JSONArray purchasedItems = new JSONArray();
+    public static ArrayList<Playlist> playlists = new ArrayList<>();
 
     private static RelativeLayout videoLayout;
     private static VideoView videoView;
@@ -94,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
 
     static Handler controlsHandler = new Handler();
     static Runnable delayedHide = null;
-    static Boolean doHide = false;
+    static Boolean doHideControls = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -440,6 +441,37 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    public static void addToPlaylist(String playlistName, JSONObject productJSON) {
+        Playlist existingPlaylist = null;
+
+        //search for existing name. If it exists, add to that list. If not, create a new list.
+        for (int i = 0; i < playlists.size(); i++) {
+            Playlist playlist = playlists.get(i);
+            String existingName = playlist.getName();
+
+            if(playlistName.equals(existingName)) {
+                existingPlaylist = playlist;
+
+            }
+        }
+
+        if(existingPlaylist != null) {
+            //don't make a new list. add to existing list
+            existingPlaylist.addPlaylistItem(productJSON);
+            Log.d(LOGVAR, "EXISTING LIST: " + existingPlaylist.getPlaylistItems());
+        } else {
+            //prepare a list to be added
+            final ArrayList<JSONObject> newList = new ArrayList<JSONObject>();
+            newList.add(productJSON);
+            //make a new list
+            Playlist addedPlayList = new Playlist(playlistName, newList);
+            //add the playlist
+            playlists.add(addedPlayList);
+            Log.d(LOGVAR, "PLAYLIST ADDED: " + addedPlayList.getPlaylistItems());
+
+        }
+    }
+
     public static void playVideo(String videoURL) {
         String url = mediaURL + videoURL;
 
@@ -461,12 +493,12 @@ public class MainActivity extends AppCompatActivity {
         videoToggleButton.setVisibility(View.VISIBLE);
         videoCloseButton.setVisibility(View.VISIBLE);
 
-        doHide = true;
+        doHideControls = true;
 
         //hide again after x sec, after clearing previous hide actions
         delayedHide = new Runnable() {
             public void run() {
-                if (doHide) {
+                if (doHideControls) {
                     hideControls();
                 }
             }
@@ -478,13 +510,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private static void hideControls() {
-        Log.d(LOGVAR, "HIDE");
         videoFFButton.setVisibility(View.INVISIBLE);
         videoRewButton.setVisibility(View.INVISIBLE);
         videoToggleButton.setVisibility(View.INVISIBLE);
         videoCloseButton.setVisibility(View.INVISIBLE);
 
-        doHide = false;
+        doHideControls = false;
     }
 
     public static void setSectionTitle(String title) {
@@ -498,8 +529,6 @@ public class MainActivity extends AppCompatActivity {
         StringRequest stringRequest = new StringRequest(Request.Method.GET, assetsURL, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-
-
                 try {
                     processJSON(response);
 

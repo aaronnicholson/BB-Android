@@ -146,6 +146,15 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
                 previewClicked(position);
             }
         });
+
+        viewHolder.playlistIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                playlistClicked(position, thisViewHolder);
+            }
+        });
+
+
     }
 
     private void configureListItemLook(ElementViewHolder viewHolder, ListItem listItem) {
@@ -237,6 +246,12 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
             MainActivity.addToFavorites(listItem.getRawJSON());
             setLookToFavorite(thisViewHolder);
         }
+    }
+
+    private void playlistClicked(int position, ElementViewHolder thisViewHolder) {
+        ListItem listItem = elements.get(position);
+
+        MainActivity.addToPlaylist("test list", listItem.getRawJSON());
     }
 
     private void thumbnailClicked(int position, ElementViewHolder thisViewHolder) {
@@ -378,7 +393,6 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
 
 
     }
-
 
     private void updateThumbnailList(int position) {
         MainActivity.configureThumbnailList(products.get(position));
