@@ -167,7 +167,37 @@ public class MainActivity extends AppCompatActivity {
 
         playListButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-//                configureThumbnailList(new JSONArray(favoriteItems));
+                //loop through playlists and return the first item from each
+                //compile those into an arraylist for configureThumbnailList
+
+                //jsonarray (or arraylist once converted) of jsonobjects, each of which contains "thumb", "name" and "products" nodes. The "products " node is a JSONArray of the product items
+
+                //"products" maps to "getPlaylistItems()". "name" maps to "name". "thumb" maps to the thumb of the first item in the list.
+
+                ArrayList<JSONObject> playlistItems = new ArrayList<>();
+
+                for (int i = 0; i < playlists.size(); i++) {
+                    JSONObject playlistObject = new JSONObject();
+                    try {
+                        playlistObject.put("name", playlists.get(i).getName());
+                        playlistObject.put("thumb", playlists.get(i).getPlaylistItems().get(0).getString("thumb"));
+                        playlistObject.put("products", new JSONArray(playlists.get(i).getPlaylistItems()));
+
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+
+                    playlistItems.add(playlistObject);
+                    Log.d(LOGVAR, "playlistObject " + i + ": " + playlistObject.toString());
+                }
+
+                Log.d(LOGVAR, "playlistItems: " + playlistItems);
+                Log.d(LOGVAR, "movies: " + movies);
+
+
+                configureThumbnailList(playlistItems);
                 currentMenu = PLAYLISTS;
                 toggleMenuButton(currentMenu);
             }
@@ -176,6 +206,7 @@ public class MainActivity extends AppCompatActivity {
         moviesButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 configureThumbnailList(movies);
+                Log.d(LOGVAR, "movies item:" + movies.toString());
                 currentMenu = MOVIES;
                 toggleMenuButton(currentMenu);
             }
@@ -400,8 +431,6 @@ public class MainActivity extends AppCompatActivity {
         //set the thumbnail list adapter so it will display the items
         ThumbnailListAdapter adapter = new ThumbnailListAdapter(listData);
         thumbnailList.setAdapter(adapter);
-
-
     }
 
     public static void addToPurchased(JSONObject productJSON) {
@@ -470,6 +499,8 @@ public class MainActivity extends AppCompatActivity {
             Log.d(LOGVAR, "PLAYLIST ADDED: " + addedPlayList.getPlaylistItems());
 
         }
+
+        //TODO: convert the ArrayList of PlayList objects to an ArrayList of JSONObjects
     }
 
     public static void playVideo(String videoURL) {

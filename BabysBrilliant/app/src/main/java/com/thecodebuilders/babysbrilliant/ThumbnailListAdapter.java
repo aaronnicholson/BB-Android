@@ -53,7 +53,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
             Boolean playInline = false;
             String imageResource;
             String price = appContext.getString(R.string.price_hard_coded);
-            String category;
+            String category = "";
             String mediaFile = "";
             Boolean isPurchased = false;
             Boolean isFavorite = false;
@@ -104,7 +104,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
 
                 rawJSON = assetsList.get(i);
                 imageResource = assetsList.get(i).getString("thumb");
-                category = assetsList.get(i).getString("cat");
+                if(!assetsList.get(i).isNull("cat")) category = assetsList.get(i).getString("cat");
 
                 //for products, use the file attribute. For subcategories, use the preview attribute.
                 if(!assetsList.get(i).isNull("file")) {
@@ -257,7 +257,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
     private void thumbnailClicked(int position, ElementViewHolder thisViewHolder) {
         ListItem listItem = elements.get(position);
 
-        //TODO: Handle for soundboard items
+        //TODO: Handle for soundboard items - using "bundle" in JSON
 
         if (listItem.isPurchasable()) {
             //if it has been purchased already
