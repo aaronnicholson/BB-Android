@@ -101,7 +101,6 @@ public class ListItem extends View {
     public Boolean isPurchasable() {
         return isPurchasable;
     }
-
     private void setIsPurchasable() {
         isPurchasable = false;
 

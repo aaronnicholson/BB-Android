@@ -1,5 +1,6 @@
 package com.thecodebuilders.babysbrilliant;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.SurfaceTexture;
@@ -25,6 +26,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
+
+
 /**
  * Created by aaronnicholson on 8/17/15.
  */
@@ -34,13 +37,17 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
     private final Context appContext = ApplicationContextProvider.getContext();
     ArrayList<JSONArray> products = new ArrayList<JSONArray>();
     ArrayList<JSONObject> assetsList;
+    MainActivity mainActivity;
 
     int listIncrement = 0; //for testing only
 
     private MediaPlayer mediaPlayer;
 
-    public ThumbnailListAdapter(ArrayList listData) {
+
+
+    public ThumbnailListAdapter(ArrayList listData, MainActivity mainActivity) {
         assetsList = listData;
+        this.mainActivity = mainActivity;
         configureListItems(assetsList.size());
     }
 
@@ -48,7 +55,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         elements = new ArrayList<ListItem>(listLength);
         products = new ArrayList<JSONArray>();
 
-        for (int i=0; i < listLength; i++) {
+        for (int i = 0; i < listLength; i++) {
             JSONObject rawJSON;
             String name;
             Boolean playInline = false;
@@ -65,29 +72,30 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
             try {
                 //subcategories have a name field instead of a title field. We use that difference to determine if it is a product or subcategory item.
                 //if it is a list of products
-                if(assetsList.get(i).isNull("name")) {
+                if (assetsList.get(i).isNull("name")) {
                     name = assetsList.get(i).getString("title");
                     isSubcategory = false;
 
-                //if it is a list of subcategories
+                    //if it is a list of subcategories
                 } else {
                     name = assetsList.get(i).getString("name");
-                    if(!assetsList.get(i).isNull("products")) products.add(assetsList.get(i).getJSONArray("products"));
+                    if (!assetsList.get(i).isNull("products"))
+                        products.add(assetsList.get(i).getJSONArray("products"));
                     isSubcategory = true;
 
                 }
 
                 //soundboards are meant to play inside their thumbnail. Anything marked with the playInline attribute in the JSON will do so.
-                if(!assetsList.get(i).isNull("playInline")) {
-                    if(assetsList.get(i).getString("playInline").equals("true")) playInline = true;
+                if (!assetsList.get(i).isNull("playInline")) {
+                    if (assetsList.get(i).getString("playInline").equals("true")) playInline = true;
                 }
 
                 //look through items in the PURCHASED list
                 //if this item is in there, mark it as purchased
-                for (int purchasedIndex = 0; purchasedIndex < MainActivity.purchasedItems.length(); purchasedIndex++) {
+                for (int purchasedIndex = 0; purchasedIndex < mainActivity.purchasedItems.length(); purchasedIndex++) {
                     //if it has no SKU, skip it
-                    if(!assetsList.get(i).isNull("SKU")) {
-                        if(assetsList.get(i).getString("SKU").equals(MainActivity.purchasedItems.getJSONObject(purchasedIndex).getString("SKU"))) {
+                    if (!assetsList.get(i).isNull("SKU")) {
+                        if (assetsList.get(i).getString("SKU").equals(mainActivity.purchasedItems.getJSONObject(purchasedIndex).getString("SKU"))) {
                             isPurchased = true;
                         }
                     }
@@ -96,10 +104,10 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
 
                 //look through items in the FAVORITES list
                 //if this item is in there, mark it as favorite
-                for (int favoriteIndex = 0; favoriteIndex < MainActivity.favoriteItems.size(); favoriteIndex++) {
+                for (int favoriteIndex = 0; favoriteIndex < mainActivity.favoriteItems.size(); favoriteIndex++) {
                     //if it has no SKU, skip it
-                    if(!assetsList.get(i).isNull("SKU")) {
-                        if(assetsList.get(i).getString("SKU").equals(MainActivity.favoriteItems.get(favoriteIndex).getString("SKU"))) {
+                    if (!assetsList.get(i).isNull("SKU")) {
+                        if (assetsList.get(i).getString("SKU").equals(mainActivity.favoriteItems.get(favoriteIndex).getString("SKU"))) {
                             isFavorite = true;
                         }
                     }
@@ -107,30 +115,29 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
 
                 rawJSON = assetsList.get(i);
                 imageResource = assetsList.get(i).getString("thumb");
-                if(!assetsList.get(i).isNull("cat")) category = assetsList.get(i).getString("cat");
+                if (!assetsList.get(i).isNull("cat")) category = assetsList.get(i).getString("cat");
 
                 //for products, use the file attribute. For subcategories, use the preview attribute.
-                if(!assetsList.get(i).isNull("file")) {
+                if (!assetsList.get(i).isNull("file")) {
                     mediaFile = assetsList.get(i).getString("file");
-                } else if(!assetsList.get(i).isNull("preview")) {
+                } else if (!assetsList.get(i).isNull("preview")) {
                     mediaFile = assetsList.get(i).getString("preview");
                 }
 
                 //isPlaylistItem
-                if(!assetsList.get(i).isNull("isPlaylistItem") && assetsList.get(i).getString("isPlaylistItem").equals("true")) {
+                if (!assetsList.get(i).isNull("isPlaylistItem") && assetsList.get(i).getString("isPlaylistItem").equals("true")) {
                     isPlaylistItem = true;
                 }
 
                 //isPlaylist
-                if(!assetsList.get(i).isNull("isPlaylist") && assetsList.get(i).getString("isPlaylist").equals("true")) {
+                if (!assetsList.get(i).isNull("isPlaylist") && assetsList.get(i).getString("isPlaylist").equals("true")) {
                     isPlaylist = true;
                 }
 
                 ListItem listItem = new ListItem(rawJSON, name, playInline, imageResource, mediaFile, price, category, isSubcategory, isPurchased, isPlaylistItem, isPlaylist, isFavorite, appContext);
 
                 elements.add(listItem);//TODO: make image dynamic
-            }
-            catch (Throwable t) {
+            } catch (Throwable t) {
                 Log.e(LOGVAR, "JSON Error " + t.getMessage() + assetsList);
             }
         }
@@ -182,9 +189,9 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         viewHolder.priceText.setText(listItem.getPrice());
 
         //set font
-        viewHolder.titleText.setTypeface(MainActivity.proximaBold);
-        viewHolder.priceText.setTypeface(MainActivity.proximaBold);
-        viewHolder.previewIcon.setTypeface(MainActivity.fontAwesome);
+        viewHolder.titleText.setTypeface(mainActivity.proximaBold);
+        viewHolder.priceText.setTypeface(mainActivity.proximaBold);
+        viewHolder.previewIcon.setTypeface(mainActivity.fontAwesome);
 
         //hide text background for certain sections
         //for music, hide subcategory and product text background
@@ -215,14 +222,14 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
 
         }
 
-        if(listItem.isFavorite()) {
+        if (listItem.isFavorite()) {
             setLookToFavorite(viewHolder);
         } else {
             setLookToNotFavorite(viewHolder);
         }
 
         //TODO: Add check for null string of file name
-        if(listItem.isSubcategory() && !listItem.isPurchasable()) {
+        if (listItem.isSubcategory() && !listItem.isPurchasable()) {
             viewHolder.previewIcon.setVisibility(View.VISIBLE);
         } else {
             viewHolder.previewIcon.setVisibility(View.INVISIBLE);
@@ -231,11 +238,11 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
 
         viewHolder.playlistIcon.setColorFilter(Color.WHITE);
 
-        if(listItem.isPlaylistItem()) {
+        if (listItem.isPlaylistItem()) {
             setLookToPlaylistItem(viewHolder);
         }
 
-        if(listItem.isPlaylist()) {
+        if (listItem.isPlaylist()) {
             setLookToPlaylist(viewHolder);
         }
 
@@ -253,18 +260,18 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
 
     private void previewClicked(int position) {
         ListItem listItem = elements.get(position);
-        if(!listItem.getMediaFile().equals("")) MainActivity.playVideo(listItem.getMediaFile());
+        if (!listItem.getMediaFile().equals("")) mainActivity.playVideo(listItem.getMediaFile());
     }
 
     private void favoritesClicked(int position, ElementViewHolder thisViewHolder) {
         ListItem listItem = elements.get(position);
 
-        if(listItem.isFavorite()) {
+        if (listItem.isFavorite()) {
             //TODO: remove from favorites
-            MainActivity.removeFromFavorites(listItem.getRawJSON());
+            mainActivity.removeFromFavorites(listItem.getRawJSON());
             setLookToNotFavorite(thisViewHolder);
         } else {
-            MainActivity.addToFavorites(listItem.getRawJSON());
+            mainActivity.addToFavorites(listItem.getRawJSON());
             setLookToFavorite(thisViewHolder);
         }
     }
@@ -272,8 +279,10 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
     private void playlistClicked(int position, ElementViewHolder thisViewHolder) {
         ListItem listItem = elements.get(position);
         //remove listIncrement and replace with playlist chooser
-        listIncrement++;
-        MainActivity.addToPlaylist("test list " + listIncrement, listItem.getRawJSON());
+//        listIncrement++;
+        mainActivity.addToPlaylist(listItem.getRawJSON());
+
+
     }
 
     private void thumbnailClicked(int position, ElementViewHolder thisViewHolder) {
@@ -289,7 +298,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
             } else {
                 listItem.setIsPurchased(true);
                 setLookToPurchased(thisViewHolder);
-                MainActivity.addToPurchased(listItem.getRawJSON());
+                mainActivity.addToPurchased(listItem.getRawJSON());
             }
         } else {
             //send the list of products for the clicked subcategory to make a new view showing them
@@ -326,11 +335,11 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
 
     private void playOrOpen(int position, ListItem listItem, ElementViewHolder viewHolder) {
         //if it's a soundboard category
-        if(listItem.isSubcategory()) {
+        if (listItem.isSubcategory()) {
             //set up section title
-            if(!assetsList.get(position).isNull("name")) {
+            if (!assetsList.get(position).isNull("name")) {
                 try {
-                    MainActivity.setSectionTitle(assetsList.get(position).getString("name"));
+                    mainActivity.setSectionTitle(assetsList.get(position).getString("name"));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -338,21 +347,21 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
             updateThumbnailList(position);
         } else {
             //if it has a file name, play it
-            if(!listItem.getMediaFile().equals("")) {
-                if(listItem.playInline()) {
+            if (!listItem.getMediaFile().equals("")) {
+                if (listItem.playInline()) {
                     //play inside the thumbnail
-//                    MainActivity.playVideo(listItem.getMediaFile());
+//                    mainActivity.playVideo(listItem.getMediaFile());
                     playInlineVideo(listItem.getMediaFile(), viewHolder);
                 } else {
                     //play in the main player
-                    MainActivity.playVideo(listItem.getMediaFile());
+                    mainActivity.playVideo(listItem.getMediaFile());
                 }
             }
         }
     }
 
     public void playInlineVideo(String videoURL, final ElementViewHolder viewHolder) {
-        String url = MainActivity.mediaURL + videoURL;
+        String url = mainActivity.mediaURL + videoURL;
         viewHolder.videoView.setAlpha(0);
         viewHolder.videoView.setVisibility(View.VISIBLE);
 
@@ -428,7 +437,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
     }
 
     private void updateThumbnailList(int position) {
-        MainActivity.configureThumbnailList(products.get(position));
+        mainActivity.configureThumbnailList(products.get(position));
     }
 
     //attaches the xml layout doc to each menu item to configure it visually.

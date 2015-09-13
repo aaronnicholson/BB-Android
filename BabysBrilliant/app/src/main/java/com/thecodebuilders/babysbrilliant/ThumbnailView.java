@@ -31,9 +31,6 @@ public class ThumbnailView extends View {
     final int rectHeight = 100;
     int rectY;
 
-//    Canvas canvas;
-
-
     public ThumbnailView(Context context) {
         super(context);
         mContext = context;

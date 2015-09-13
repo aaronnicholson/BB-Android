@@ -1,5 +1,6 @@
 package com.thecodebuilders.babysbrilliant;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -7,6 +8,9 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -68,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
     public static String currentMenu = MOVIES;
 
     public static String mediaURL = appContext.getString(R.string.media_url);
+    private MediaPlayer mediaPlayer;
 
     public static ArrayList<JSONObject> favoriteItems = new ArrayList<>();
     //TODO: fetch and populated pre-purchased items from user db
@@ -96,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
     static Handler controlsHandler = new Handler();
     static Runnable delayedHide = null;
     static Boolean doHideControls = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -185,6 +191,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 configureThumbnailList(playlistItems);
+
                 currentMenu = PLAYLISTS;
                 toggleMenuButton(currentMenu);
             }
@@ -254,12 +261,17 @@ public class MainActivity extends AppCompatActivity {
 
         videoCloseButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                if (videoView.isPlaying()) {
-                    videoView.pause();
-                    videoView.stopPlayback();
-                    videoView.suspend();
-                    videoToggleButton.setText(getString(R.string.video_pause));
-                }
+                videoView.pause();
+                videoView.stopPlayback();
+                videoView.suspend();
+//                if(mediaPlayer!=null) {
+//                    if(mediaPlayer.isPlaying())
+//                        mediaPlayer.stop();
+//                    mediaPlayer.reset();
+//                    mediaPlayer.release();
+//                    mediaPlayer=null;
+//                }
+                videoToggleButton.setText(getString(R.string.video_pause));
                 videoLayout.setVisibility(View.INVISIBLE);
             }
         });
@@ -291,6 +303,7 @@ public class MainActivity extends AppCompatActivity {
                             }
                         },
                         500);
+                mediaPlayer = mp;
                 showControls();
             }
         });
@@ -316,13 +329,14 @@ public class MainActivity extends AppCompatActivity {
         soundBoardsButton.setColorFilter(menuDarkGrey);
         hearingImpairedButton.setColorFilter(menuDarkGrey);
 
-        //then set the tapped one to red
+        //then set the tapped one to red and set the title in the UI
         switch (clickedItem) {
             case PURCHASED_ITEMS:
                 setSectionTitle(getString(R.string.title_purchased));
                 return;
             case PLAYLISTS:
                 playListButton.setColorFilter(menuBlue);
+                //TODO: further refine what is shown here
                 videoFFButton.setVisibility(View.VISIBLE);
                 videoRewButton.setVisibility(View.VISIBLE);
                 setSectionTitle(getString(R.string.title_playlists));
@@ -366,6 +380,7 @@ public class MainActivity extends AppCompatActivity {
         ImageView settingsView = (ImageView) findViewById(R.id.settings);
 
         //determine screen size in dp
+        //TODO: hoist the density code up so that it can be used elsewhere as well
         DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
         float dpHeight = displayMetrics.heightPixels / displayMetrics.density;
         float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
@@ -395,7 +410,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //this is called when tapping on a menu item or subcategory and sets the list to the new content. JSONArray version.
-    public static void configureThumbnailList(JSONArray jsonData) {
+    public void configureThumbnailList(JSONArray jsonData) {
         //convert JSONArray to ArrayList
         ArrayList<JSONObject> listData = new ArrayList<>();
         try {
@@ -407,16 +422,16 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         //set the thumbnail list adapter so it will display the items
-        ThumbnailListAdapter adapter = new ThumbnailListAdapter(listData);
+        ThumbnailListAdapter adapter = new ThumbnailListAdapter(listData, this);
         thumbnailList.setAdapter(adapter);
 
 
     }
 
     //overloaded version for passing ArrayLists directly
-    public static void configureThumbnailList(ArrayList listData) {
+    public void configureThumbnailList(ArrayList listData) {
         //set the thumbnail list adapter so it will display the items
-        ThumbnailListAdapter adapter = new ThumbnailListAdapter(listData);
+        ThumbnailListAdapter adapter = new ThumbnailListAdapter(listData, this);
         thumbnailList.setAdapter(adapter);
     }
 
@@ -432,7 +447,7 @@ public class MainActivity extends AppCompatActivity {
         favoriteItems.add(productJSON);
     }
 
-    public static void removeFromFavorites(JSONObject rawJSON) {
+    public void removeFromFavorites(JSONObject rawJSON) {
 
         try {
             Log.d(LOGVAR, "FAV START: " + favoriteItems.size());
@@ -457,7 +472,26 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public static void addToPlaylist(String playlistName, JSONObject productJSON) {
+    public void addToPlaylist(JSONObject productJSON) {
+//        buildDialog(productJSON);
+        PlaylistChooser playlistChooser = new PlaylistChooser();
+        playlistChooser.show(getSupportFragmentManager(), "TITLE");
+    }
+
+    private void buildDialog(JSONObject productJSON) {
+        // 1. Instantiate an AlertDialog.Builder with its constructor
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+// 2. Chain together various setter methods to set the dialog characteristics
+        builder.setMessage("MESSAGE")
+                .setTitle("TITLE");
+
+// 3. Get the AlertDialog from create()
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    /*public static void addToPlaylist(String playlistName, JSONObject productJSON) {
         Playlist existingPlaylist = null;
 
         //mark it so the parser can handle it as a playlist item
@@ -472,13 +506,12 @@ public class MainActivity extends AppCompatActivity {
             Playlist playlist = playlists.get(i);
             String existingName = playlist.getName();
 
-            if(playlistName.equals(existingName)) {
+            if (playlistName.equals(existingName)) {
                 existingPlaylist = playlist;
-
             }
         }
 
-        if(existingPlaylist != null) {
+        if (existingPlaylist != null) {
             //don't make a new list. add to existing list
             existingPlaylist.addPlaylistItem(productJSON);
 //            Log.d(LOGVAR, "EXISTING LIST: " + existingPlaylist.getPlaylistItems());
@@ -497,7 +530,7 @@ public class MainActivity extends AppCompatActivity {
         //change
 
         //TODO: convert the ArrayList of PlayList objects to an ArrayList of JSONObjects
-    }
+    }*/
 
     public static void playVideo(String videoURL) {
         String url = mediaURL + videoURL;
@@ -630,4 +663,5 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 }
