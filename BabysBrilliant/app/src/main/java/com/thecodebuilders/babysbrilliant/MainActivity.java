@@ -24,6 +24,7 @@ import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.android.volley.Request;
@@ -39,7 +40,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements PlaylistChooser.PlaylistChooserListener{
     public final static Context appContext = ApplicationContextProvider.getContext();
 
     public final static String PURCHASED_ITEMS = "purchasedItems";
@@ -78,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
     //TODO: fetch and populated pre-purchased items from user db
     public static JSONArray purchasedItems = new JSONArray();
     public static ArrayList<Playlist> playlists = new ArrayList<>();
+    public JSONObject pendingPlaylistItem;
 
     private static RelativeLayout videoLayout;
     private static VideoView videoView;
@@ -108,6 +110,10 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //TODO: for testing only
+//        playlists.add(new Playlist("Test list 1", null));
+//        playlists.add(new Playlist("Test list 2", null));
 
         assetsURL = getString(R.string.assets_url);
 
@@ -473,64 +479,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void addToPlaylist(JSONObject productJSON) {
-//        buildDialog(productJSON);
+        pendingPlaylistItem = productJSON;
         PlaylistChooser playlistChooser = new PlaylistChooser();
-        playlistChooser.show(getSupportFragmentManager(), "TITLE");
+        playlistChooser.show(getSupportFragmentManager(), "playlistChooser");
     }
 
-    private void buildDialog(JSONObject productJSON) {
-        // 1. Instantiate an AlertDialog.Builder with its constructor
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-// 2. Chain together various setter methods to set the dialog characteristics
-        builder.setMessage("MESSAGE")
-                .setTitle("TITLE");
-
-// 3. Get the AlertDialog from create()
-        AlertDialog dialog = builder.create();
-        dialog.show();
+    @Override
+    public void onPlaylistSelect(int item) {
+        playlists.get(item).addPlaylistItem(pendingPlaylistItem);
+        Toast.makeText(MainActivity.this, "Your video was added to the " + playlists.get(item).getName() + " playlist.", Toast.LENGTH_SHORT).show();
     }
 
-    /*public static void addToPlaylist(String playlistName, JSONObject productJSON) {
-        Playlist existingPlaylist = null;
-
-        //mark it so the parser can handle it as a playlist item
-        try {
-            productJSON.put("isPlaylistItem", "true");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        //search for existing name. If it exists, add to that list. If not, create a new list.
-        for (int i = 0; i < playlists.size(); i++) {
-            Playlist playlist = playlists.get(i);
-            String existingName = playlist.getName();
-
-            if (playlistName.equals(existingName)) {
-                existingPlaylist = playlist;
-            }
-        }
-
-        if (existingPlaylist != null) {
-            //don't make a new list. add to existing list
-            existingPlaylist.addPlaylistItem(productJSON);
-//            Log.d(LOGVAR, "EXISTING LIST: " + existingPlaylist.getPlaylistItems());
+    @Override
+    public void onPlaylistAdd(String name) {
+        if(name.equals("")) {
+            Toast.makeText(MainActivity.this, R.string.playlistAddEmptyStringError, Toast.LENGTH_SHORT).show();
         } else {
-            //prepare a list to be added
-            final ArrayList<JSONObject> newList = new ArrayList<JSONObject>();
-            newList.add(productJSON);
-            //make a new list
-            Playlist addedPlayList = new Playlist(playlistName, newList);
-            //add the playlist
-            playlists.add(addedPlayList);
-//            Log.d(LOGVAR, "PLAYLIST ADDED: " + addedPlayList.getPlaylistItems());
+            ArrayList<JSONObject> newList = new ArrayList<>();
+            newList.add(pendingPlaylistItem);
+            playlists.add(0, new Playlist(name, newList));
+            Toast.makeText(MainActivity.this, "Your video was added to the new " + name + " playlist.", Toast.LENGTH_SHORT).show();
 
         }
 
-        //change
-
-        //TODO: convert the ArrayList of PlayList objects to an ArrayList of JSONObjects
-    }*/
+    }
 
     public static void playVideo(String videoURL) {
         String url = mediaURL + videoURL;
@@ -663,5 +635,6 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 
 }
