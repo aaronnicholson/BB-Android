@@ -70,7 +70,7 @@ public class ThumbnailView extends View {
         canvas.drawRoundRect(solidRect, cornerRadius, cornerRadius, redPaint);
         canvas.drawRect(solidRectCorners, redPaint);
 
-        Log.d("ThumbnailView", "onDraw called");
+        //Log.d("ThumbnailView", "onDraw called");
 
     }
 }

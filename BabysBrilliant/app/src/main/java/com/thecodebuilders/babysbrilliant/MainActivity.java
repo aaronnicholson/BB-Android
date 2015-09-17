@@ -1,6 +1,5 @@
 package com.thecodebuilders.babysbrilliant;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -8,15 +7,11 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -111,10 +106,6 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //TODO: for testing only
-//        playlists.add(new Playlist("Test list 1", null));
-//        playlists.add(new Playlist("Test list 2", null));
-
         assetsURL = getString(R.string.assets_url);
 
         homeButton = (ImageView) findViewById(R.id.bblogo);
@@ -206,7 +197,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         moviesButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 configureThumbnailList(movies);
-                Log.d(LOGVAR, "movies item:" + movies.toString());
+                //Log.d(LOGVAR, "movies item:" + movies.toString());
                 currentMenu = MOVIES;
                 toggleMenuButton(currentMenu);
             }
@@ -456,7 +447,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     public void removeFromFavorites(JSONObject rawJSON) {
 
         try {
-            Log.d(LOGVAR, "FAV START: " + favoriteItems.size());
+            //Log.d(LOGVAR, "FAV START: " + favoriteItems.size());
             for (int favoriteIndex = 0; favoriteIndex < favoriteItems.size(); favoriteIndex++) {
                 //if it has no SKU, skip it
                 if (!rawJSON.isNull("SKU") || favoriteItems.get(favoriteIndex).isNull("SKU")) {
@@ -466,7 +457,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                 }
             }
 
-            Log.d(LOGVAR, "FAV END: " + favoriteItems.size());
+            //Log.d(LOGVAR, "FAV END: " + favoriteItems.size());
 
             //TODO: make favorites menu refresh when removing one
             if (currentMenu.equals(FAVORITE_ITEMS)) {
@@ -484,10 +475,13 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         playlistChooser.show(getSupportFragmentManager(), "playlistChooser");
     }
 
+    //TODO replace strings with string resources
     @Override
     public void onPlaylistSelect(int item) {
         playlists.get(item).addPlaylistItem(pendingPlaylistItem);
-        Toast.makeText(MainActivity.this, "Your video was added to the " + playlists.get(item).getName() + " playlist.", Toast.LENGTH_SHORT).show();
+        Toast.makeText(MainActivity.this, "Your video was added to the " + playlists.get(item).getName() + " playlist." + " We've brought you to the playlists section.", Toast.LENGTH_SHORT).show();
+        playListButton.performClick();
+
     }
 
     @Override
@@ -498,8 +492,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             ArrayList<JSONObject> newList = new ArrayList<>();
             newList.add(pendingPlaylistItem);
             playlists.add(0, new Playlist(name, newList));
-            Toast.makeText(MainActivity.this, "Your video was added to the new " + name + " playlist.", Toast.LENGTH_SHORT).show();
-
+            Toast.makeText(MainActivity.this, "Your video was added to the new " + name + " playlist."  + " We've brought you to the playlists section.", Toast.LENGTH_SHORT).show();
+            playListButton.performClick();
         }
 
     }
@@ -567,7 +561,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                     //TODO: Save remote JSON to local JSON
 
                 } catch (Throwable t) {
-                    Log.e(LOGVAR, "Reverting to LOCAL JSON");
+                    //Log.e(LOGVAR, "Reverting to LOCAL JSON");
                     getLocalJSON();
                 }
 
@@ -576,7 +570,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e(LOGVAR, "Reverting to LOCAL JSON. VOLLEY ERROR: " + error.getMessage());
+                //Log.e(LOGVAR, "Reverting to LOCAL JSON. VOLLEY ERROR: " + error.getMessage());
                 getLocalJSON();
             }
         });
@@ -603,7 +597,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             processJSON(getString(R.string.raw_json));
 
         } catch (Throwable t) {
-            Log.e(LOGVAR, "Could not parse LOCAL malformed JSON");
+            //Log.e(LOGVAR, "Could not parse LOCAL malformed JSON");
         }
     }
 

@@ -55,8 +55,7 @@ public class PlaylistChooser extends DialogFragment {
         final String[] playlistNamesJavaArray = getPlaylistNames();
 
         if(playlistNamesJavaArray.length == 0) {
-            newPlaylistDialog = createNewPlaylistDialog();
-            return newPlaylistDialog;
+            return createNewPlaylistDialog();
 
         } else {
             return createChooserDialog(playlistNamesJavaArray);
