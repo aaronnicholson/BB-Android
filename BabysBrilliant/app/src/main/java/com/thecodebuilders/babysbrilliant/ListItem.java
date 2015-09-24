@@ -35,6 +35,7 @@ public class ListItem extends View {
     private Boolean playInline;
     private Boolean isPurchasable = false;
     private JSONObject rawJSON;
+
     public ListItem(JSONObject rawJSON, String title, Boolean playInline, String imageResource, String mediaFile, String price, String category, Boolean isSubcategory, Boolean isPurchased, Boolean isPlaylistItem, Boolean isPlaylist, Boolean isFavorite, Context context) {
         super(context);
         this.rawJSON = rawJSON;
@@ -57,11 +58,9 @@ public class ListItem extends View {
     public JSONObject getRawJSON() {
         return rawJSON;
     }
-
     public String getTitle() {
         return title;
     }
-
     public String getSectionTitle() {
         return sectionTitle;
     }

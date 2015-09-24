@@ -1,6 +1,5 @@
 package com.thecodebuilders.babysbrilliant;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.SurfaceTexture;
@@ -43,15 +42,16 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
 
     private MediaPlayer mediaPlayer;
 
-
-
     public ThumbnailListAdapter(ArrayList listData, MainActivity mainActivity) {
         assetsList = listData;
         this.mainActivity = mainActivity;
-        configureListItems(assetsList.size());
+        parseListItems(assetsList.size());
     }
 
-    private void configureListItems(int listLength) {
+    //This gets the data ready for the adapter to use in order to set up the view for each list item.
+    //It takes the data from the ArrayList that is passed in and parses it into the ListItem class.
+    //Then it adds each ListItem instance to the elements ArrayList.
+    private void parseListItems(int listLength) {
         elements = new ArrayList<ListItem>(listLength);
         products = new ArrayList<JSONArray>();
 
@@ -70,9 +70,9 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
             Boolean isPlaylist = false;
 
             try {
+                JSONObject itemJSON = assetsList.get(i);
                 //subcategories have a name field instead of a title field. We use that difference to determine if it is a product or subcategory item.
                 //if it is a list of products
-                JSONObject itemJSON = assetsList.get(i);
                 if (itemJSON.isNull("name")) {
                     name = itemJSON.getString("title");
                     isSubcategory = false;
@@ -276,16 +276,34 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
             setLookToPlaylist(viewHolder);
         }
 
+
+
         //load image from assets folder
         try {
             InputStream stream = appContext.getAssets().open(listItem.getImageResource());
             Drawable drawable = Drawable.createFromStream(stream, null);
             viewHolder.thumbnailImage.setImageDrawable(drawable);
         } catch (Exception e) {
-            //Log.e(LOGVAR, e.getMessage());
+            Log.e(LOGVAR, "CAN'T FIND IMAGE:" + listItem.getImageResource() + ", " +e.getMessage());
+
+            //if it can't be found, use the local placeholder image
+            InputStream stream = null;
+            try {
+                stream = appContext.getAssets().open("thumb_placeholder.png");
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+            Drawable drawable = Drawable.createFromStream(stream, null);
+            viewHolder.thumbnailImage.setImageDrawable(drawable);
+
+            loadImageFromServer(listItem.getImageResource());
         }
 
         viewHolder.itemView.setTag(listItem);
+    }
+
+    private void loadImageFromServer(String imageResource) {
+
     }
 
     private void previewClicked(int position) {

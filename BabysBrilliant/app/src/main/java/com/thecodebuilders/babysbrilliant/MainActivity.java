@@ -8,12 +8,12 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,13 +29,11 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.OutputStream;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements PlaylistChooser.PlaylistChooserListener{
@@ -67,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     public static JSONArray music;
     public static JSONArray nightLights;
     public static JSONArray soundBoards;
+    public ArrayList<JSONArray> jsonSets = new ArrayList<>();
 
     public static String currentMenu = MOVIES;
 
@@ -437,16 +436,20 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        //set the thumbnail list adapter so it will display the items
-        ThumbnailListAdapter adapter = new ThumbnailListAdapter(listData, this);
-        thumbnailList.setAdapter(adapter);
 
-
+        configureThumbnailList(listData);
     }
 
     //overloaded version for passing ArrayLists directly
     public void configureThumbnailList(ArrayList listData) {
         //set the thumbnail list adapter so it will display the items
+        //TODO: I could change what kind of adapter is used depending on the type of list we want,
+        // such as a list of movies vs. a list of playlists.
+        // Right now it is being handled by conditionals within the ThumbnailListAdapter, but this is getting a bit messy.
+        // Query what kind of list it is, based on the data, then send a different type of adapter in,
+        // such as PlaylistAdapter.
+        // We could have: PlaylistsAdapter, PlaylistAdapter, FavoritesAdapter, SoundboardsAdapter, SectionAdapter, PurchasedAdapter
+        // These should be based on an interface or a superclass to keep them consistent.
         ThumbnailListAdapter adapter = new ThumbnailListAdapter(listData, this);
         thumbnailList.setAdapter(adapter);
     }
@@ -573,7 +576,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     //retrieve the data model from the server
     public void getRemoteJSON() {
-        queue = Volley.newRequestQueue(this);
+        queue = VolleySingleton.getInstance().getRequestQueue();
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, assetsURL, new Response.Listener<String>() {
             @Override
@@ -584,7 +587,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                     //TODO: Save remote JSON to local JSON
 
                 } catch (Throwable t) {
-                    //Log.e(LOGVAR, "Reverting to LOCAL JSON");
+                    Log.e(LOGVAR, "Reverting to LOCAL JSON");
                     getLocalJSON();
                 }
 
@@ -593,7 +596,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                //Log.e(LOGVAR, "Reverting to LOCAL JSON. VOLLEY ERROR: " + error.getMessage());
+                Log.e(LOGVAR, "Reverting to LOCAL JSON. VOLLEY ERROR: " + error.getMessage());
                 getLocalJSON();
             }
         });
@@ -603,8 +606,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     private void processJSON(String response) throws JSONException {
         assetsString = Uri.decode(response);
-
         jsonData = new JSONObject(assetsString);
+
         movies = jsonData.getJSONArray(MOVIES);
         audioBooks = jsonData.getJSONArray(AUDIO_BOOKS);
         hearingImpaired = jsonData.getJSONArray(HEARING_IMPAIRED);
@@ -612,8 +615,39 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         nightLights = jsonData.getJSONArray(NIGHT_LIGHTS);
         soundBoards = jsonData.getJSONArray(SOUND_BOARDS);
 
+        jsonSets.add(movies);
+        jsonSets.add(audioBooks);
+        jsonSets.add(hearingImpaired);
+        jsonSets.add(music);
+        jsonSets.add(nightLights);
+        jsonSets.add(soundBoards);
+
+//        identifyMissingThumbnails();
+
         initApp();
     }
+
+    /*private void identifyMissingThumbnails() {
+        try {
+            ArrayList<String> thumbs = new ArrayList<>();
+
+            Log.d(LOGVAR, "size:"+ jsonSets.size());
+            for (int i = 0; i < jsonSets.size(); i++) {
+                JSONArray set = jsonSets.get(i);
+                Log.d(LOGVAR, "set:"+i);
+                for (int j = 0; j < set.length(); j++) {
+                    Log.d(LOGVAR, set.getJSONObject(j).getString("thumb"));
+                    thumbs.add(set.getJSONObject(j).getString("thumb"));
+                }
+            }
+
+
+            Log.d(LOGVAR, "thumbs length:" + thumbs.size());
+            Log.d(LOGVAR, "thumbs:" + thumbs);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }*/
 
     private void getLocalJSON() {
         try {
@@ -658,174 +692,4 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         downloaderThread.start();
     }
 
-    /**
-     * This is the Handler for this activity. It will receive messages from the
-     * DownloaderThread and make the necessary updates to the UI.
-     */
-//    public Handler activityHandler = new Handler()
-//    {
-//        public void handleMessage(Message msg)
-//        {
-//            switch(msg.what)
-//            {
-//				/*
-//				 * Handling MESSAGE_UPDATE_PROGRESS_BAR:
-//				 * 1. Get the current progress, as indicated in the arg1 field
-//				 *    of the Message.
-//				 * 2. Update the progress bar.
-//				 */
-//                case MESSAGE_UPDATE_PROGRESS_BAR:
-//                    if(progressDialog != null)
-//                    {
-//                        int currentProgress = msg.arg1;
-//                        progressDialog.setProgress(currentProgress);
-//                    }
-//                    break;
-//
-//				/*
-//				 * Handling MESSAGE_CONNECTING_STARTED:
-//				 * 1. Get the URL of the file being downloaded. This is stored
-//				 *    in the obj field of the Message.
-//				 * 2. Create an indeterminate progress bar.
-//				 * 3. Set the message that should be sent if user cancels.
-//				 * 4. Show the progress bar.
-//				 */
-//                case MESSAGE_CONNECTING_STARTED:
-//                    if(msg.obj != null && msg.obj instanceof String)
-//                    {
-//                        String url = (String) msg.obj;
-//                        // truncate the url
-//                        if(url.length() > 16)
-//                        {
-//                            String tUrl = url.substring(0, 15);
-//                            tUrl += "...";
-//                            url = tUrl;
-//                        }
-//                        String pdTitle = thisActivity.getString(R.string.progress_dialog_title_connecting);
-//                        String pdMsg = thisActivity.getString(R.string.progress_dialog_message_prefix_connecting);
-//                        pdMsg += " " + url;
-//
-//                        dismissCurrentProgressDialog();
-//                        progressDialog = new ProgressDialog(thisActivity);
-//                        progressDialog.setTitle(pdTitle);
-//                        progressDialog.setMessage(pdMsg);
-//                        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-//                        progressDialog.setIndeterminate(true);
-//                        // set the message to be sent when this dialog is canceled
-//                        Message newMsg = Message.obtain(this, MESSAGE_DOWNLOAD_CANCELED);
-//                        progressDialog.setCancelMessage(newMsg);
-//                        progressDialog.show();
-//                    }
-//                    break;
-//
-//				/*
-//				 * Handling MESSAGE_DOWNLOAD_STARTED:
-//				 * 1. Create a progress bar with specified max value and current
-//				 *    value 0; assign it to progressDialog. The arg1 field will
-//				 *    contain the max value.
-//				 * 2. Set the title and text for the progress bar. The obj
-//				 *    field of the Message will contain a String that
-//				 *    represents the name of the file being downloaded.
-//				 * 3. Set the message that should be sent if dialog is canceled.
-//				 * 4. Make the progress bar visible.
-//				 */
-//                case MESSAGE_DOWNLOAD_STARTED:
-//                    // obj will contain a String representing the file name
-//                    if(msg.obj != null && msg.obj instanceof String)
-//                    {
-//                        int maxValue = msg.arg1;
-//                        String fileName = (String) msg.obj;
-//                        String pdTitle = thisActivity.getString(R.string.progress_dialog_title_downloading);
-//                        String pdMsg = thisActivity.getString(R.string.progress_dialog_message_prefix_downloading);
-//                        pdMsg += " " + fileName;
-//
-//                        dismissCurrentProgressDialog();
-//                        progressDialog = new ProgressDialog(thisActivity);
-//                        progressDialog.setTitle(pdTitle);
-//                        progressDialog.setMessage(pdMsg);
-//                        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-//                        progressDialog.setProgress(0);
-//                        progressDialog.setMax(maxValue);
-//                        // set the message to be sent when this dialog is canceled
-//                        Message newMsg = Message.obtain(this, MESSAGE_DOWNLOAD_CANCELED);
-//                        progressDialog.setCancelMessage(newMsg);
-//                        progressDialog.setCancelable(true);
-//                        progressDialog.show();
-//                    }
-//                    break;
-//
-//				/*
-//				 * Handling MESSAGE_DOWNLOAD_COMPLETE:
-//				 * 1. Remove the progress bar from the screen.
-//				 * 2. Display Toast that says download is complete.
-//				 */
-//                case MESSAGE_DOWNLOAD_COMPLETE:
-//                    dismissCurrentProgressDialog();
-//                    displayMessage(getString(R.string.user_message_download_complete));
-//                    break;
-//
-//				/*
-//				 * Handling MESSAGE_DOWNLOAD_CANCELLED:
-//				 * 1. Interrupt the downloader thread.
-//				 * 2. Remove the progress bar from the screen.
-//				 * 3. Display Toast that says download is complete.
-//				 */
-//                case MESSAGE_DOWNLOAD_CANCELED:
-//                    if(downloaderThread != null)
-//                    {
-//                        downloaderThread.interrupt();
-//                    }
-//                    dismissCurrentProgressDialog();
-//                    displayMessage(getString(R.string.user_message_download_canceled));
-//                    break;
-//
-//				/*
-//				 * Handling MESSAGE_ENCOUNTERED_ERROR:
-//				 * 1. Check the obj field of the message for the actual error
-//				 *    message that will be displayed to the user.
-//				 * 2. Remove any progress bars from the screen.
-//				 * 3. Display a Toast with the error message.
-//				 */
-//                case MESSAGE_ENCOUNTERED_ERROR:
-//                    // obj will contain a string representing the error message
-//                    if(msg.obj != null && msg.obj instanceof String)
-//                    {
-//                        String errorMessage = (String) msg.obj;
-//                        dismissCurrentProgressDialog();
-//                        displayMessage(errorMessage);
-//                    }
-//                    break;
-//
-//                default:
-//                    // nothing to do here
-//                    break;
-//            }
-//        }
-//    };
-//
-//    /**
-//     * If there is a progress dialog, dismiss it and set progressDialog to
-//     * null.
-//     */
-//    public void dismissCurrentProgressDialog()
-//    {
-//        if(progressDialog != null)
-//        {
-//            progressDialog.hide();
-//            progressDialog.dismiss();
-//            progressDialog = null;
-//        }
-//    }
-//
-//    /**
-//     * Displays a message to the user, in the form of a Toast.
-//     * @param message Message to be displayed.
-//     */
-//    public void displayMessage(String message)
-//    {
-//        if(message != null)
-//        {
-//            Toast.makeText(thisActivity, message, Toast.LENGTH_SHORT).show();
-//        }
-//    }
 }
