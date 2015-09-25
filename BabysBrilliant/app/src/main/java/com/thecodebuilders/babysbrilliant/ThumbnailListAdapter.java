@@ -1,6 +1,8 @@
 package com.thecodebuilders.babysbrilliant;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.SurfaceTexture;
 import android.graphics.drawable.Drawable;
@@ -17,10 +19,17 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageLoader;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -37,15 +46,20 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
     ArrayList<JSONArray> products = new ArrayList<JSONArray>();
     ArrayList<JSONObject> assetsList;
     MainActivity mainActivity;
+    private VolleySingleton volleySingleton;
+    private ImageLoader imageLoader;
 
     int listIncrement = 0; //for testing only
 
     private MediaPlayer mediaPlayer;
 
     public ThumbnailListAdapter(ArrayList listData, MainActivity mainActivity) {
+        volleySingleton = VolleySingleton.getInstance();
+        imageLoader = volleySingleton.getImageLoader();
         assetsList = listData;
         this.mainActivity = mainActivity;
         parseListItems(assetsList.size());
+
     }
 
     //This gets the data ready for the adapter to use in order to set up the view for each list item.
@@ -199,7 +213,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
 
     }
 
-    private void configureListItemLook(ElementViewHolder viewHolder, ListItem listItem) {
+    private void configureListItemLook(final ElementViewHolder viewHolder, final ListItem listItem) {
 
         viewHolder.videoView.setVisibility(View.INVISIBLE);
 
@@ -276,34 +290,97 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
             setLookToPlaylist(viewHolder);
         }
 
-
+        /*This section will first look for the thumbnail in the assets folder.
+        * If it is not found there, it will look to see if it was previously downloaded and saved to internal memory.
+        * If it is not found there, it will download it from the server, and save it to internal memory for next time*/
 
         //load image from assets folder
+        String fileName = listItem.getImageResource();
         try {
-            InputStream stream = appContext.getAssets().open(listItem.getImageResource());
+            InputStream stream = appContext.getAssets().open(fileName);
             Drawable drawable = Drawable.createFromStream(stream, null);
             viewHolder.thumbnailImage.setImageDrawable(drawable);
+
+        //but if it's not in there, get it from the server after displaying a placeholder
         } catch (Exception e) {
-            Log.e(LOGVAR, "CAN'T FIND IMAGE:" + listItem.getImageResource() + ", " +e.getMessage());
-
-            //if it can't be found, use the local placeholder image
-            InputStream stream = null;
+            //load the saved image and display it
             try {
-                stream = appContext.getAssets().open("thumb_placeholder.png");
-            } catch (IOException e1) {
-                e1.printStackTrace();
+                loadLocalSavedImage(fileName, viewHolder);
+            } catch (FileNotFoundException localNotFoundError) {
+                localNotFoundError.printStackTrace();
+                //if that's not there, then get the real image from the server
+                loadImageFromServer(viewHolder, listItem);
             }
-            Drawable drawable = Drawable.createFromStream(stream, null);
-            viewHolder.thumbnailImage.setImageDrawable(drawable);
-
-            loadImageFromServer(listItem.getImageResource());
         }
 
         viewHolder.itemView.setTag(listItem);
     }
 
-    private void loadImageFromServer(String imageResource) {
+    private void showPlaceHolderImage(ElementViewHolder viewHolder) {
+        InputStream stream = null;
+        try {
+            stream = appContext.getAssets().open("thumb_placeholder.png");
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+        Drawable drawable = Drawable.createFromStream(stream, null);
+        viewHolder.thumbnailImage.setImageDrawable(drawable);
+    }
 
+    private void loadImageFromServer(final ElementViewHolder viewHolder, final ListItem listItem) {
+
+        final String fileName = listItem.getImageResource();
+        if(fileName !=null) {
+
+            String mediaURL = appContext.getResources().getString(R.string.media_url) + fileName;
+            imageLoader.get(mediaURL, new ImageLoader.ImageListener() {
+                @Override
+                public void onResponse(ImageLoader.ImageContainer imageContainer, boolean stillLoading) {
+                    if(stillLoading) {
+                        showPlaceHolderImage(viewHolder);
+                    } else {
+                        //show and save the bitmap
+                        Bitmap loadedBitmap = imageContainer.getBitmap();
+                        Bitmap savedBitmap = Bitmap.createBitmap(loadedBitmap);
+                        viewHolder.thumbnailImage.setImageBitmap(loadedBitmap);
+                        saveThumbToLocalFile(fileName, savedBitmap, viewHolder);
+                    }
+
+                }
+
+                @Override
+                public void onErrorResponse(VolleyError volleyError) {
+                    Log.e(LOGVAR, volleyError.getLocalizedMessage());
+                    showPlaceHolderImage(viewHolder);
+                }
+            });
+        }
+    }
+
+    private void saveThumbToLocalFile(String fileName, final Bitmap bitmap, ElementViewHolder viewHolder) {
+        FileOutputStream fileOutputStream = null;
+        if(bitmap == null) {
+            Log.d(LOGVAR, "saving bitmap is null");
+        } else {
+            try {
+                fileOutputStream = appContext.openFileOutput(fileName, Context.MODE_PRIVATE);
+                bitmap.compress(Bitmap.CompressFormat.PNG, 85, fileOutputStream);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    fileOutputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private void loadLocalSavedImage(String fileName, ElementViewHolder viewHolder) throws FileNotFoundException {
+        File file = new File(appContext.getFilesDir(), fileName);
+        Bitmap loadedBitmap = BitmapFactory.decodeStream(new FileInputStream(file));
+        viewHolder.thumbnailImage.setImageBitmap(loadedBitmap);
     }
 
     private void previewClicked(int position) {
