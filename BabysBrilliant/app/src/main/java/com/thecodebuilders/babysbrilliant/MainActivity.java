@@ -172,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         homeButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                configureThumbnailList(purchasedItems);
+                configureThumbnailList(purchasedItems, "purchased");
                 currentMenu = PURCHASED_ITEMS;
                 toggleMenuButton(currentMenu);
             }
@@ -180,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         favoritesButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                configureThumbnailList(favoriteItems);
+                configureThumbnailList(favoriteItems, "favorites");
                 currentMenu = FAVORITE_ITEMS;
                 toggleMenuButton(currentMenu);
             }
@@ -205,7 +205,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                     playlistItems.add(playlistObject);
                 }
 
-                configureThumbnailList(playlistItems);
+                configureThumbnailList(playlistItems, "playlists");
 
                 currentMenu = PLAYLISTS;
                 toggleMenuButton(currentMenu);
@@ -214,7 +214,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         moviesButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                configureThumbnailList(movies);
+                configureThumbnailList(movies, "section");
                 //Log.d(LOGVAR, "movies item:" + movies.toString());
                 currentMenu = MOVIES;
                 toggleMenuButton(currentMenu);
@@ -223,7 +223,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         musicButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                configureThumbnailList(music);
+                configureThumbnailList(music, "section");
                 currentMenu = MUSIC;
                 toggleMenuButton(currentMenu);
             }
@@ -231,7 +231,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         nightLightsButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                configureThumbnailList(nightLights);
+                configureThumbnailList(nightLights, "section");
                 currentMenu = NIGHT_LIGHTS;
                 toggleMenuButton(currentMenu);
             }
@@ -239,7 +239,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         audioBooksButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                configureThumbnailList(audioBooks);
+                configureThumbnailList(audioBooks, "section");
                 currentMenu = AUDIO_BOOKS;
                 toggleMenuButton(currentMenu);
             }
@@ -247,7 +247,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         soundBoardsButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                configureThumbnailList(soundBoards);
+                configureThumbnailList(soundBoards, "section");
                 currentMenu = SOUND_BOARDS;
                 toggleMenuButton(currentMenu);
             }
@@ -255,7 +255,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         hearingImpairedButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                configureThumbnailList(hearingImpaired);
+                configureThumbnailList(hearingImpaired, "section");
                 currentMenu = HEARING_IMPAIRED;
                 toggleMenuButton(currentMenu);
             }
@@ -424,8 +424,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         thumbnailList.setLayoutManager(thumbnailListLayoutManager);
     }
 
-    //this is called when tapping on a menu item or subcategory and sets the list to the new content. JSONArray version.
-    public void configureThumbnailList(JSONArray jsonData) {
+    //this is called when tapping on a menu item or subcategory and sets the list to the new content. JSONArray version. Then runs the ArrayList version.
+    public void configureThumbnailList(JSONArray jsonData, String adapterType) {
         //convert JSONArray to ArrayList
         ArrayList<JSONObject> listData = new ArrayList<>();
         try {
@@ -437,11 +437,11 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             e.printStackTrace();
         }
 
-        configureThumbnailList(listData);
+        configureThumbnailList(listData, adapterType);
     }
 
     //overloaded version for passing ArrayLists directly
-    public void configureThumbnailList(ArrayList listData) {
+    public void configureThumbnailList(ArrayList listData, String adapterType) {
         //set the thumbnail list adapter so it will display the items
         //TODO: I could change what kind of adapter is used depending on the type of list we want,
         // such as a list of movies vs. a list of playlists.
@@ -450,8 +450,34 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         // such as PlaylistAdapter.
         // We could have: PlaylistsAdapter, PlaylistAdapter, FavoritesAdapter, SoundboardsAdapter, SectionAdapter, PurchasedAdapter
         // These should be based on an interface or a superclass to keep them consistent.
-        ThumbnailListAdapter adapter = new ThumbnailListAdapter(listData, this);
-        thumbnailList.setAdapter(adapter);
+
+        //TODO: base this on the "cat" setting on the objects?
+
+        //TODO: set section title view here
+        //set up section title
+       /* if (!listData.get(0).isNull("name")) {
+            try {
+                setSectionTitle(listData.get(0).getString("name"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }*/
+
+        Log.d(LOGVAR, "name:"+listData.toString());
+
+        if(adapterType=="section") {
+            SectionAdapter adapter = new SectionAdapter(listData, this);
+            thumbnailList.setAdapter(adapter);
+        } else if(adapterType=="videos") {
+            VideosAdapter adapter = new VideosAdapter(listData, this);
+            thumbnailList.setAdapter(adapter);
+        }
+
+        else {
+            SectionAdapter adapter = new SectionAdapter(listData, this);
+            thumbnailList.setAdapter(adapter);
+        }
+
     }
 
     public static void addToPurchased(JSONObject productJSON) {
@@ -483,7 +509,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
             //TODO: make favorites menu refresh when removing one
             if (currentMenu.equals(FAVORITE_ITEMS)) {
-                configureThumbnailList(new JSONArray(favoriteItems));
+                configureThumbnailList(new JSONArray(favoriteItems), "favorites");
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -523,10 +549,9 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     public void playVideo(String videoURL) {
         String url = mediaURL + videoURL;
         //TODO: temporary for testing
-        downloadItem(url);
+//        downloadItem(url);
 
 
-        /*
         videoToggleButton.setText(appContext.getString(R.string.video_pause));
         videoLayout.setVisibility(View.VISIBLE);
         videoView.setVideoPath(url);
@@ -536,7 +561,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         videoView.setAlpha(0); //hide prior to media being ready
         //TODO: show preloader
 
-        showControls();*/
+        showControls();
     }
 
     private static void showControls() {
@@ -622,32 +647,9 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         jsonSets.add(nightLights);
         jsonSets.add(soundBoards);
 
-//        identifyMissingThumbnails();
-
         initApp();
     }
 
-    /*private void identifyMissingThumbnails() {
-        try {
-            ArrayList<String> thumbs = new ArrayList<>();
-
-            Log.d(LOGVAR, "size:"+ jsonSets.size());
-            for (int i = 0; i < jsonSets.size(); i++) {
-                JSONArray set = jsonSets.get(i);
-                Log.d(LOGVAR, "set:"+i);
-                for (int j = 0; j < set.length(); j++) {
-                    Log.d(LOGVAR, set.getJSONObject(j).getString("thumb"));
-                    thumbs.add(set.getJSONObject(j).getString("thumb"));
-                }
-            }
-
-
-            Log.d(LOGVAR, "thumbs length:" + thumbs.size());
-            Log.d(LOGVAR, "thumbs:" + thumbs);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }*/
 
     private void getLocalJSON() {
         try {
@@ -660,7 +662,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     private void initApp() throws JSONException {
         //TODO: add preloader
-        configureThumbnailList(jsonData.getJSONArray(currentMenu));
+        configureThumbnailList(jsonData.getJSONArray(currentMenu), "section");
         toggleMenuButton(MOVIES);
     }
 
@@ -686,10 +688,5 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         return super.onOptionsItemSelected(item);
     }
 
-    //DOWNLOAD
-    void downloadItem(String downloadURL) {
-        downloaderThread = new DownloaderThread(thisActivity, downloadURL);
-        downloaderThread.start();
-    }
 
 }

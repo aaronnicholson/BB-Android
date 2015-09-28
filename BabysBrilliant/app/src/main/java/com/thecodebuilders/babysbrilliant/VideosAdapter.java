@@ -35,11 +35,10 @@ import java.io.InputStream;
 import java.util.ArrayList;
 
 
-
 /**
  * Created by aaronnicholson on 8/17/15.
  */
-public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdapter.ElementViewHolder> {
+public class VideosAdapter extends RecyclerView.Adapter<VideosAdapter.ElementViewHolder> {
     private final String LOGVAR = "ThumbnailListAdapter";
     private ArrayList<ListItem> elements;
     private final Context appContext = ApplicationContextProvider.getContext();
@@ -53,7 +52,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
 
     private MediaPlayer mediaPlayer;
 
-    public ThumbnailListAdapter(ArrayList listData, MainActivity mainActivity) {
+    public VideosAdapter(ArrayList listData, MainActivity mainActivity) {
         volleySingleton = VolleySingleton.getInstance();
         imageLoader = volleySingleton.getImageLoader();
         assetsList = listData;

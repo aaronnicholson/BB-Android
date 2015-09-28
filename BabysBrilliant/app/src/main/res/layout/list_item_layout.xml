@@ -55,6 +55,7 @@
                 android:adjustViewBounds="true"
                 android:maxWidth="@dimen/product_icon_width"
                 android:src="@drawable/playlists"
+                android:visibility="invisible"
                 />
 
             <ImageView
@@ -65,6 +66,7 @@
                 android:maxWidth="@dimen/product_icon_width"
                 android:layout_marginLeft="10dp"
                 android:src="@drawable/favorites"
+                android:visibility="invisible"
                 />
         </LinearLayout>
 
@@ -81,6 +83,7 @@
             android:text="\uf06e"
             android:textSize="26sp"
             android:textColor="#fff"
+            android:visibility="invisible"
             />
 
 
@@ -97,12 +100,15 @@
             android:paddingTop="10dp"
             android:rotation="45"
             android:textColor="#333333"
-            android:textSize="22sp" />
+            android:textSize="22sp"
+            android:visibility="invisible"
+            />
 
         <TextureView
             android:id="@+id/video_view_inline"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:visibility="invisible"/>
 
     </RelativeLayout>
 

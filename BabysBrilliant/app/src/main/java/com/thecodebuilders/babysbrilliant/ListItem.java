@@ -1,18 +1,9 @@
 package com.thecodebuilders.babysbrilliant;
 
 import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
-import android.util.Log;
 import android.view.View;
-import android.widget.VideoView;
 
 import org.json.JSONObject;
-
-import java.io.InputStream;
 
 /**
  * Created by aaronnicholson on 8/17/15.
@@ -26,7 +17,7 @@ public class ListItem extends View {
     private String price;
     private Boolean showBackground = true;
     private Boolean showText = true;
-    private Boolean isSubcategory;
+    private Boolean isSection;
     private Boolean isPurchased;
     private Boolean isFavorite;
     private Boolean isPlaylistItem;
@@ -36,7 +27,7 @@ public class ListItem extends View {
     private Boolean isPurchasable = false;
     private JSONObject rawJSON;
 
-    public ListItem(JSONObject rawJSON, String title, Boolean playInline, String imageResource, String mediaFile, String price, String category, Boolean isSubcategory, Boolean isPurchased, Boolean isPlaylistItem, Boolean isPlaylist, Boolean isFavorite, Context context) {
+    public ListItem(JSONObject rawJSON, String title, Boolean playInline, String imageResource, String mediaFile, String price, String category, Boolean isSection, Boolean isPurchased, Boolean isPlaylistItem, Boolean isPlaylist, Boolean isFavorite, Context context) {
         super(context);
         this.rawJSON = rawJSON;
         this.title = title;
@@ -45,7 +36,7 @@ public class ListItem extends View {
         this.mediaFile = mediaFile;
         this.price = price;
         this.category = category;
-        this.isSubcategory = isSubcategory;
+        this.isSection = isSection;
         this.isPurchased = isPurchased;
         this.isFavorite = isFavorite;
         this.isPlaylistItem = isPlaylistItem;
@@ -94,8 +85,8 @@ public class ListItem extends View {
     public void setIsPurchased(Boolean isPurchased) {
         this.isPurchased = isPurchased;
     }
-    public Boolean isSubcategory() {
-        return isSubcategory;
+    public Boolean isSection() {
+        return isSection;
     }
     public Boolean isPurchasable() {
         return isPurchasable;
@@ -104,12 +95,12 @@ public class ListItem extends View {
         isPurchasable = false;
 
         //sound board groups are purchasable
-        if(category.equals("5") && isSubcategory) {
+        if(category.equals("5") && isSection) {
             isPurchasable = true;
         }
 
         //products that are not sound board items are purchasable
-        if(!category.equals("5") && !isSubcategory) {
+        if(!category.equals("5") && !isSection) {
             isPurchasable = true;
         }
 
@@ -119,13 +110,13 @@ public class ListItem extends View {
         if(category.equals("1")) {
             showBackground = false;
         }
-        if(category.equals("5") && !isSubcategory) {
+        if(category.equals("5") && !isSection) {
             showBackground = false;
         }
         return showBackground;
     }
     public Boolean doShowText() {
-        if(category.equals("5") && !isSubcategory) {
+        if(category.equals("5") && !isSection) {
             showText = false;
         }
         return showText;
