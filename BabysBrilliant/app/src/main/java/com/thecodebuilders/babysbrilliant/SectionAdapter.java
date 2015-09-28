@@ -138,9 +138,15 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.ElementV
 
         }
 
-        /*This section will first look for the thumbnail in the assets folder.
-        * If it is not found there, it will look to see if it was previously downloaded and saved to internal memory.
-        * If it is not found there, it will download it from the server, and save it to internal memory for next time*/
+        setThumbnailImage(viewHolder, listItem);
+
+        viewHolder.itemView.setTag(listItem);
+    }
+
+    private void setThumbnailImage(ElementViewHolder viewHolder, ListItem listItem) {
+    /*This section will first look for the thumbnail in the assets folder.
+    * If it is not found there, it will look to see if it was previously downloaded and saved to internal memory.
+    * If it is not found there, it will download it from the server, and save it to internal memory for next time*/
 
         //load image from assets folder
         String fileName = listItem.getImageResource();
@@ -160,8 +166,6 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.ElementV
                 loadImageFromServer(viewHolder, listItem);
             }
         }
-
-        viewHolder.itemView.setTag(listItem);
     }
 
     private void showPlaceHolderImage(ElementViewHolder viewHolder) {

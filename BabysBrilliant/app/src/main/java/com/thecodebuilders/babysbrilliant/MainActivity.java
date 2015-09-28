@@ -453,6 +453,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         //TODO: base this on the "cat" setting on the objects?
 
+        Log.d(LOGVAR, "adapterType: "+adapterType);
+
         if(adapterType=="section") {
             SectionAdapter adapter = new SectionAdapter(listData, this);
             thumbnailList.setAdapter(adapter);
@@ -462,7 +464,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         }
 
         else {
-            SectionAdapter adapter = new SectionAdapter(listData, this);
+            ThumbnailListAdapter adapter = new ThumbnailListAdapter(listData, this);
             thumbnailList.setAdapter(adapter);
         }
 
