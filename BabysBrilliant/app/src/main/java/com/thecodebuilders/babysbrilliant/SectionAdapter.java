@@ -18,6 +18,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -236,12 +237,23 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.ElementV
     }
 
     private void thumbnailClicked(int position, ElementViewHolder thisViewHolder) {
-
         updateThumbnailList(position);
     }
 
     private void updateThumbnailList(int position) {
+        setSectionTitle(position);
         mainActivity.configureThumbnailList(products.get(position), "videos");
+    }
+
+    private void setSectionTitle(int position) {
+        //set up section title
+        if (!assetsList.get(position).isNull("name")) {
+            try {
+                mainActivity.setSectionTitle(assetsList.get(position).getString("name"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     //attaches the xml layout doc to each menu item to configure it visually.

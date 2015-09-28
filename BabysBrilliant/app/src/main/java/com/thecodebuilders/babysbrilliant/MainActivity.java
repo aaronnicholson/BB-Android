@@ -453,18 +453,6 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         //TODO: base this on the "cat" setting on the objects?
 
-        //TODO: set section title view here
-        //set up section title
-       /* if (!listData.get(0).isNull("name")) {
-            try {
-                setSectionTitle(listData.get(0).getString("name"));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }*/
-
-        Log.d(LOGVAR, "name:"+listData.toString());
-
         if(adapterType=="section") {
             SectionAdapter adapter = new SectionAdapter(listData, this);
             thumbnailList.setAdapter(adapter);
