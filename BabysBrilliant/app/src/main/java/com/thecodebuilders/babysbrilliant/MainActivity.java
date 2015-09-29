@@ -106,9 +106,6 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        downloaderThread = null;
-        progressDialog = null;
-
         assetsURL = getString(R.string.assets_url);
 
         homeButton = (ImageView) findViewById(R.id.bblogo);
