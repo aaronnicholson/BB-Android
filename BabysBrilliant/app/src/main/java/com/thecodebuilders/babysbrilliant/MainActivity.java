@@ -1,6 +1,5 @@
 package com.thecodebuilders.babysbrilliant;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -100,20 +99,6 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     static Handler controlsHandler = new Handler();
     static Runnable delayedHide = null;
     static Boolean doHideControls = false;
-
-    // Used to communicate state changes in the DownloaderThread
-    public static final int MESSAGE_DOWNLOAD_STARTED = 1000;
-    public static final int MESSAGE_DOWNLOAD_COMPLETE = 1001;
-    public static final int MESSAGE_UPDATE_PROGRESS_BAR = 1002;
-    public static final int MESSAGE_DOWNLOAD_CANCELED = 1003;
-    public static final int MESSAGE_CONNECTING_STARTED = 1004;
-    public static final int MESSAGE_ENCOUNTERED_ERROR = 1005;
-
-    // Downloader instance variables
-    private static MainActivity thisActivity;
-    private static Thread downloaderThread;
-    private static ProgressDialog progressDialog;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -442,8 +427,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     //overloaded version for passing ArrayLists directly
     public void configureThumbnailList(ArrayList listData, String adapterType) {
-        //set the thumbnail list adapter so it will display the items
-        //TODO: I could change what kind of adapter is used depending on the type of list we want,
+        // set the thumbnail list adapter so it will display the items
+        // TODO: I could change what kind of adapter is used depending on the type of list we want,
         // such as a list of movies vs. a list of playlists.
         // Right now it is being handled by conditionals within the ThumbnailListAdapter, but this is getting a bit messy.
         // Query what kind of list it is, based on the data, then send a different type of adapter in,

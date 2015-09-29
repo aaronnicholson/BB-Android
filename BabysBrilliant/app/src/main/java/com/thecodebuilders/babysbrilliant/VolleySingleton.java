@@ -28,7 +28,6 @@ public class VolleySingleton {
             @Override
             public void putBitmap(String url, Bitmap bitmap) {
                 cache.put(url, bitmap);
-                //TODO: perhaps save image to local file system here?
             }
         });
     }
