@@ -1,11 +1,7 @@
 package com.thecodebuilders.adapter;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +9,6 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.thecodebuilders.application.ApplicationContextProvider;
 import com.thecodebuilders.babysbrilliant.ListItem;
@@ -25,12 +20,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 
 
@@ -142,15 +131,15 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.ElementV
 
         }
 
-        setThumbnailImage(viewHolder, listItem);
+       CommonAdapterUtility.setThumbnailImage(listItem,viewHolder.thumbnailImage);
 
         viewHolder.itemView.setTag(listItem);
     }
 
-    private void setThumbnailImage(ElementViewHolder viewHolder, ListItem listItem) {
-    /*This section will first look for the thumbnail in the assets folder.
+   /* private void setThumbnailImage(ElementViewHolder viewHolder, ListItem listItem) {
+    *//*This section will first look for the thumbnail in the assets folder.
     * If it is not found there, it will look to see if it was previously downloaded and saved to internal memory.
-    * If it is not found there, it will download it from the server, and save it to internal memory for next time*/
+    * If it is not found there, it will download it from the server, and save it to internal memory for next time*//*
 
         //load image from assets folder
         String fileName = listItem.getImageResource();
@@ -163,16 +152,16 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.ElementV
         } catch (Exception e) {
             //load the saved image and display it
             try {
-                loadLocalSavedImage(fileName, viewHolder);
+                CommonAdapterUtility.loadLocalSavedImage(fileName, viewHolder.thumbnailImage);
             } catch (FileNotFoundException localNotFoundError) {
                 localNotFoundError.printStackTrace();
                 //if that's not there, then get the real image from the server
-                loadImageFromServer(viewHolder, listItem);
+                CommonAdapterUtility.loadImageFromServer(listItem, viewHolder.thumbnailImage);
             }
         }
-    }
+    }*/
 
-    private void showPlaceHolderImage(ElementViewHolder viewHolder) {
+   /* private void showPlaceHolderImage(ElementViewHolder viewHolder) {
         InputStream stream = null;
         try {
             stream = appContext.getAssets().open("thumb_placeholder.png");
@@ -181,9 +170,9 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.ElementV
         }
         Drawable drawable = Drawable.createFromStream(stream, null);
         viewHolder.thumbnailImage.setImageDrawable(drawable);
-    }
+    }*/
 
-    private void loadImageFromServer(final ElementViewHolder viewHolder, final ListItem listItem) {
+    /*private void loadImageFromServer(final ElementViewHolder viewHolder, final ListItem listItem) {
 
         final String fileName = listItem.getImageResource();
         if (fileName != null) {
@@ -193,13 +182,14 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.ElementV
                 @Override
                 public void onResponse(ImageLoader.ImageContainer imageContainer, boolean stillLoading) {
                     if (stillLoading) {
-                        showPlaceHolderImage(viewHolder);
+                        CommonAdapterUtility.showPlaceHolderImage(viewHolder.thumbnailImage);
                     } else {
                         //show and save the bitmap
                         Bitmap loadedBitmap = imageContainer.getBitmap();
                         Bitmap savedBitmap = Bitmap.createBitmap(loadedBitmap);
                         viewHolder.thumbnailImage.setImageBitmap(loadedBitmap);
-                        saveThumbToLocalFile(fileName, savedBitmap, viewHolder);
+                        CommonAdapterUtility.saveThumbToLocalFile(fileName, savedBitmap);
+
                     }
 
                 }
@@ -207,13 +197,13 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.ElementV
                 @Override
                 public void onErrorResponse(VolleyError volleyError) {
                     Log.e(LOGVAR, volleyError.getLocalizedMessage());
-                    showPlaceHolderImage(viewHolder);
+                    CommonAdapterUtility.showPlaceHolderImage(viewHolder.thumbnailImage);
                 }
             });
         }
-    }
+    }*/
 
-    private void saveThumbToLocalFile(String fileName, final Bitmap bitmap, ElementViewHolder viewHolder) {
+   /* private void saveThumbToLocalFile(String fileName, final Bitmap bitmap, ElementViewHolder viewHolder) {
         FileOutputStream fileOutputStream = null;
         if (bitmap == null) {
             Log.d(LOGVAR, "saving bitmap is null");
@@ -231,13 +221,13 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.ElementV
                 }
             }
         }
-    }
+    }*/
 
-    private void loadLocalSavedImage(String fileName, ElementViewHolder viewHolder) throws FileNotFoundException {
+    /*private void loadLocalSavedImage(String fileName, ElementViewHolder viewHolder) throws FileNotFoundException {
         File file = new File(appContext.getFilesDir(), fileName);
         Bitmap loadedBitmap = BitmapFactory.decodeStream(new FileInputStream(file));
         viewHolder.thumbnailImage.setImageBitmap(loadedBitmap);
-    }
+    }*/
 
     private void previewClicked(int position) {
         ListItem listItem = elements.get(position);
@@ -245,6 +235,7 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.ElementV
     }
 
     private void thumbnailClicked(int position, ElementViewHolder thisViewHolder) {
+
         updateThumbnailList(position);
     }
 
