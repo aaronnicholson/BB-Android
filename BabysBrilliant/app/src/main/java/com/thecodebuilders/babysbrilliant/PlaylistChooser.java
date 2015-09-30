@@ -12,6 +12,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 
+import com.thecodebuilders.beans.Playlist;
+
 import java.util.ArrayList;
 
 /**
@@ -28,6 +30,7 @@ public class PlaylistChooser extends DialogFragment {
      * Each method passes the DialogFragment in case the host needs to query it. */
     public interface PlaylistChooserListener {
         public void onPlaylistSelect(int item);
+
         public void onPlaylistAdd(String name);
     }
 
@@ -54,7 +57,7 @@ public class PlaylistChooser extends DialogFragment {
 
         final String[] playlistNamesJavaArray = getPlaylistNames();
 
-        if(playlistNamesJavaArray.length == 0) {
+        if (playlistNamesJavaArray.length == 0) {
             return createNewPlaylistDialog();
 
         } else {
@@ -128,7 +131,7 @@ public class PlaylistChooser extends DialogFragment {
         playlists = MainActivity.playlists;
         playlistNames = new ArrayList<>();
 
-        String[] playlistNamesJavaArray = new String[ playlists.size() ];
+        String[] playlistNamesJavaArray = new String[playlists.size()];
 
         for (int i = 0; i < playlists.size(); i++) {
             String name = playlists.get(i).getName();

@@ -28,6 +28,13 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.thecodebuilders.adapter.SectionAdapter;
+import com.thecodebuilders.adapter.ThumbnailListAdapter;
+import com.thecodebuilders.adapter.VideosAdapter;
+import com.thecodebuilders.application.ApplicationContextProvider;
+import com.thecodebuilders.beans.Playlist;
+import com.thecodebuilders.network.VolleySingleton;
+import com.thecodebuilders.utility.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,7 +42,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements PlaylistChooser.PlaylistChooserListener{
+public class MainActivity extends AppCompatActivity implements PlaylistChooser.PlaylistChooserListener {
     public final static Context appContext = ApplicationContextProvider.getContext();
 
     public final static String PURCHASED_ITEMS = "purchasedItems";
@@ -44,7 +51,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     public static final String MOVIES = "movies";
     public static final String MUSIC = "music";
     public static final String NIGHT_LIGHTS = "night lights";
-    public static final String AUDIO_BOOKS = "audiobooks";
+    public static final String
+            AUDIO_BOOKS = "audiobooks";
     public static final String SOUND_BOARDS = "soundboard";
     public static final String HEARING_IMPAIRED = "hearing impaired";
 
@@ -54,14 +62,20 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     RequestQueue queue;
     String assetsString;
 
-    public static Typeface fontAwesome = Typeface.createFromAsset(appContext.getAssets(), appContext.getString(R.string.font_awesome));
+
+    public static Typeface fontAwesome = Typeface.
+            createFromAsset(appContext.getAssets(), appContext.getString(R.string.font_awesome));
     public static Typeface proximaBold = Typeface.createFromAsset(appContext.getAssets(), appContext.getString(R.string.proxima_bold));
 
-    public static JSONObject jsonData;
-    public static JSONArray movies;
-    public static JSONArray audioBooks;
+    public static JSONObject
+            jsonData;
+    public static JSONArray
+            movies;
+    public static JSONArray
+            audioBooks;
     public static JSONArray hearingImpaired;
-    public static JSONArray music;
+    public static JSONArray
+            music;
     public static JSONArray nightLights;
     public static JSONArray soundBoards;
     public ArrayList<JSONArray> jsonSets = new ArrayList<>();
@@ -435,17 +449,16 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         //TODO: base this on the "cat" setting on the objects?
 
-        Log.d(LOGVAR, "adapterType: "+adapterType);
+        Log.d(LOGVAR, "adapterType: " + adapterType);
 
-        if(adapterType=="section") {
+        if (adapterType == "section") {
             SectionAdapter adapter = new SectionAdapter(listData, this);
             thumbnailList.setAdapter(adapter);
-        } else if(adapterType=="videos") {
+        }
+        else if (adapterType == "videos") {
             VideosAdapter adapter = new VideosAdapter(listData, this);
             thumbnailList.setAdapter(adapter);
-        }
-
-        else {
+        } else {
             ThumbnailListAdapter adapter = new ThumbnailListAdapter(listData, this);
             thumbnailList.setAdapter(adapter);
         }
@@ -506,13 +519,13 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     @Override
     public void onPlaylistAdd(String name) {
-        if(name.equals("")) {
+        if (name.equals("")) {
             Toast.makeText(MainActivity.this, R.string.playlistAddEmptyStringError, Toast.LENGTH_SHORT).show();
         } else {
             ArrayList<JSONObject> newList = new ArrayList<>();
             newList.add(pendingPlaylistItem);
             playlists.add(0, new Playlist(name, newList));
-            Toast.makeText(MainActivity.this, "Your video was added to the new " + name + " playlist."  + " We've brought you to the playlists section.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, "Your video was added to the new " + name + " playlist." + " We've brought you to the playlists section.", Toast.LENGTH_SHORT).show();
             playListButton.performClick();
         }
 

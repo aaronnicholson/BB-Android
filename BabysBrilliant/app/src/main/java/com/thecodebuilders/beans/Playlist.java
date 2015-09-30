@@ -1,6 +1,7 @@
-package com.thecodebuilders.babysbrilliant;
+package com.thecodebuilders.beans;
 
 import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 /**
@@ -8,7 +9,7 @@ import java.util.ArrayList;
  */
 public class Playlist {
     String name;
-    ArrayList<JSONObject> playlistItems;
+   public  ArrayList<JSONObject> playlistItems;
 
     public Playlist(String name, ArrayList<JSONObject> playlistItems) {
         this.name = name;

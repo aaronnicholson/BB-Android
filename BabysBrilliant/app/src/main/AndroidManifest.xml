@@ -7,7 +7,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/Theme.AppCompat"
-        android:name=".ApplicationContextProvider"
+        android:name="com.thecodebuilders.application.ApplicationContextProvider"
         android:hardwareAccelerated="true">
         <activity
             android:name=".MainActivity"

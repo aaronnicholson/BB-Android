@@ -1,4 +1,4 @@
-package com.thecodebuilders.babysbrilliant;
+package com.thecodebuilders.utility;
 
 import android.content.Context;
 import android.content.res.Resources;

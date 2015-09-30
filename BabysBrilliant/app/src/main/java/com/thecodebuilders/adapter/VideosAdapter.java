@@ -1,17 +1,13 @@
-package com.thecodebuilders.babysbrilliant;
+package com.thecodebuilders.adapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.SurfaceTexture;
 import android.graphics.drawable.Drawable;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,9 +17,13 @@ import android.widget.TextView;
 
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
+import com.thecodebuilders.application.ApplicationContextProvider;
+import com.thecodebuilders.babysbrilliant.ListItem;
+import com.thecodebuilders.babysbrilliant.MainActivity;
+import com.thecodebuilders.babysbrilliant.R;
+import com.thecodebuilders.beans.Playlist;
+import com.thecodebuilders.network.VolleySingleton;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;

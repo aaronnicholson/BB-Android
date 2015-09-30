@@ -1,4 +1,4 @@
-package com.thecodebuilders.babysbrilliant;
+package com.thecodebuilders.network;
 
 import android.graphics.Bitmap;
 import android.util.LruCache;
@@ -6,6 +6,7 @@ import android.util.LruCache;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
+import com.thecodebuilders.application.ApplicationContextProvider;
 
 /**
  * Created by aaronnicholson on 9/24/15.
@@ -19,7 +20,8 @@ public class VolleySingleton {
     private VolleySingleton() {
         mRequestQueue = Volley.newRequestQueue(ApplicationContextProvider.getContext());
         mImageLoader = new ImageLoader(mRequestQueue, new ImageLoader.ImageCache() {
-            private LruCache<String, Bitmap> cache = new LruCache<>((int) (Runtime.getRuntime().maxMemory()/1024/8));
+            private LruCache<String, Bitmap> cache = new LruCache<>((int) (Runtime.getRuntime().maxMemory() / 1024 / 8));
+
             @Override
             public Bitmap getBitmap(String url) {
                 return cache.get(url);
@@ -33,7 +35,7 @@ public class VolleySingleton {
     }
 
     public static VolleySingleton getInstance() {
-        if(sInstance==null) {
+        if (sInstance == null) {
             sInstance = new VolleySingleton();
         }
 

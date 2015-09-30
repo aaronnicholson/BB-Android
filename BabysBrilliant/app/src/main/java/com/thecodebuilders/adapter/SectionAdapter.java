@@ -1,4 +1,4 @@
-package com.thecodebuilders.babysbrilliant;
+package com.thecodebuilders.adapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -7,7 +7,6 @@ import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -16,6 +15,11 @@ import android.widget.TextView;
 
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
+import com.thecodebuilders.application.ApplicationContextProvider;
+import com.thecodebuilders.babysbrilliant.ListItem;
+import com.thecodebuilders.babysbrilliant.MainActivity;
+import com.thecodebuilders.babysbrilliant.R;
+import com.thecodebuilders.network.VolleySingleton;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -70,7 +74,7 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.ElementV
             String price = null;
             Boolean isPurchased = null;
             Boolean isPlaylistItem = null;
-            Boolean isPlaylist  = null;
+            Boolean isPlaylist = null;
             Boolean isFavorite = null;
 
             try {
@@ -155,7 +159,7 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.ElementV
             Drawable drawable = Drawable.createFromStream(stream, null);
             viewHolder.thumbnailImage.setImageDrawable(drawable);
 
-        //but if it's not in there, get it from the server after displaying a placeholder
+            //but if it's not in there, get it from the server after displaying a placeholder
         } catch (Exception e) {
             //load the saved image and display it
             try {
@@ -182,13 +186,13 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.ElementV
     private void loadImageFromServer(final ElementViewHolder viewHolder, final ListItem listItem) {
 
         final String fileName = listItem.getImageResource();
-        if(fileName !=null) {
+        if (fileName != null) {
 
             String mediaURL = appContext.getResources().getString(R.string.media_url) + fileName;
             imageLoader.get(mediaURL, new ImageLoader.ImageListener() {
                 @Override
                 public void onResponse(ImageLoader.ImageContainer imageContainer, boolean stillLoading) {
-                    if(stillLoading) {
+                    if (stillLoading) {
                         showPlaceHolderImage(viewHolder);
                     } else {
                         //show and save the bitmap
@@ -211,7 +215,7 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.ElementV
 
     private void saveThumbToLocalFile(String fileName, final Bitmap bitmap, ElementViewHolder viewHolder) {
         FileOutputStream fileOutputStream = null;
-        if(bitmap == null) {
+        if (bitmap == null) {
             Log.d(LOGVAR, "saving bitmap is null");
         } else {
             try {

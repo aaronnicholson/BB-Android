@@ -49,74 +49,90 @@ public class ListItem extends View {
     public JSONObject getRawJSON() {
         return rawJSON;
     }
+
     public String getTitle() {
         return title;
     }
+
     public String getSectionTitle() {
         return sectionTitle;
     }
+
     public String getImageResource() {
         return imageResource;
     }
+
     public String getMediaFile() {
         return mediaFile;
     }
+
     public String getCategory() {
         return category;
     }
+
     public String getPrice() {
         return price;
     }
+
     public Boolean playInline() {
         return playInline;
     }
+
     public Boolean isPurchased() {
         return isPurchased;
     }
+
     public Boolean isFavorite() {
         return isFavorite;
     }
+
     public Boolean isPlaylistItem() {
         return isPlaylistItem;
     }
+
     public Boolean isPlaylist() {
         return isPlaylist;
     }
+
     public void setIsPurchased(Boolean isPurchased) {
         this.isPurchased = isPurchased;
     }
+
     public Boolean isSection() {
         return isSection;
     }
+
     public Boolean isPurchasable() {
         return isPurchasable;
     }
+
     private void setIsPurchasable() {
         isPurchasable = false;
 
         //sound board groups are purchasable
-        if(category.equals("5") && isSection) {
+        if (category.equals("5") && isSection) {
             isPurchasable = true;
         }
 
         //products that are not sound board items are purchasable
-        if(!category.equals("5") && !isSection) {
+        if (!category.equals("5") && !isSection) {
             isPurchasable = true;
         }
 
     }
 
     public Boolean doShowBackground() {
-        if(category.equals("1")) {
+        if (category.equals("1")) {
             showBackground = false;
         }
-        if(category.equals("5") && !isSection) {
+        if (category.equals("5") && !isSection) {
             showBackground = false;
         }
         return showBackground;
     }
+
     public Boolean doShowText() {
-        if(category.equals("5") && !isSection) {
+        if (category.equals("5") && !isSection) {
             showText = false;
         }
         return showText;
