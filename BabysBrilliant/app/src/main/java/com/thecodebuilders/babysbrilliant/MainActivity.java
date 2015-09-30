@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     public static final String HEARING_IMPAIRED = "hearing impaired";
 
     private static String LOGVAR = "MainActivity";
+
     private static String assetsURL;
     private static RecyclerView thumbnailList;
     RequestQueue queue;
@@ -625,6 +626,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     private void getLocalJSON() {
         try {
+            //TODO: pull this out of strings and into a flat file.
             processJSON(getString(R.string.raw_json));
 
         } catch (Throwable t) {
