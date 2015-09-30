@@ -37,8 +37,8 @@ import java.util.ArrayList;
 /**
  * Created by aaronnicholson on 8/17/15.
  */
-public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdapter.ElementViewHolder> {
-    private final String LOGVAR = "ThumbnailListAdapter";
+public class PurchasedAdapter extends RecyclerView.Adapter<PurchasedAdapter.ElementViewHolder> {
+    private final String LOGVAR = "PurchasedAdapter";
     private ArrayList<ListItem> elements;
     private final Context appContext = ApplicationContextProvider.getContext();
     ArrayList<JSONArray> products = new ArrayList<JSONArray>();
@@ -51,7 +51,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
 
     private MediaPlayer mediaPlayer;
 
-    public ThumbnailListAdapter(ArrayList listData, MainActivity mainActivity) {
+    public PurchasedAdapter(ArrayList listData, MainActivity mainActivity) {
         volleySingleton = VolleySingleton.getInstance();
         imageLoader = volleySingleton.getImageLoader();
         assetsList = listData;
@@ -299,7 +299,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
             Drawable drawable = Drawable.createFromStream(stream, null);
             viewHolder.thumbnailImage.setImageDrawable(drawable);
 
-        //but if it's not in there, get it from the server after displaying a placeholder
+            //but if it's not in there, get it from the server after displaying a placeholder
         } catch (Exception e) {
             //load the saved image and display it
             try {
@@ -307,7 +307,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
             } catch (FileNotFoundException localNotFoundError) {
                 localNotFoundError.printStackTrace();
                 //if that's not there, then get the real image from the server
-                CommonAdapterUtility.loadImageFromServer(listItem,viewHolder.thumbnailImage);
+                CommonAdapterUtility.loadImageFromServer(listItem, viewHolder.thumbnailImage);
             }
         }
 

@@ -28,7 +28,11 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.thecodebuilders.adapter.FavoritesAdapter;
+import com.thecodebuilders.adapter.PlaylistAdapter;
+import com.thecodebuilders.adapter.PurchasedAdapter;
 import com.thecodebuilders.adapter.SectionAdapter;
+import com.thecodebuilders.adapter.SoundBoardsAdapter;
 import com.thecodebuilders.adapter.ThumbnailListAdapter;
 import com.thecodebuilders.adapter.VideosAdapter;
 import com.thecodebuilders.application.ApplicationContextProvider;
@@ -183,6 +187,14 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             }
         });
 
+        soundBoardsButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                configureThumbnailList(soundBoards, "soundBoards");
+                currentMenu = SOUND_BOARDS;
+                toggleMenuButton(currentMenu);
+            }
+        });
+
         playListButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 //create a list of JSONObjects that the list adapter can understand
@@ -242,13 +254,6 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             }
         });
 
-        soundBoardsButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                configureThumbnailList(soundBoards, "section");
-                currentMenu = SOUND_BOARDS;
-                toggleMenuButton(currentMenu);
-            }
-        });
 
         hearingImpairedButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -455,9 +460,20 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         if (adapterType == "section") {
             SectionAdapter adapter = new SectionAdapter(listData, this);
             thumbnailList.setAdapter(adapter);
-        }
-        else if (adapterType == "videos") {
+        } else if (adapterType == "videos") {
             VideosAdapter adapter = new VideosAdapter(listData, this);
+            thumbnailList.setAdapter(adapter);
+        } else if (adapterType == "purchased") {
+            PurchasedAdapter adapter = new PurchasedAdapter(listData, this);
+            thumbnailList.setAdapter(adapter);
+        } else if (adapterType == "playlists") {
+            PlaylistAdapter adapter = new PlaylistAdapter(listData, this);
+            thumbnailList.setAdapter(adapter);
+        } else if (adapterType == "favorites") {
+            FavoritesAdapter adapter = new FavoritesAdapter(listData, this);
+            thumbnailList.setAdapter(adapter);
+        } else if (adapterType == "soundBoards") {
+            SoundBoardsAdapter adapter = new SoundBoardsAdapter(listData, this);
             thumbnailList.setAdapter(adapter);
         } else {
             ThumbnailListAdapter adapter = new ThumbnailListAdapter(listData, this);
