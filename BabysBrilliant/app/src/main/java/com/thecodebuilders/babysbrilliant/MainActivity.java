@@ -1,10 +1,13 @@
 package com.thecodebuilders.babysbrilliant;
 
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBar;
@@ -315,6 +318,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                 //show the video after a short delay to allow previous video image to clear out
                 new android.os.Handler().postDelayed(
                         new Runnable() {
+                            @SuppressLint("NewApi")
                             public void run() {
                                 videoView.setAlpha(1);
                             }
@@ -391,6 +395,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     private void setMenuWidth() {
         HorizontalScrollView menuScrollView = (HorizontalScrollView) findViewById(R.id.menu_scroll_view);
         ImageView logoView = (ImageView) findViewById(R.id.bblogo);
@@ -404,7 +409,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         int density = (int) displayMetrics.density;
         int margin = (int) getResources().getDimension(R.dimen.small_margin) / density;//to give scroll area its own margin
         int margins = margin * 4; //to account for left and right margins of logo, scroll view and settings icon
-        int menuHorizontalRoom = (int) (dpWidth - logoView.getMaxWidth() / displayMetrics.density - settingsView.getMaxWidth() / displayMetrics.density - margins);
+         int menuHorizontalRoom = (int) (dpWidth - logoView.getMaxWidth() / displayMetrics.density - settingsView.getMaxWidth() / displayMetrics.density - margins);
         int convertedWidth = (int) Utils.convertDpToPixel(menuHorizontalRoom, this);
 
         //set menu width
@@ -548,6 +553,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     }
 
+    @SuppressLint("NewApi")
     public void playVideo(String videoURL) {
         String url = mediaURL + videoURL;
         //TODO: temporary for testing
