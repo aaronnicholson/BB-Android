@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
@@ -314,73 +315,6 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         viewHolder.itemView.setTag(listItem);
     }
 
-   /* private void showPlaceHolderImage(ElementViewHolder viewHolder) {
-        InputStream stream = null;
-        try {
-            stream = appContext.getAssets().open("thumb_placeholder.png");
-        } catch (IOException e1) {
-            e1.printStackTrace();
-        }
-        Drawable drawable = Drawable.createFromStream(stream, null);
-        viewHolder.thumbnailImage.setImageDrawable(drawable);
-    }*/
-
-   /* private void loadImageFromServer(final ElementViewHolder viewHolder, final ListItem listItem) {
-
-        final String fileName = listItem.getImageResource();
-        if(fileName !=null) {
-
-            String mediaURL = appContext.getResources().getString(R.string.media_url) + fileName;
-            imageLoader.get(mediaURL, new ImageLoader.ImageListener() {
-                @Override
-                public void onResponse(ImageLoader.ImageContainer imageContainer, boolean stillLoading) {
-                    if(stillLoading) {
-                        showPlaceHolderImage(viewHolder);
-                    } else {
-                        //show and save the bitmap
-                        Bitmap loadedBitmap = imageContainer.getBitmap();
-                        Bitmap savedBitmap = Bitmap.createBitmap(loadedBitmap);
-                        viewHolder.thumbnailImage.setImageBitmap(loadedBitmap);
-                        CommonAdapterUtility.saveThumbToLocalFile(fileName, savedBitmap);
-                    }
-
-                }
-
-                @Override
-                public void onErrorResponse(VolleyError volleyError) {
-                    Log.e(LOGVAR, volleyError.getLocalizedMessage());
-                    showPlaceHolderImage(viewHolder);
-                }
-            });
-        }
-    }*/
-
-    /*private void saveThumbToLocalFile(String fileName, final Bitmap bitmap, ElementViewHolder viewHolder) {
-        FileOutputStream fileOutputStream = null;
-        if(bitmap == null) {
-            Log.d(LOGVAR, "saving bitmap is null");
-        } else {
-            try {
-                fileOutputStream = appContext.openFileOutput(fileName, Context.MODE_PRIVATE);
-                bitmap.compress(Bitmap.CompressFormat.PNG, 85, fileOutputStream);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    fileOutputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }*/
-
-   /* private void loadLocalSavedImage(String fileName, ElementViewHolder viewHolder) throws FileNotFoundException {
-        File file = new File(appContext.getFilesDir(), fileName);
-        Bitmap loadedBitmap = BitmapFactory.decodeStream(new FileInputStream(file));
-        viewHolder.thumbnailImage.setImageBitmap(loadedBitmap);
-    }*/
-
     private void previewClicked(int position) {
         ListItem listItem = elements.get(position);
         if (!listItem.getMediaFile().equals("")) mainActivity.playVideo(listItem.getMediaFile());
@@ -489,6 +423,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
     }
 
     public void playInlineVideo(String videoURL, final ElementViewHolder viewHolder) {
+        Log.d(LOGVAR, "play inline video");
         String url = mainActivity.mediaURL + videoURL;
         viewHolder.videoView.setAlpha(0);
         viewHolder.videoView.setVisibility(View.VISIBLE);

@@ -26,7 +26,7 @@ import java.util.ArrayList;
 /**
  * Created by aaronnicholson on 8/17/15.
  */
-public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.ElementViewHolder> {
+public class SectionAdapter extends RecyclerView.Adapter<ElementViewHolder> {
     private final String LOGVAR = "SectionAdapter";
     private ArrayList<ListItem> elements;
     private final Context appContext = ApplicationContextProvider.getContext();
@@ -93,7 +93,7 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.ElementV
         viewHolder.thumbnailImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                thumbnailClicked(position, thisViewHolder);
+                thumbnailClicked(position);
             }
         });
 
@@ -136,105 +136,13 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.ElementV
         viewHolder.itemView.setTag(listItem);
     }
 
-   /* private void setThumbnailImage(ElementViewHolder viewHolder, ListItem listItem) {
-    *//*This section will first look for the thumbnail in the assets folder.
-    * If it is not found there, it will look to see if it was previously downloaded and saved to internal memory.
-    * If it is not found there, it will download it from the server, and save it to internal memory for next time*//*
-
-        //load image from assets folder
-        String fileName = listItem.getImageResource();
-        try {
-            InputStream stream = appContext.getAssets().open(fileName);
-            Drawable drawable = Drawable.createFromStream(stream, null);
-            viewHolder.thumbnailImage.setImageDrawable(drawable);
-
-            //but if it's not in there, get it from the server after displaying a placeholder
-        } catch (Exception e) {
-            //load the saved image and display it
-            try {
-                CommonAdapterUtility.loadLocalSavedImage(fileName, viewHolder.thumbnailImage);
-            } catch (FileNotFoundException localNotFoundError) {
-                localNotFoundError.printStackTrace();
-                //if that's not there, then get the real image from the server
-                CommonAdapterUtility.loadImageFromServer(listItem, viewHolder.thumbnailImage);
-            }
-        }
-    }*/
-
-   /* private void showPlaceHolderImage(ElementViewHolder viewHolder) {
-        InputStream stream = null;
-        try {
-            stream = appContext.getAssets().open("thumb_placeholder.png");
-        } catch (IOException e1) {
-            e1.printStackTrace();
-        }
-        Drawable drawable = Drawable.createFromStream(stream, null);
-        viewHolder.thumbnailImage.setImageDrawable(drawable);
-    }*/
-
-    /*private void loadImageFromServer(final ElementViewHolder viewHolder, final ListItem listItem) {
-
-        final String fileName = listItem.getImageResource();
-        if (fileName != null) {
-
-            String mediaURL = appContext.getResources().getString(R.string.media_url) + fileName;
-            imageLoader.get(mediaURL, new ImageLoader.ImageListener() {
-                @Override
-                public void onResponse(ImageLoader.ImageContainer imageContainer, boolean stillLoading) {
-                    if (stillLoading) {
-                        CommonAdapterUtility.showPlaceHolderImage(viewHolder.thumbnailImage);
-                    } else {
-                        //show and save the bitmap
-                        Bitmap loadedBitmap = imageContainer.getBitmap();
-                        Bitmap savedBitmap = Bitmap.createBitmap(loadedBitmap);
-                        viewHolder.thumbnailImage.setImageBitmap(loadedBitmap);
-                        CommonAdapterUtility.saveThumbToLocalFile(fileName, savedBitmap);
-
-                    }
-
-                }
-
-                @Override
-                public void onErrorResponse(VolleyError volleyError) {
-                    Log.e(LOGVAR, volleyError.getLocalizedMessage());
-                    CommonAdapterUtility.showPlaceHolderImage(viewHolder.thumbnailImage);
-                }
-            });
-        }
-    }*/
-
-   /* private void saveThumbToLocalFile(String fileName, final Bitmap bitmap, ElementViewHolder viewHolder) {
-        FileOutputStream fileOutputStream = null;
-        if (bitmap == null) {
-            Log.d(LOGVAR, "saving bitmap is null");
-        } else {
-            try {
-                fileOutputStream = appContext.openFileOutput(fileName, Context.MODE_PRIVATE);
-                bitmap.compress(Bitmap.CompressFormat.PNG, 85, fileOutputStream);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    fileOutputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }*/
-
-    /*private void loadLocalSavedImage(String fileName, ElementViewHolder viewHolder) throws FileNotFoundException {
-        File file = new File(appContext.getFilesDir(), fileName);
-        Bitmap loadedBitmap = BitmapFactory.decodeStream(new FileInputStream(file));
-        viewHolder.thumbnailImage.setImageBitmap(loadedBitmap);
-    }*/
 
     private void previewClicked(int position) {
         ListItem listItem = elements.get(position);
         if (!listItem.getMediaFile().equals("")) mainActivity.playVideo(listItem.getMediaFile());
     }
 
-    private void thumbnailClicked(int position, ElementViewHolder thisViewHolder) {
+    private void thumbnailClicked(int position) {
 
         updateThumbnailList(position);
     }
@@ -282,20 +190,4 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.ElementV
         return elements.size();
     }
 
-    //just sets java handles for the layout items configured in the xml doc.
-    public class ElementViewHolder extends RecyclerView.ViewHolder {
-        private final TextView titleText;
-        private final ImageView thumbnailImage;
-        private final RelativeLayout textBackground;
-        private final TextView previewIcon;
-
-        public ElementViewHolder(View itemView) {
-            super(itemView);
-            thumbnailImage = (ImageView) itemView.findViewById(R.id.thumbnailImage);
-            titleText = (TextView) itemView.findViewById(R.id.titleText);
-            textBackground = (RelativeLayout) itemView.findViewById(R.id.textBackground);
-            previewIcon = (TextView) itemView.findViewById(R.id.preview_icon);
-        }
-
-    }
 }

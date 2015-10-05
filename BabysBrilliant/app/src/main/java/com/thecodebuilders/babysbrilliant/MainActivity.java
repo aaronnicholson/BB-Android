@@ -58,8 +58,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     public static final String MOVIES = "movies";
     public static final String MUSIC = "music";
     public static final String NIGHT_LIGHTS = "night lights";
-    public static final String
-            AUDIO_BOOKS = "audiobooks";
+    public static final String AUDIO_BOOKS = "audiobooks";
     public static final String SOUND_BOARDS = "soundboard";
     public static final String HEARING_IMPAIRED = "hearing impaired";
 
@@ -75,15 +74,11 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             createFromAsset(appContext.getAssets(), appContext.getString(R.string.font_awesome));
     public static Typeface proximaBold = Typeface.createFromAsset(appContext.getAssets(), appContext.getString(R.string.proxima_bold));
 
-    public static JSONObject
-            jsonData;
-    public static JSONArray
-            movies;
-    public static JSONArray
-            audioBooks;
+    public static JSONObject jsonData;
+    public static JSONArray movies;
+    public static JSONArray audioBooks;
     public static JSONArray hearingImpaired;
-    public static JSONArray
-            music;
+    public static JSONArray music;
     public static JSONArray nightLights;
     public static JSONArray soundBoards;
     public ArrayList<JSONArray> jsonSets = new ArrayList<>();
@@ -465,7 +460,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         if (adapterType == "section") {
             SectionAdapter adapter = new SectionAdapter(listData, this);
             thumbnailList.setAdapter(adapter);
-        } else if (adapterType == "videos") {
+        }
+       /* else if (adapterType == "videos") {
             VideosAdapter adapter = new VideosAdapter(listData, this);
             thumbnailList.setAdapter(adapter);
         } else if (adapterType == "purchased") {
@@ -480,7 +476,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         } else if (adapterType == "soundBoards") {
             SoundBoardsAdapter adapter = new SoundBoardsAdapter(listData, this);
             thumbnailList.setAdapter(adapter);
-        } else {
+        } */
+        else {
             ThumbnailListAdapter adapter = new ThumbnailListAdapter(listData, this);
             thumbnailList.setAdapter(adapter);
         }
@@ -657,7 +654,6 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         initApp();
     }
-
 
     private void getLocalJSON() {
         try {
