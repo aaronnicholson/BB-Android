@@ -10,9 +10,11 @@
 
     <!--ratio is .56-->
     <RelativeLayout
+        android:id="@+id/rel1"
         android:layout_width="360dp"
         android:layout_height="202dp"
         android:layout_alignParentBottom="true"
+        android:visibility="visible"
         >
 
         <ImageView
@@ -110,7 +112,18 @@
             android:layout_height="match_parent"
             android:visibility="invisible"/>
 
+
+
     </RelativeLayout>
+
+    <VideoView
+        android:id="@+id/videoView1"
+        android:layout_width="360dp"
+        android:layout_height="202dp"
+        android:layout_alignParentBottom="true"
+        android:fitsSystemWindows="true"
+        android:visibility="invisible"
+        />
 
 
 </RelativeLayout>

@@ -6,6 +6,7 @@ import android.graphics.SurfaceTexture;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.VideoView;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.thecodebuilders.application.ApplicationContextProvider;
@@ -47,6 +49,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
     MainActivity mainActivity;
     private VolleySingleton volleySingleton;
     private ImageLoader imageLoader;
+
 
     int listIncrement = 0; //for testing only
 
@@ -181,6 +184,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
 
     private void configureListItemListeners(ElementViewHolder viewHolder, final int position) {
         final ElementViewHolder thisViewHolder = viewHolder;
+        viewHolder.thumbnailImage.setTag(position);
         viewHolder.thumbnailImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -300,15 +304,15 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
             Drawable drawable = Drawable.createFromStream(stream, null);
             viewHolder.thumbnailImage.setImageDrawable(drawable);
 
-        //but if it's not in there, get it from the server after displaying a placeholder
+            //but if it's not in there, get it from the server after displaying a placeholder
         } catch (Exception e) {
             //load the saved image and display it
             try {
-                CommonAdapterUtility.loadLocalSavedImage(fileName,viewHolder.thumbnailImage);
+                CommonAdapterUtility.loadLocalSavedImage(fileName, viewHolder.thumbnailImage);
             } catch (FileNotFoundException localNotFoundError) {
                 localNotFoundError.printStackTrace();
                 //if that's not there, then get the real image from the server
-                CommonAdapterUtility.loadImageFromServer(listItem,viewHolder.thumbnailImage);
+                CommonAdapterUtility.loadImageFromServer(listItem, viewHolder.thumbnailImage);
             }
         }
 
@@ -413,7 +417,8 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
                 if (listItem.playInline()) {
                     //play inside the thumbnail
 //                    mainActivity.playVideo(listItem.getMediaFile());
-                    playInlineVideo(listItem.getMediaFile(), viewHolder);
+                    playInlineVideo(listItem.getMediaFile(), viewHolder, position
+                    );
                 } else {
                     //play in the main player
                     mainActivity.playVideo(listItem.getMediaFile());
@@ -422,15 +427,48 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         }
     }
 
-    public void playInlineVideo(String videoURL, final ElementViewHolder viewHolder) {
+    public void playInlineVideo(String videoURL, final ElementViewHolder viewHolder, int position) {
         Log.d(LOGVAR, "play inline video");
-        String url = mainActivity.mediaURL + videoURL;
+        Object s = viewHolder.thumbnailImage.getTag().equals("0");
+        // if(viewHolder.thumbnailImage.getTag().equals(0)||viewHolder.thumbnailImage.getTag().equals("0")) {
+        //   viewHolder.videoHolder.setVisibility(View.VISIBLE);
+        //     viewHolder.rel1.setVisibility(View.INVISIBLE);
+        //String url = mainActivity.mediaURL + videoURL;
+        String url = "https://s3-us-west-1.amazonaws.com/babysbrilliant-media/SoundboardCow2.mp4";
+
+        Uri video = Uri.parse("android.resource://" + mainActivity.getPackageName() + "/"
+                + R.raw.cow_sound);
+
+
+          /*  try {
+                // Uri video = Uri.parse(url);
+                Uri video = Uri.parse("android.resource://" + mainActivity.getPackageName() + "/"
+                        + R.raw.cow_sound);
+                viewHolder.videoHolder.setVideoURI(video);
+                viewHolder.videoHolder.requestFocus();
+                viewHolder.videoHolder.start();
+                viewHolder.videoHolder.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+
+                    public void onCompletion(MediaPlayer mp) {
+                        //viewHolder.videoHolder.start();
+                        viewHolder.videoHolder.setVisibility(View.INVISIBLE);
+                        viewHolder.rel1.setVisibility(View.VISIBLE);
+                    }
+
+                });
+
+            } catch (Exception ex) {
+
+            }*/
+        //    }
+
+
         viewHolder.videoView.setAlpha(0);
         viewHolder.videoView.setVisibility(View.VISIBLE);
 
         mediaPlayer = new MediaPlayer();
         try {
-            mediaPlayer.setDataSource(url); //this triggers the listener, which plays the video
+            mediaPlayer.setDataSource(mainActivity, video); //this triggers the listener, which plays the video
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -499,6 +537,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
 
     }
 
+
     private void updateThumbnailList(int position) {
         mainActivity.configureThumbnailList(products.get(position), "videos");
     }
@@ -542,6 +581,10 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         private final TextureView videoView;
         private final RelativeLayout listItemContainer;
 
+        private final RelativeLayout rel1;
+        VideoView videoHolder;
+
+
         public ElementViewHolder(View itemView) {
             super(itemView);
             thumbnailImage = (ImageView) itemView.findViewById(R.id.thumbnailImage);
@@ -553,6 +596,10 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
             previewIcon = (TextView) itemView.findViewById(R.id.preview_icon);
             videoView = (TextureView) itemView.findViewById(R.id.video_view_inline);
             listItemContainer = (RelativeLayout) itemView.findViewById(R.id.list_item_container);
+
+
+            rel1 = (RelativeLayout) itemView.findViewById(R.id.rel1);
+            videoHolder = (VideoView) itemView.findViewById(R.id.videoView1);
         }
 
     }

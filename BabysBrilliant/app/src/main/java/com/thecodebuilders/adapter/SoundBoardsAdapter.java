@@ -27,7 +27,7 @@ import java.util.ArrayList;
  * Created by aaronnicholson on 8/17/15.
  */
 public class SoundBoardsAdapter extends RecyclerView.Adapter<SoundBoardsAdapter.ElementViewHolder> {
-    private final String LOGVAR = "SectionAdapter";
+    private final String LOGVAR = "SoundBoardsAdapter";
     private ArrayList<ListItem> elements;
     private final Context appContext = ApplicationContextProvider.getContext();
     ArrayList<JSONArray> products = new ArrayList<JSONArray>();

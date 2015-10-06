@@ -31,13 +31,8 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.thecodebuilders.adapter.FavoritesAdapter;
-import com.thecodebuilders.adapter.PlaylistAdapter;
-import com.thecodebuilders.adapter.PurchasedAdapter;
 import com.thecodebuilders.adapter.SectionAdapter;
-import com.thecodebuilders.adapter.SoundBoardsAdapter;
 import com.thecodebuilders.adapter.ThumbnailListAdapter;
-import com.thecodebuilders.adapter.VideosAdapter;
 import com.thecodebuilders.application.ApplicationContextProvider;
 import com.thecodebuilders.beans.Playlist;
 import com.thecodebuilders.network.VolleySingleton;
@@ -427,7 +422,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     }
 
     //this is called when tapping on a menu item or subcategory and sets the list to the new content. JSONArray version. Then runs the ArrayList version.
-    public void configureThumbnailList(JSONArray jsonData, String adapterType) {
+    public void     configureThumbnailList(JSONArray jsonData, String adapterType) {
         //convert JSONArray to ArrayList
         ArrayList<JSONObject> listData = new ArrayList<>();
         try {
