@@ -6,7 +6,9 @@ import android.graphics.SurfaceTexture;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
@@ -15,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.VideoView;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.thecodebuilders.application.ApplicationContextProvider;
@@ -37,7 +40,7 @@ import java.util.ArrayList;
 /**
  * Created by aaronnicholson on 8/17/15.
  */
-public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ElementViewHolder> {
+public class PlaylistAdapter extends RecyclerView.Adapter<ElementViewHolder> {
     private final String LOGVAR = "PlaylistAdapter";
     private ArrayList<ListItem> elements;
     private final Context appContext = ApplicationContextProvider.getContext();
@@ -45,15 +48,9 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Elemen
     ArrayList<JSONObject> assetsList;
     MainActivity mainActivity;
     private VolleySingleton volleySingleton;
-    private ImageLoader imageLoader;
-
-    int listIncrement = 0; //for testing only
-
-    private MediaPlayer mediaPlayer;
 
     public PlaylistAdapter(ArrayList listData, MainActivity mainActivity) {
         volleySingleton = VolleySingleton.getInstance();
-        imageLoader = volleySingleton.getImageLoader();
         assetsList = listData;
         this.mainActivity = mainActivity;
         parseListItems(assetsList.size());
@@ -67,6 +64,9 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Elemen
         elements = new ArrayList<ListItem>(listLength);
         products = new ArrayList<JSONArray>();
 
+        Log.d(LOGVAR, "parse:" + listLength);
+
+
         for (int i = 0; i < listLength; i++) {
             JSONObject rawJSON;
             String name;
@@ -77,82 +77,17 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Elemen
             String mediaFile = "";
             Boolean isPurchased = false;
             Boolean isFavorite = false;
-            Boolean isSubcategory;
+            Boolean isSection = true;
             Boolean isPlaylistItem = false;
-            Boolean isPlaylist = false;
+            Boolean isPlaylist = true;
 
             try {
                 JSONObject itemJSON = assetsList.get(i);
-                //subcategories have a name field instead of a title field. We use that difference to determine if it is a product or subcategory item.
-                //if it is a list of products
-                if (itemJSON.isNull("name")) {
-                    name = itemJSON.getString("title");
-                    isSubcategory = false;
 
-                    //if it is a list of subcategories
-                } else {
-                    name = itemJSON.getString("name");
-                    if (!itemJSON.isNull("products"))
-                        products.add(itemJSON.getJSONArray("products"));
-                    isSubcategory = true;
+                name = itemJSON.getString("name");
+                if (!itemJSON.isNull("products"))
+                    products.add(itemJSON.getJSONArray("products"));
 
-                }
-
-                //soundboards are meant to play inside their thumbnail. Anything marked with the playInline attribute in the JSON will do so.
-                if (!itemJSON.isNull("playInline")) {
-                    if (itemJSON.getString("playInline").equals("true")) playInline = true;
-                }
-
-                //look through items in the PURCHASED list
-                //if this item is in there, mark it as purchased
-                for (int purchasedIndex = 0; purchasedIndex < mainActivity.purchasedItems.length(); purchasedIndex++) {
-                    //if it has no SKU, skip it
-                    if (!itemJSON.isNull("SKU")) {
-                        if (itemJSON.getString("SKU").equals(mainActivity.purchasedItems.getJSONObject(purchasedIndex).getString("SKU"))) {
-                            isPurchased = true;
-                        }
-                    }
-
-                }
-
-                //look through items in the FAVORITES list
-                //if this item is in there, mark it as favorite
-                for (int favoriteIndex = 0; favoriteIndex < mainActivity.favoriteItems.size(); favoriteIndex++) {
-                    //if it has no SKU, skip it
-                    if (!itemJSON.isNull("SKU")) {
-                        if (itemJSON.getString("SKU").equals(mainActivity.favoriteItems.get(favoriteIndex).getString("SKU"))) {
-                            isFavorite = true;
-                        }
-                    }
-                }
-
-                for (int favoriteIndex = 0; favoriteIndex < mainActivity.favoriteItems.size(); favoriteIndex++) {
-                    //if it has no SKU, skip it
-                    if (!itemJSON.isNull("SKU")) {
-                        if (itemJSON.getString("SKU").equals(mainActivity.favoriteItems.get(favoriteIndex).getString("SKU"))) {
-                            isFavorite = true;
-                        }
-                    }
-                }
-
-                //look through each playlist on MainActivity
-                for (int playlistIndex = 0; playlistIndex < mainActivity.playlists.size(); playlistIndex++) {
-                    //look at each item in the playlist
-                    Playlist playlist = mainActivity.playlists.get(playlistIndex);
-                    for (int playlistItemIndex = 0; playlistItemIndex < playlist.playlistItems.size(); playlistItemIndex++) {
-                        JSONObject playlistItem = playlist.playlistItems.get(playlistItemIndex);
-
-                        //if our original item has no SKU, skip it
-                        if (!itemJSON.isNull("SKU")) {
-                            if (itemJSON.getString("SKU").equals(playlistItem.getString("SKU"))) {
-                                //if this item matches the item in the playlist, mark it isPlaylistItem
-                                isPlaylistItem = true;
-                            }
-                        }
-                    }
-                }
-
-                rawJSON = itemJSON;
                 imageResource = itemJSON.getString("thumb");
                 if (!itemJSON.isNull("cat")) category = itemJSON.getString("cat");
 
@@ -163,16 +98,11 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Elemen
                     mediaFile = itemJSON.getString("preview");
                 }
 
-                //isPlaylist
-//                if (!itemJSON.isNull("isPlaylist") && itemJSON.getString("isPlaylist").equals("true")) {
-//                    isPlaylist = true;
-//                }
-
-                ListItem listItem = new ListItem(rawJSON, name, playInline, imageResource, mediaFile, price, category, isSubcategory, isPurchased, isPlaylistItem, isPlaylist, isFavorite, appContext);
+                ListItem listItem = new ListItem(itemJSON, name, playInline, imageResource, mediaFile, price, category, isSection, isPurchased, isPlaylistItem, isPlaylist, isFavorite, appContext);
 
                 elements.add(listItem);//TODO: make image dynamic
             } catch (Throwable t) {
-                //Log.e(LOGVAR, "JSON Error " + t.getMessage() + assetsList);
+                Log.e(LOGVAR, "JSON Error " + t.getMessage() + assetsList);
             }
         }
 
@@ -180,6 +110,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Elemen
 
     private void configureListItemListeners(ElementViewHolder viewHolder, final int position) {
         final ElementViewHolder thisViewHolder = viewHolder;
+        viewHolder.thumbnailImage.setTag(position);
         viewHolder.thumbnailImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -187,45 +118,22 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Elemen
             }
         });
 
-        viewHolder.favoritesIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                favoritesClicked(position, thisViewHolder);
-            }
-        });
-
-        viewHolder.previewIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                previewClicked(position);
-            }
-        });
-
-        viewHolder.playlistIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                playlistClicked(position, thisViewHolder);
-            }
-        });
-
-
     }
 
     private void configureListItemLook(final ElementViewHolder viewHolder, final ListItem listItem) {
 
         viewHolder.videoView.setVisibility(View.INVISIBLE);
-
+        viewHolder.previewIcon.setVisibility(View.INVISIBLE);
         viewHolder.favoritesIcon.setVisibility(View.INVISIBLE);
         viewHolder.playlistIcon.setVisibility(View.INVISIBLE);
+        viewHolder.priceText.setVisibility(View.INVISIBLE);
+
 
         //set text
         viewHolder.titleText.setText(listItem.getTitle());
-        viewHolder.priceText.setText(listItem.getPrice());
 
         //set font
         viewHolder.titleText.setTypeface(mainActivity.proximaBold);
-        viewHolder.priceText.setTypeface(mainActivity.proximaBold);
-        viewHolder.previewIcon.setTypeface(mainActivity.fontAwesome);
 
         //hide text background for certain sections
         //for music, hide subcategory and product text background
@@ -233,335 +141,22 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Elemen
             viewHolder.textBackground.setVisibility(View.INVISIBLE);
         }
 
-        //for soundboards, hide product footer entirely
-        if (!listItem.doShowText()) {
-            viewHolder.titleText.setVisibility(View.INVISIBLE);
-        }
+        viewHolder.titleText.setTextSize(16);
 
-        //set text size differently if it is a subcategory
-        if (listItem.isSection()) {
-            viewHolder.titleText.setTextSize(16);
-        } else {
-            viewHolder.titleText.setTextSize(13);
-        }
-
-        //hide price on subcategories
-        if (!listItem.isPurchasable()) {
-            viewHolder.priceText.setVisibility(View.INVISIBLE);
-        }
-
-        //if it has been purchased already
-        if (listItem.isPurchased()) {
-            setLookToPurchased(viewHolder);
-
-        }
-
-        if (listItem.isFavorite()) {
-            setLookToFavorite(viewHolder);
-        } else {
-            setLookToNotFavorite(viewHolder);
-        }
-
-        if (listItem.isPlaylistItem()) {
-            setLookToPlaylistItem(viewHolder);
-        } else {
-            setLookToNotPlaylistItem(viewHolder);
-        }
-
-        //TODO: Add check for null string of file name
-        if (listItem.isSection() && !listItem.isPurchasable()) {
-            viewHolder.previewIcon.setVisibility(View.VISIBLE);
-        } else {
-            viewHolder.previewIcon.setVisibility(View.INVISIBLE);
-
-        }
-
-        //default icon look
-        viewHolder.playlistIcon.setColorFilter(Color.WHITE);
-        viewHolder.favoritesIcon.setColorFilter(Color.WHITE);
-
-        if (listItem.isPlaylistItem()) {
-            setLookToPlaylistItem(viewHolder);
-        }
-
-        if (listItem.isPlaylist()) {
-            setLookToPlaylist(viewHolder);
-        }
-
-        /*This section will first look for the thumbnail in the assets folder.
-        * If it is not found there, it will look to see if it was previously downloaded and saved to internal memory.
-        * If it is not found there, it will download it from the server, and save it to internal memory for next time*/
-
-        //load image from assets folder
-        String fileName = listItem.getImageResource();
-        try {
-            InputStream stream = appContext.getAssets().open(fileName);
-            Drawable drawable = Drawable.createFromStream(stream, null);
-            viewHolder.thumbnailImage.setImageDrawable(drawable);
-
-            //but if it's not in there, get it from the server after displaying a placeholder
-        } catch (Exception e) {
-            //load the saved image and display it
-            try {
-                CommonAdapterUtility.loadLocalSavedImage(fileName,viewHolder.thumbnailImage);
-            } catch (FileNotFoundException localNotFoundError) {
-                localNotFoundError.printStackTrace();
-                //if that's not there, then get the real image from the server
-                CommonAdapterUtility.loadImageFromServer(listItem, viewHolder.thumbnailImage);
-            }
-        }
+        CommonAdapterUtility.setThumbnailImage(listItem,viewHolder.thumbnailImage);
 
         viewHolder.itemView.setTag(listItem);
-    }
-
-   /* private void showPlaceHolderImage(ElementViewHolder viewHolder) {
-        InputStream stream = null;
-        try {
-            stream = appContext.getAssets().open("thumb_placeholder.png");
-        } catch (IOException e1) {
-            e1.printStackTrace();
-        }
-        Drawable drawable = Drawable.createFromStream(stream, null);
-        viewHolder.thumbnailImage.setImageDrawable(drawable);
-    }*/
-
-   /* private void loadImageFromServer(final ElementViewHolder viewHolder, final ListItem listItem) {
-
-        final String fileName = listItem.getImageResource();
-        if(fileName !=null) {
-
-            String mediaURL = appContext.getResources().getString(R.string.media_url) + fileName;
-            imageLoader.get(mediaURL, new ImageLoader.ImageListener() {
-                @Override
-                public void onResponse(ImageLoader.ImageContainer imageContainer, boolean stillLoading) {
-                    if(stillLoading) {
-                        showPlaceHolderImage(viewHolder);
-                    } else {
-                        //show and save the bitmap
-                        Bitmap loadedBitmap = imageContainer.getBitmap();
-                        Bitmap savedBitmap = Bitmap.createBitmap(loadedBitmap);
-                        viewHolder.thumbnailImage.setImageBitmap(loadedBitmap);
-                        CommonAdapterUtility.saveThumbToLocalFile(fileName, savedBitmap);
-                    }
-
-                }
-
-                @Override
-                public void onErrorResponse(VolleyError volleyError) {
-                    Log.e(LOGVAR, volleyError.getLocalizedMessage());
-                    showPlaceHolderImage(viewHolder);
-                }
-            });
-        }
-    }*/
-
-    /*private void saveThumbToLocalFile(String fileName, final Bitmap bitmap, ElementViewHolder viewHolder) {
-        FileOutputStream fileOutputStream = null;
-        if(bitmap == null) {
-            Log.d(LOGVAR, "saving bitmap is null");
-        } else {
-            try {
-                fileOutputStream = appContext.openFileOutput(fileName, Context.MODE_PRIVATE);
-                bitmap.compress(Bitmap.CompressFormat.PNG, 85, fileOutputStream);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    fileOutputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }*/
-
-   /* private void loadLocalSavedImage(String fileName, ElementViewHolder viewHolder) throws FileNotFoundException {
-        File file = new File(appContext.getFilesDir(), fileName);
-        Bitmap loadedBitmap = BitmapFactory.decodeStream(new FileInputStream(file));
-        viewHolder.thumbnailImage.setImageBitmap(loadedBitmap);
-    }*/
-
-    private void previewClicked(int position) {
-        ListItem listItem = elements.get(position);
-        if (!listItem.getMediaFile().equals("")) mainActivity.playVideo(listItem.getMediaFile());
-    }
-
-    private void favoritesClicked(int position, ElementViewHolder thisViewHolder) {
-        ListItem listItem = elements.get(position);
-
-        if (listItem.isFavorite()) {
-            //TODO: remove from favorites
-            mainActivity.removeFromFavorites(listItem.getRawJSON());
-            setLookToNotFavorite(thisViewHolder);
-        } else {
-            mainActivity.addToFavorites(listItem.getRawJSON());
-            setLookToFavorite(thisViewHolder);
-        }
-    }
-
-    private void playlistClicked(int position, ElementViewHolder thisViewHolder) {
-        ListItem listItem = elements.get(position);
-        //remove listIncrement and replace with playlist chooser
-//        listIncrement++;
-        mainActivity.addToPlaylist(listItem.getRawJSON());
-
-
     }
 
     private void thumbnailClicked(int position, ElementViewHolder thisViewHolder) {
         ListItem listItem = elements.get(position);
 
-        //TODO: Handle for soundboard items - using "bundle" in JSON
+        playOrOpen(position, listItem, thisViewHolder);
 
-        if (listItem.isPurchasable()) {
-            //if it has been purchased already
-            if (listItem.isPurchased()) {
-                playOrOpen(position, listItem, thisViewHolder);
-                //if it has not been purchased already
-            } else {
-                listItem.setIsPurchased(true);
-                setLookToPurchased(thisViewHolder);
-                mainActivity.addToPurchased(listItem.getRawJSON());
-            }
-        } else {
-            //send the list of products for the clicked subcategory to make a new view showing them
-            playOrOpen(position, listItem, thisViewHolder);
-        }
-    }
-
-    private void setLookToFavorite(ElementViewHolder viewHolder) {
-        viewHolder.favoritesIcon.setColorFilter(Color.YELLOW);
-    }
-
-    private void setLookToNotFavorite(ElementViewHolder viewHolder) {
-        viewHolder.favoritesIcon.setColorFilter(Color.WHITE);
-    }
-
-    private void setLookToPurchased(ElementViewHolder viewHolder) {
-        viewHolder.priceText.setVisibility(View.INVISIBLE);
-
-        //TODO: hide these on soundboards?
-        viewHolder.favoritesIcon.setVisibility(View.VISIBLE);
-        viewHolder.playlistIcon.setVisibility(View.VISIBLE);
-        //Log.d(LOGVAR, "set to visible");
-    }
-
-    private void setLookToPlaylistItem(ElementViewHolder viewHolder) {
-        viewHolder.priceText.setVisibility(View.INVISIBLE);
-        viewHolder.playlistIcon.setColorFilter(Color.YELLOW);
-    }
-
-    private void setLookToNotPlaylistItem(ElementViewHolder viewHolder) {
-        viewHolder.priceText.setVisibility(View.INVISIBLE);
-        viewHolder.playlistIcon.setColorFilter(Color.WHITE);
-
-    }
-
-    private void setLookToPlaylist(ElementViewHolder viewHolder) {
-        viewHolder.previewIcon.setVisibility(View.INVISIBLE);
     }
 
     private void playOrOpen(int position, ListItem listItem, ElementViewHolder viewHolder) {
-        //if it's a soundboard category
-        if (listItem.isSection()) {
-            //set up section title
-            if (!assetsList.get(position).isNull("name")) {
-                try {
-                    mainActivity.setSectionTitle(assetsList.get(position).getString("name"));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-            updateThumbnailList(position);
-        } else {
-            //if it has a file name, play it
-            if (!listItem.getMediaFile().equals("")) {
-                if (listItem.playInline()) {
-                    //play inside the thumbnail
-//                    mainActivity.playVideo(listItem.getMediaFile());
-                    playInlineVideo(listItem.getMediaFile(), viewHolder);
-                } else {
-                    //play in the main player
-                    mainActivity.playVideo(listItem.getMediaFile());
-                }
-            }
-        }
-    }
-
-    public void playInlineVideo(String videoURL, final ElementViewHolder viewHolder) {
-        String url = mainActivity.mediaURL + videoURL;
-        viewHolder.videoView.setAlpha(0);
-        viewHolder.videoView.setVisibility(View.VISIBLE);
-
-        mediaPlayer = new MediaPlayer();
-        try {
-            mediaPlayer.setDataSource(url); //this triggers the listener, which plays the video
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        //TODO: show preloader
-
-        //TODO: put this on a separate thread
-        //TODO: download the video to local storage, then play
-        viewHolder.videoView.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
-            @Override
-            public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-                Surface s = new Surface(surface);
-
-                try {
-                    mediaPlayer.setSurface(s);
-                    mediaPlayer.prepare();
-//                    mediaPlayer.setOnBufferingUpdateListener(this);
-                    mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                        @Override
-                        public void onCompletion(MediaPlayer mp) {
-                            viewHolder.videoView.setAlpha(1);
-                            viewHolder.videoView.setVisibility(View.INVISIBLE);
-                        }
-                    });
-                    mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                        @Override
-                        public void onPrepared(MediaPlayer mp) {
-                            viewHolder.videoView.setAlpha(1);
-                        }
-                    });
-//                    mediaPlayer.setOnVideoSizeChangedListener(this);
-                    mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                    mediaPlayer.start();
-                } catch (IllegalArgumentException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (SecurityException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (IllegalStateException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-
-
-            @Override
-            public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-
-            }
-
-            @Override
-            public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-                return false;
-            }
-
-            @Override
-            public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-
-            }
-        });
-
-
+        //TODO: play playlist
     }
 
     private void updateThumbnailList(int position) {
@@ -595,30 +190,4 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Elemen
         return elements.size();
     }
 
-    //just sets java handles for the layout items configured in the xml doc.
-    public class ElementViewHolder extends RecyclerView.ViewHolder {
-        private final TextView titleText;
-        private final ImageView thumbnailImage;
-        private final TextView priceText;
-        private final RelativeLayout textBackground;
-        private final ImageView favoritesIcon;
-        private final ImageView playlistIcon;
-        private final TextView previewIcon;
-        private final TextureView videoView;
-        private final RelativeLayout listItemContainer;
-
-        public ElementViewHolder(View itemView) {
-            super(itemView);
-            thumbnailImage = (ImageView) itemView.findViewById(R.id.thumbnailImage);
-            titleText = (TextView) itemView.findViewById(R.id.titleText);
-            priceText = (TextView) itemView.findViewById(R.id.priceText);
-            textBackground = (RelativeLayout) itemView.findViewById(R.id.textBackground);
-            favoritesIcon = (ImageView) itemView.findViewById(R.id.favorites_icon);
-            playlistIcon = (ImageView) itemView.findViewById(R.id.playlist_icon);
-            previewIcon = (TextView) itemView.findViewById(R.id.preview_icon);
-            videoView = (TextureView) itemView.findViewById(R.id.video_view_inline);
-            listItemContainer = (RelativeLayout) itemView.findViewById(R.id.list_item_container);
-        }
-
-    }
 }

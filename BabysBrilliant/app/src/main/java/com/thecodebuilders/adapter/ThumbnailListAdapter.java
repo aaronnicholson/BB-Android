@@ -130,15 +130,6 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
                     }
                 }
 
-                for (int favoriteIndex = 0; favoriteIndex < mainActivity.favoriteItems.size(); favoriteIndex++) {
-                    //if it has no SKU, skip it
-                    if (!itemJSON.isNull("SKU")) {
-                        if (itemJSON.getString("SKU").equals(mainActivity.favoriteItems.get(favoriteIndex).getString("SKU"))) {
-                            isFavorite = true;
-                        }
-                    }
-                }
-
                 //look through each playlist on MainActivity
                 for (int playlistIndex = 0; playlistIndex < mainActivity.playlists.size(); playlistIndex++) {
                     //look at each item in the playlist
@@ -463,12 +454,15 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         //    }
 
 
-        viewHolder.videoView.setAlpha(0);
+//        viewHolder.videoView.setAlpha(0);
         viewHolder.videoView.setVisibility(View.VISIBLE);
 
         mediaPlayer = new MediaPlayer();
         try {
+            Log.d(LOGVAR, "set data source");
+
             mediaPlayer.setDataSource(mainActivity, video); //this triggers the listener, which plays the video
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -483,6 +477,8 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
                 Surface s = new Surface(surface);
 
                 try {
+                    Log.d(LOGVAR, "surface TRY block");
+
                     mediaPlayer.setSurface(s);
                     mediaPlayer.prepare();
 //                    mediaPlayer.setOnBufferingUpdateListener(this);
@@ -490,7 +486,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
                         @Override
                         public void onCompletion(MediaPlayer mp) {
                             viewHolder.videoView.setAlpha(1);
-                            viewHolder.videoView.setVisibility(View.INVISIBLE);
+//                            viewHolder.videoView.setVisibility(View.INVISIBLE);
                         }
                     });
                     mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {

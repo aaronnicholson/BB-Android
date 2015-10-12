@@ -3,13 +3,10 @@ package com.thecodebuilders.adapter;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.thecodebuilders.application.ApplicationContextProvider;
@@ -27,7 +24,7 @@ import java.util.ArrayList;
 /**
  * Created by aaronnicholson on 8/17/15.
  */
-public class VideosAdapter extends RecyclerView.Adapter<VideosAdapter.ElementViewHolder> {
+public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
     private final String LOGVAR = "VideosAdapter";
     private ArrayList<ListItem> elements;
     private final Context appContext = ApplicationContextProvider.getContext();
@@ -216,11 +213,7 @@ public class VideosAdapter extends RecyclerView.Adapter<VideosAdapter.ElementVie
 
     private void playlistClicked(int position, ElementViewHolder thisViewHolder) {
         ListItem listItem = elements.get(position);
-        //remove listIncrement and replace with playlist chooser
-//        listIncrement++;
         mainActivity.addToPlaylist(listItem.getRawJSON());
-
-
     }
 
     private void thumbnailClicked(int position, ElementViewHolder thisViewHolder) {
@@ -239,6 +232,7 @@ public class VideosAdapter extends RecyclerView.Adapter<VideosAdapter.ElementVie
     }
 
     private void setLookToFavorite(ElementViewHolder viewHolder) {
+        Log.d(LOGVAR, "SET LOOK FAV");
         viewHolder.favoritesIcon.setColorFilter(Color.YELLOW);
     }
 
@@ -292,26 +286,4 @@ public class VideosAdapter extends RecyclerView.Adapter<VideosAdapter.ElementVie
         return elements.size();
     }
 
-    //just sets java handles for the layout items configured in the xml doc.
-    public class ElementViewHolder extends RecyclerView.ViewHolder {
-        private final TextView titleText;
-        private final ImageView thumbnailImage;
-        private final TextView priceText;
-        private final RelativeLayout textBackground;
-        private final ImageView favoritesIcon;
-        private final ImageView playlistIcon;
-        private final TextureView videoView;
-
-        public ElementViewHolder(View itemView) {
-            super(itemView);
-            thumbnailImage = (ImageView) itemView.findViewById(R.id.thumbnailImage);
-            titleText = (TextView) itemView.findViewById(R.id.titleText);
-            priceText = (TextView) itemView.findViewById(R.id.priceText);
-            textBackground = (RelativeLayout) itemView.findViewById(R.id.textBackground);
-            favoritesIcon = (ImageView) itemView.findViewById(R.id.favorites_icon);
-            playlistIcon = (ImageView) itemView.findViewById(R.id.playlist_icon);
-            videoView = (TextureView) itemView.findViewById(R.id.video_view_inline);
-        }
-
-    }
 }
