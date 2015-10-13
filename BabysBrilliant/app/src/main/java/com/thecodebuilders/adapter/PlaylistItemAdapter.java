@@ -24,8 +24,8 @@ import java.util.ArrayList;
 /**
  * Created by aaronnicholson on 8/17/15.
  */
-public class PlaylistAdapter extends RecyclerView.Adapter<ElementViewHolder> {
-    private final String LOGVAR = "PlaylistAdapter";
+public class PlaylistItemAdapter extends RecyclerView.Adapter<ElementViewHolder> {
+    private final String LOGVAR = "PlaylistItemAdapter";
     private ArrayList<ListItem> elements;
     private final Context appContext = ApplicationContextProvider.getContext();
     ArrayList<JSONArray> products = new ArrayList<JSONArray>();
@@ -33,7 +33,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<ElementViewHolder> {
     MainActivity mainActivity;
     private VolleySingleton volleySingleton;
 
-    public PlaylistAdapter(ArrayList listData, MainActivity mainActivity) {
+    public PlaylistItemAdapter(ArrayList listData, MainActivity mainActivity) {
         volleySingleton = VolleySingleton.getInstance();
         assetsList = listData;
         this.mainActivity = mainActivity;
@@ -57,16 +57,14 @@ public class PlaylistAdapter extends RecyclerView.Adapter<ElementViewHolder> {
             String mediaFile = "";
             Boolean isPurchased = false;
             Boolean isFavorite = false;
-            Boolean isSection = true;
-            Boolean isPlaylistItem = false;
-            Boolean isPlaylist = true;
+            Boolean isSection = false;
+            Boolean isPlaylistItem = true;
+            Boolean isPlaylist = false;
 
             try {
                 JSONObject itemJSON = assetsList.get(i);
 
-                name = itemJSON.getString("name");
-                if (!itemJSON.isNull("products"))
-                    products.add(itemJSON.getJSONArray("products"));
+                name = itemJSON.getString("title");
 
                 imageResource = itemJSON.getString("thumb");
                 if (!itemJSON.isNull("cat")) category = itemJSON.getString("cat");
@@ -97,34 +95,28 @@ public class PlaylistAdapter extends RecyclerView.Adapter<ElementViewHolder> {
                 thumbnailClicked(position, thisViewHolder);
             }
         });
-        viewHolder.deletePlaylistIcon.setOnClickListener(new View.OnClickListener() {
+        viewHolder.deletePlaylistItemIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mainActivity.removePlaylist(position);
-            }
-        });
-        viewHolder.editPlaylistIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                editClicked(position);
+                mainActivity.removeItemFromPlaylist(position);
             }
         });
 
     }
 
     private void configureListItemLook(final ElementViewHolder viewHolder, final ListItem listItem) {
-        viewHolder.editPlaylistIcon.setVisibility(View.VISIBLE);
-        viewHolder.deletePlaylistIcon.setVisibility(View.VISIBLE);
+        viewHolder.bumpLeftIcon.setVisibility(View.VISIBLE);
+        viewHolder.bumpRightIcon.setVisibility(View.VISIBLE);
+        viewHolder.deletePlaylistItemIcon.setVisibility(View.VISIBLE);
 
         //set text
         viewHolder.titleText.setText(listItem.getTitle());
 
         //set font
         viewHolder.titleText.setTypeface(mainActivity.proximaBold);
-        viewHolder.deletePlaylistIcon.setTypeface(mainActivity.fontAwesome);
-
-        viewHolder.editPlaylistIcon.setColorFilter(Color.WHITE);
-
+        viewHolder.bumpLeftIcon.setTypeface(mainActivity.fontAwesome);
+        viewHolder.bumpRightIcon.setTypeface(mainActivity.fontAwesome);
+        viewHolder.deletePlaylistItemIcon.setTypeface(mainActivity.fontAwesome);
 
         //hide text background for certain sections
         //for music, hide subcategory and product text background
@@ -132,7 +124,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<ElementViewHolder> {
             viewHolder.textBackground.setVisibility(View.INVISIBLE);
         }
 
-        viewHolder.titleText.setTextSize(16);
+        viewHolder.titleText.setTextSize(13);
 
         CommonAdapterUtility.setThumbnailImage(listItem, viewHolder.thumbnailImage);
 
@@ -142,25 +134,8 @@ public class PlaylistAdapter extends RecyclerView.Adapter<ElementViewHolder> {
     private void thumbnailClicked(int position, ElementViewHolder thisViewHolder) {
         ListItem listItem = elements.get(position);
 
-        //TODO: play playlist
+        mainActivity.playVideo(listItem.getMediaFile());
 
-    }
-
-    private void editClicked(int position) {
-        //set up section title
-        if (!assetsList.get(position).isNull("name")) {
-            try {
-                mainActivity.setSectionTitle(assetsList.get(position).getString("name"));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-        mainActivity.activePlaylist = position;
-        updateThumbnailList(position);
-    }
-
-    private void updateThumbnailList(int position) {
-        mainActivity.configureThumbnailList(products.get(position), "playlistItems");
     }
 
     //attaches the xml layout doc to each menu item to configure it visually.

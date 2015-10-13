@@ -11,10 +11,10 @@
     <string name="video_ff">\uf050</string>
     <string name="video_rew">\uf049</string>
     <string name="video_close"></string>
-    <string name="video_download">\u063</string>
-    <string name="arrow_right">\u061</string>
-    <string name="arrow_left">\u060</string>
-    <string name="delete">\u00d</string>
+    <string name="video_download">\uf063</string>
+    <string name="arrow_right">\uf061</string>
+    <string name="arrow_left">\uf060</string>
+    <string name="delete">\uf00d</string>
     <string name="menu_dark_grey">#676767</string>
     <string name="font_awesome">fonts/FontAwesome.otf</string>
     <string name="title_playlists">playlists</string>

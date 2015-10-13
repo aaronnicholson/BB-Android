@@ -20,6 +20,11 @@ public class ElementViewHolder extends RecyclerView.ViewHolder {
     public final ImageView favoritesIcon;
     public final ImageView playlistIcon;
     public final TextView previewIcon;
+    public final TextView deletePlaylistIcon;
+    public final TextView deletePlaylistItemIcon;
+    public final TextView bumpLeftIcon;
+    public final TextView bumpRightIcon;
+    public final ImageView editPlaylistIcon;
     public final TextureView videoView;
     public final RelativeLayout listItemContainer;
 
@@ -31,7 +36,12 @@ public class ElementViewHolder extends RecyclerView.ViewHolder {
         textBackground = (RelativeLayout) itemView.findViewById(R.id.textBackground);
         favoritesIcon = (ImageView) itemView.findViewById(R.id.favorites_icon);
         playlistIcon = (ImageView) itemView.findViewById(R.id.playlist_icon);
+        editPlaylistIcon = (ImageView) itemView.findViewById(R.id.edit_playlist);
         previewIcon = (TextView) itemView.findViewById(R.id.preview_icon);
+        deletePlaylistIcon = (TextView) itemView.findViewById(R.id.delete_playlist);
+        deletePlaylistItemIcon = (TextView) itemView.findViewById(R.id.delete_playlist_item);
+        bumpLeftIcon = (TextView) itemView.findViewById(R.id.bump_left);
+        bumpRightIcon = (TextView) itemView.findViewById(R.id.bump_right);
         videoView = (TextureView) itemView.findViewById(R.id.video_view_inline);
         listItemContainer = (RelativeLayout) itemView.findViewById(R.id.list_item_container);
     }

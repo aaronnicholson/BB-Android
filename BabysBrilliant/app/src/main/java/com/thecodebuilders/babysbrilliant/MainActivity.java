@@ -32,6 +32,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.thecodebuilders.adapter.PlaylistAdapter;
+import com.thecodebuilders.adapter.PlaylistItemAdapter;
 import com.thecodebuilders.adapter.SectionAdapter;
 import com.thecodebuilders.adapter.ThumbnailListAdapter;
 import com.thecodebuilders.adapter.VideosAdapter;
@@ -89,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     //TODO: fetch and populated pre-purchased items from user db
     public static JSONArray purchasedItems = new JSONArray();
     public static ArrayList<Playlist> playlists = new ArrayList<>();
+    public int activePlaylist = 0;
     public JSONObject pendingPlaylistItem;
 
     private static RelativeLayout videoLayout;
@@ -466,6 +468,10 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             PlaylistAdapter adapter = new PlaylistAdapter(listData, this);
             thumbnailList.setAdapter(adapter);
         }
+        else if (adapterType == "playlistItems") {
+            PlaylistItemAdapter adapter = new PlaylistItemAdapter(listData, this);
+            thumbnailList.setAdapter(adapter);
+        }
         /* else if (adapterType == "purchased") {
             PurchasedAdapter adapter = new PurchasedAdapter(listData, this);
             thumbnailList.setAdapter(adapter);
@@ -546,7 +552,25 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             Toast.makeText(MainActivity.this, "Your video was added to the new " + name + " playlist." + " We've brought you to the playlists section.", Toast.LENGTH_SHORT).show();
             playListButton.performClick();
         }
+    }
 
+    public void removePlaylist(int index) {
+        //TODO: insert permission interstitial
+        playlists.remove(index);
+        playListButton.performClick();
+    }
+
+    public void removeItemFromPlaylist(int index) {
+        playlists.get(activePlaylist).removePlaylistItemAtIndex(index);
+
+        //if this makes the playlist empty, remove the playlist
+        if(playlists.get(activePlaylist).playlistItems.size() < 1) {
+            playlists.remove(activePlaylist);
+            playListButton.performClick();
+        } else {
+            playListButton.performClick();
+            //TODO: refresh this playlist view instead of going to playlist top level
+        }
     }
 
     @SuppressLint("NewApi")
