@@ -5,9 +5,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.thecodebuilders.application.ApplicationContextProvider;
@@ -135,7 +132,6 @@ public class SectionAdapter extends RecyclerView.Adapter<ElementViewHolder> {
 
         viewHolder.itemView.setTag(listItem);
     }
-
 
     private void previewClicked(int position) {
         ListItem listItem = elements.get(position);

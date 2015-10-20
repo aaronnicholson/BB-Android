@@ -31,8 +31,11 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.thecodebuilders.adapter.PlaylistAdapter;
+import com.thecodebuilders.adapter.PlaylistItemAdapter;
 import com.thecodebuilders.adapter.SectionAdapter;
 import com.thecodebuilders.adapter.ThumbnailListAdapter;
+import com.thecodebuilders.adapter.VideosAdapter;
 import com.thecodebuilders.application.ApplicationContextProvider;
 import com.thecodebuilders.beans.Playlist;
 import com.thecodebuilders.network.VolleySingleton;
@@ -87,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     //TODO: fetch and populated pre-purchased items from user db
     public static JSONArray purchasedItems = new JSONArray();
     public static ArrayList<Playlist> playlists = new ArrayList<>();
+    public int activePlaylist = 0;
     public JSONObject pendingPlaylistItem;
 
     private static RelativeLayout videoLayout;
@@ -174,7 +178,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         favoritesButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                configureThumbnailList(favoriteItems, "favorites");
+                configureThumbnailList(favoriteItems, "videos");
                 currentMenu = FAVORITE_ITEMS;
                 toggleMenuButton(currentMenu);
             }
@@ -422,7 +426,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     }
 
     //this is called when tapping on a menu item or subcategory and sets the list to the new content. JSONArray version. Then runs the ArrayList version.
-    public void     configureThumbnailList(JSONArray jsonData, String adapterType) {
+    public void configureThumbnailList(JSONArray jsonData, String adapterType) {
         //convert JSONArray to ArrayList
         ArrayList<JSONObject> listData = new ArrayList<>();
         try {
@@ -456,16 +460,22 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             SectionAdapter adapter = new SectionAdapter(listData, this);
             thumbnailList.setAdapter(adapter);
         }
-       /* else if (adapterType == "videos") {
+        else if (adapterType == "videos") {
             VideosAdapter adapter = new VideosAdapter(listData, this);
             thumbnailList.setAdapter(adapter);
-        } else if (adapterType == "purchased") {
-            PurchasedAdapter adapter = new PurchasedAdapter(listData, this);
-            thumbnailList.setAdapter(adapter);
-        } else if (adapterType == "playlists") {
+        }
+        else if (adapterType == "playlists") {
             PlaylistAdapter adapter = new PlaylistAdapter(listData, this);
             thumbnailList.setAdapter(adapter);
-        } else if (adapterType == "favorites") {
+        }
+        else if (adapterType == "playlistItems") {
+            PlaylistItemAdapter adapter = new PlaylistItemAdapter(listData, this);
+            thumbnailList.setAdapter(adapter);
+        }
+        /* else if (adapterType == "purchased") {
+            PurchasedAdapter adapter = new PurchasedAdapter(listData, this);
+            thumbnailList.setAdapter(adapter);
+        }  else if (adapterType == "favorites") {
             FavoritesAdapter adapter = new FavoritesAdapter(listData, this);
             thumbnailList.setAdapter(adapter);
         } else if (adapterType == "soundBoards") {
@@ -542,7 +552,25 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             Toast.makeText(MainActivity.this, "Your video was added to the new " + name + " playlist." + " We've brought you to the playlists section.", Toast.LENGTH_SHORT).show();
             playListButton.performClick();
         }
+    }
 
+    public void removePlaylist(int index) {
+        //TODO: insert permission interstitial
+        playlists.remove(index);
+        playListButton.performClick();
+    }
+
+    public void removeItemFromPlaylist(int index) {
+        playlists.get(activePlaylist).removePlaylistItemAtIndex(index);
+
+        //if this makes the playlist empty, remove the playlist
+        if(playlists.get(activePlaylist).playlistItems.size() < 1) {
+            playlists.remove(activePlaylist);
+            playListButton.performClick();
+        } else {
+            playListButton.performClick();
+            //TODO: refresh this playlist view instead of going to playlist top level
+        }
     }
 
     @SuppressLint("NewApi")
