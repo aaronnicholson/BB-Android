@@ -1,4 +1,4 @@
-package com.thecodebuilders.beans;
+package com.thecodebuilders.model;
 
 import org.json.JSONObject;
 

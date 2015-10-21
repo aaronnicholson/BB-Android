@@ -24,7 +24,7 @@ import com.thecodebuilders.application.ApplicationContextProvider;
 import com.thecodebuilders.babysbrilliant.ListItem;
 import com.thecodebuilders.babysbrilliant.MainActivity;
 import com.thecodebuilders.babysbrilliant.R;
-import com.thecodebuilders.beans.Playlist;
+import com.thecodebuilders.model.Playlist;
 import com.thecodebuilders.network.VolleySingleton;
 
 import org.json.JSONArray;

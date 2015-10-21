@@ -3,6 +3,7 @@ package com.thecodebuilders.babysbrilliant;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.media.MediaPlayer;
@@ -37,7 +38,7 @@ import com.thecodebuilders.adapter.SectionAdapter;
 import com.thecodebuilders.adapter.ThumbnailListAdapter;
 import com.thecodebuilders.adapter.VideosAdapter;
 import com.thecodebuilders.application.ApplicationContextProvider;
-import com.thecodebuilders.beans.Playlist;
+import com.thecodebuilders.model.Playlist;
 import com.thecodebuilders.network.VolleySingleton;
 import com.thecodebuilders.utility.Utils;
 
@@ -109,6 +110,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     ImageView audioBooksButton;
     ImageView soundBoardsButton;
     ImageView hearingImpairedButton;
+    ImageView settings;
 
     static TextView sectionTitle;
 
@@ -133,6 +135,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         audioBooksButton = (ImageView) findViewById(R.id.audiobooks);
         soundBoardsButton = (ImageView) findViewById(R.id.soundboards);
         hearingImpairedButton = (ImageView) findViewById(R.id.hearingimpaired);
+        settings = (ImageView) findViewById(R.id.settings);
 
         videoToggleButton = (TextView) findViewById(R.id.video_toggle_button);
         videoCloseButton = (TextView) findViewById(R.id.video_close_button);
@@ -257,6 +260,13 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                 configureThumbnailList(hearingImpaired, "section");
                 currentMenu = HEARING_IMPAIRED;
                 toggleMenuButton(currentMenu);
+            }
+        });
+
+        settings.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent setting  = new Intent(MainActivity.this, ParentalChallengeScreen.class);
+                startActivity(setting);
             }
         });
 

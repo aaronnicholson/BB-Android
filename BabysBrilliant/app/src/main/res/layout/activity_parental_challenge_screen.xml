@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FE0000"
+    android:orientation="vertical"
+    android:weightSum="1" >
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:layout_weight="0.25"
+        android:gravity="center"
+        android:orientation="vertical" >
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.05" />
+
+        <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_gravity="center"
+            android:layout_weight="0.1"
+            android:fontFamily="fonts/ProximaNovaSoft-Bold.otf"
+            android:gravity="center"
+            android:text="GROWN-UPS ONLY!"
+            android:textColor="#FDF8F5"
+            android:textSize="16sp" />
+
+        <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="0.1"
+            android:text="You are about to enter Settings"
+            android:textColor="#FDF8F5"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.05" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.6"
+        android:orientation="horizontal"
+        android:weightSum="1" >
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.6"
+            android:orientation="vertical" >
+
+            <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="To complete your action, please enter the numbers:"
+                android:textColor="#FDF8F5"
+                android:textSize="14sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.2"
+                android:gravity="center"
+                android:orientation="horizontal"
+                >
+
+                <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
+                    android:id="@+id/digit_first"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:text="ONE"
+                    android:textColor="#FDF8F5"
+                    android:textSize="14sp" />
+
+                <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
+                    android:id="@+id/digit_second"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="10dp"
+                    android:gravity="center"
+                    android:text="ONE"
+                    android:textColor="#FDF8F5"
+                    android:textSize="14sp" />
+
+                <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
+                    android:id="@+id/digit_third"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="10dp"
+                    android:gravity="center"
+                    android:text="ONE"
+                    android:textColor="#FDF8F5"
+                    android:textSize="14sp" />
+
+                <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
+                    android:id="@+id/digit_fourth"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="10dp"
+                    android:gravity="center"
+                    android:text="ONE"
+                    android:textColor="#FDF8F5"
+                    android:textSize="14sp" />
+            </LinearLayout>
+            
+            
+             <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.2"
+                android:gravity="center"
+                android:orientation="horizontal" >
+
+                <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
+                    android:id="@+id/num_digit_first"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:text=""
+                    android:visibility="visible"
+                    android:textColor="#FDF8F5"
+                    android:textSize="18sp" />
+
+                <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
+                    android:id="@+id/num_digit_second"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="10dp"
+                    android:gravity="center"
+                    android:text=""
+                    android:visibility="visible"
+                    android:textColor="#FDF8F5"
+                    android:textSize="18sp" />
+
+                <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
+                    android:id="@+id/num_digit_third"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="10dp"
+                    android:gravity="center"
+                    android:visibility="visible"
+                    android:text=""
+                    android:textColor="#FDF8F5"
+                    android:textSize="18sp" />
+
+                <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
+                    android:id="@+id/num_digit_fourth"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="10dp"
+                    android:gravity="center"
+                    android:text=""
+                    android:visibility="visible"
+                    android:textColor="#FDF8F5"
+                    android:textSize="18sp" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.2" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.4"
+            android:orientation="vertical"
+            android:weightSum="0.6" >
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_gravity="center"
+                android:layout_weight="0.1"
+                android:orientation="horizontal"
+              >
+
+                <!-- com.thecodebuilders.FontFamily.ProximaNovaSoftBold -->
+
+                <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
+                    android:id="@+id/one_digit"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:text="1"
+                    android:onClick="Click"
+                    android:textColor="#FDF8F5"
+                    android:textSize="22sp" />
+
+                <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
+                    android:id="@+id/two_digit"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="30dp"
+                    android:text="2"
+                    android:onClick="Click"
+                    android:textColor="#FDF8F5"
+                    android:textSize="22sp" />
+
+                <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
+                    android:id="@+id/three_digit"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="30dp"
+                    android:text="3"
+                    android:onClick="Click"
+                    android:textColor="#FDF8F5"
+                    android:textSize="22sp" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.05" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_gravity="center"
+                android:layout_weight="0.1"
+                android:orientation="horizontal" >
+
+                <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
+                    android:id="@+id/four_digit"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:text="4"
+                    android:onClick="Click"
+                    android:textColor="#FDF8F5"
+                    android:textSize="22sp" />
+
+                <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
+                    android:id="@+id/five_digit"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="30dp"
+                    android:text="5"
+                    android:onClick="Click"
+                    android:textColor="#FDF8F5"
+                    android:textSize="22sp" />
+
+                <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
+                    android:id="@+id/six_digit"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="30dp"
+                    android:text="6"
+                    android:onClick="Click"
+                    android:textColor="#FDF8F5"
+                    android:textSize="22sp" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.05" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_gravity="center"
+                android:layout_weight="0.1"
+                android:orientation="horizontal" >
+
+                <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
+                    android:id="@+id/seven_digit"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:text="7"
+                    android:onClick="Click"
+                    android:textColor="#FDF8F5"
+                    android:textSize="22sp" />
+
+                <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
+                    android:id="@+id/eight_digit"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="30dp"
+                    android:text="8"
+                    android:onClick="Click"
+                    android:textColor="#FDF8F5"
+                    android:textSize="22sp" />
+
+                <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
+                    android:id="@+id/nine_digit"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="30dp"
+                    android:text="9"
+                    android:onClick="Click"
+                    android:textColor="#FDF8F5"
+                    android:textSize="22sp" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.05" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_gravity="center"
+                android:layout_weight="0.1"
+                android:orientation="horizontal" >
+
+                <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:text="7"
+                    android:onClick="Click"
+                    android:textColor="#FDF8F5"
+                    android:textSize="18sp"
+                    android:visibility="invisible" />
+
+                <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
+                    android:id="@+id/zero_digit"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="30dp"
+                    android:text="0"
+                    android:onClick="Click"
+                    android:textColor="#FDF8F5"
+                    android:textSize="22sp" />
+
+                <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
+                    android:id="@+id/erase_digit"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="30dp"
+                    android:text="9"
+                    android:onClick="Click"
+                    android:textColor="#FDF8F5"
+                    android:textSize="22sp" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:layout_weight="0.1"
+        android:gravity="center"
+        android:orientation="horizontal" >
+
+        <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
+            android:id="@+id/cancel_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CANCEL"
+            android:onClick="Click"
+            android:textColor="#F5F906"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+</LinearLayout>
