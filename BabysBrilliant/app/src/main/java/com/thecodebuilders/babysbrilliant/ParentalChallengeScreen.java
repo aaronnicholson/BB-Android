@@ -1,5 +1,6 @@
 package com.thecodebuilders.babysbrilliant;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -166,6 +167,9 @@ public class ParentalChallengeScreen extends AppCompatActivity {
                 if (randomNumber.equalsIgnoreCase(num_digit_first.getText() + "" + num_digit_second.getText() + num_digit_third.getText() + num_digit_fourth.getText())) {
 
                     Toast.makeText(getApplicationContext(), "Success", Toast.LENGTH_SHORT).show();
+                    Intent mainIntent = new Intent(ParentalChallengeScreen.this, Settings.class);
+                    startActivity(mainIntent);
+                    ParentalChallengeScreen.this.finish();
                 }
 
             } else {

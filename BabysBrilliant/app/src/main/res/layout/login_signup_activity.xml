@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFF000"
+    android:orientation="vertical"
+    android:weightSum="1">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+
+        android:layout_weight="0.25"
+        android:orientation="horizontal"
+        android:weightSum="1">
+
+
+        <ImageView
+            android:id="@+id/bblogo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.2"
+            android:adjustViewBounds="true"
+            android:maxWidth="100dp"
+            android:src="@drawable/bblogo" />
+
+        <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="10dp"
+            android:layout_weight="0.8"
+            android:fontFamily="fonts/ProximaNovaSoft-Bold.otf"
+            android:text="@string/hard_txt"
+            android:textColor="#312F30"
+            android:textSize="12sp" />
+
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.005" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.6"
+
+        android:orientation="horizontal"
+        android:weightSum="1">
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.18" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.82"
+
+            android:orientation="vertical">
+
+
+            <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Please log in or sign up:"
+                android:textColor="#312F30"
+                android:textSize="20sp" />
+
+            <EditText
+                android:id="@+id/email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="textEmailAddress"
+                android:textColor="#312F30" />
+
+            <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="email address"
+                android:textColor="#312F30"
+                android:textSize="20sp" />
+
+            <EditText
+                android:id="@+id/passwd"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="textEmailAddress"
+                android:textColor="#312F30" />
+
+            <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="password"
+                android:textColor="#312F30"
+                android:textSize="20sp" />
+
+            <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Make sure these are correct and that you've written down your password!"
+                android:textColor="#312F30"
+                android:textSize="16sp" />
+
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+
+        android:layout_weight="0.15"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:weightSum="1">
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.18" />
+
+        <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
+            android:id="@+id/login"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.2"
+            android:gravity="center|left"
+            android:onClick="Click"
+            android:text="LOG IN"
+            android:textColor="#312F30"
+            android:textSize="18sp" />
+
+        <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
+            android:id="@+id/reset_pass"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.2"
+            android:gravity="center"
+            android:onClick="Click"
+            android:text="RESET PASSWORD"
+            android:textColor="#312F30"
+            android:textSize="18sp" />
+
+        <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
+            android:id="@+id/sign_up"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.2"
+            android:gravity="center|right"
+            android:onClick="Click"
+            android:text="SIGN UP"
+            android:textColor="#312F30"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+</LinearLayout>

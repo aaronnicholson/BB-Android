@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Baby\'s Brilliant</string>
     <string name="media_url">https://s3-us-west-1.amazonaws.com/babysbrilliant-media/</string>
-
+<string name="hard_txt">You\'ll start with three free videos and you can purchase more for   your collection.\n\n If you\'ve been having problems logging in or recovering content tap  RESET PASSWORD. If you continue to have problems, email  support@babybrilliant.com for help</string>
     <string name="action_settings">Settings</string>
     <string name="assets_url">http://new.babysbrilliant.com/app/?a=pDBstandard</string>
     <string name="proxima_bold">fonts/ProximaNovaSoft-Bold.otf</string>
