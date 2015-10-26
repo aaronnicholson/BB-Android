@@ -38,7 +38,7 @@
 
         <activity
             android:name=".SplashScreen"
-            android:label="@string/title_activity_parental_challenge_screen"
+            android:label="@string/app_name"
             android:screenOrientation="landscape">
 
             <intent-filter>

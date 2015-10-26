@@ -2,6 +2,7 @@ package com.thecodebuilders.babysbrilliant;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -40,6 +41,7 @@ import com.thecodebuilders.adapter.VideosAdapter;
 import com.thecodebuilders.application.ApplicationContextProvider;
 import com.thecodebuilders.model.Playlist;
 import com.thecodebuilders.network.VolleySingleton;
+import com.thecodebuilders.utility.Constant;
 import com.thecodebuilders.utility.Utils;
 
 import org.json.JSONArray;
@@ -123,8 +125,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        assetsURL = getString(R.string.assets_url);
+        //http://new.babysbrilliant.com/app/?a=pDBstandard
+        assetsURL = Constant.URL + "a=pDBstandard";
 
         homeButton = (ImageView) findViewById(R.id.bblogo);
         playListButton = (ImageView) findViewById(R.id.playlists);
@@ -169,6 +171,23 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (requestCode == 1) {
+            if (resultCode == Activity.RESULT_OK) {
+
+                configureThumbnailList(favoriteItems, "videos");
+                currentMenu = FAVORITE_ITEMS;
+                toggleMenuButton(currentMenu);
+
+            }
+            if (resultCode == Activity.RESULT_CANCELED) {
+                //Write your code if there's no result
+            }
+        }
+    }//onActivityResult
+
     private void setUpListeners() {
 
         homeButton.setOnClickListener(new View.OnClickListener() {
@@ -181,9 +200,14 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         favoritesButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                configureThumbnailList(favoriteItems, "videos");
+
+               /* configureThumbnailList(favoriteItems, "videos");
                 currentMenu = FAVORITE_ITEMS;
-                toggleMenuButton(currentMenu);
+                toggleMenuButton(currentMenu);*/
+
+
+                Intent mainIntent = new Intent(MainActivity.this, ParentalChallengeScreen.class);
+                startActivityForResult(mainIntent, 1);
             }
         });
 
@@ -265,7 +289,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         settings.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent setting  = new Intent(MainActivity.this, ParentalChallengeScreen.class);
+                Intent setting = new Intent(MainActivity.this, ParentalChallengeScreen.class);
                 startActivity(setting);
             }
         });
@@ -413,7 +437,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         int density = (int) displayMetrics.density;
         int margin = (int) getResources().getDimension(R.dimen.small_margin) / density;//to give scroll area its own margin
         int margins = margin * 4; //to account for left and right margins of logo, scroll view and settings icon
-         int menuHorizontalRoom = (int) (dpWidth - logoView.getMaxWidth() / displayMetrics.density - settingsView.getMaxWidth() / displayMetrics.density - margins);
+        int menuHorizontalRoom = (int) (dpWidth - logoView.getMaxWidth() / displayMetrics.density - settingsView.getMaxWidth() / displayMetrics.density - margins);
         int convertedWidth = (int) Utils.convertDpToPixel(menuHorizontalRoom, this);
 
         //set menu width
@@ -469,16 +493,13 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         if (adapterType == "section") {
             SectionAdapter adapter = new SectionAdapter(listData, this);
             thumbnailList.setAdapter(adapter);
-        }
-        else if (adapterType == "videos") {
+        } else if (adapterType == "videos") {
             VideosAdapter adapter = new VideosAdapter(listData, this);
             thumbnailList.setAdapter(adapter);
-        }
-        else if (adapterType == "playlists") {
+        } else if (adapterType == "playlists") {
             PlaylistAdapter adapter = new PlaylistAdapter(listData, this);
             thumbnailList.setAdapter(adapter);
-        }
-        else if (adapterType == "playlistItems") {
+        } else if (adapterType == "playlistItems") {
             PlaylistItemAdapter adapter = new PlaylistItemAdapter(listData, this);
             thumbnailList.setAdapter(adapter);
         }
@@ -574,7 +595,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         playlists.get(activePlaylist).removePlaylistItemAtIndex(index);
 
         //if this makes the playlist empty, remove the playlist
-        if(playlists.get(activePlaylist).playlistItems.size() < 1) {
+        if (playlists.get(activePlaylist).playlistItems.size() < 1) {
             playlists.remove(activePlaylist);
             playListButton.performClick();
         } else {
