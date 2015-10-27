@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class ParentalChallengeScreen extends AppCompatActivity {
 
@@ -167,10 +166,10 @@ public class ParentalChallengeScreen extends AppCompatActivity {
 
                 if (randomNumber.equalsIgnoreCase(num_digit_first.getText() + "" + num_digit_second.getText() + num_digit_third.getText() + num_digit_fourth.getText())) {
 
-                    Toast.makeText(getApplicationContext(), "Success", Toast.LENGTH_SHORT).show();
 
+                    Intent returnIntent = getIntent();
+                    returnIntent.putExtra("Key", returnIntent.getStringExtra("Key"));
 
-                    Intent returnIntent = new Intent();
                     setResult(Activity.RESULT_OK, returnIntent);
                     finish();
                 }

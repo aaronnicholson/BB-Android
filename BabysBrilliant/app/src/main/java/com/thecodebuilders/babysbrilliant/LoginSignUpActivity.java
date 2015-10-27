@@ -51,11 +51,11 @@ public class LoginSignUpActivity extends AppCompatActivity {
 
         if (v.getId() == R.id.login) {
 
-            /*Intent mainIntent = new Intent(LoginSignUpActivity.this, MainActivity.class);
+            Intent mainIntent = new Intent(LoginSignUpActivity.this, MainActivity.class);
             startActivity(mainIntent);
-            LoginSignUpActivity.this.finish();*/
+            LoginSignUpActivity.this.finish();
 
-            if (email.length() == 0) {
+        /*    if (email.length() == 0) {
                 showDialog("Enter Email id");
             } else if (passwd.length() == 0) {
 
@@ -64,7 +64,7 @@ public class LoginSignUpActivity extends AppCompatActivity {
                 reset_pass.setVisibility(View.GONE);
                 progressBar.setVisibility(View.VISIBLE);
                 getRemoteJSON(Constant.URL + "a=lgn&u=" + email.getText() + "&p=" + passwd.getText());
-            }
+            }*/
 
         } else if (v.getId() == R.id.sign_up) {
 
@@ -79,7 +79,7 @@ public class LoginSignUpActivity extends AppCompatActivity {
 
             }
         } else {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.RESET_PASSWD));
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.RESET_PASSWORD));
             startActivity(browserIntent);
         }
     }

@@ -21,6 +21,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -69,6 +70,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     private static RecyclerView thumbnailList;
     RequestQueue queue;
     String assetsString;
+    View includedLayout;
+    FrameLayout includedLayout_frame;
 
 
     public static Typeface fontAwesome = Typeface.
@@ -102,6 +105,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     private static TextView videoCloseButton;
     private static TextView videoFFButton;
     private static TextView videoRewButton;
+
+    private String fromClick;
 
     ImageView homeButton;
     ImageView playListButton;
@@ -150,6 +155,9 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         sectionTitle = (TextView) findViewById(R.id.section_title);
 
+        includedLayout = findViewById(R.id.settings_lay);
+        includedLayout_frame = (FrameLayout) findViewById(R.id.settings_lay_frame);
+
         videoToggleButton.setTypeface(MainActivity.fontAwesome);
         videoCloseButton.setTypeface(MainActivity.fontAwesome);
         videoFFButton.setTypeface(MainActivity.fontAwesome);
@@ -174,12 +182,22 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
+
         if (requestCode == 1) {
             if (resultCode == Activity.RESULT_OK) {
 
-                configureThumbnailList(favoriteItems, "videos");
-                currentMenu = FAVORITE_ITEMS;
-                toggleMenuButton(currentMenu);
+                if (data.getStringExtra("Key").equalsIgnoreCase("fav")) {
+                    configureThumbnailList(favoriteItems, "videos");
+                    currentMenu = FAVORITE_ITEMS;
+                    toggleMenuButton(currentMenu);
+                } else if (data.getStringExtra("Key").equalsIgnoreCase("setting")) {
+
+
+                    includedLayout_frame.setVisibility(View.VISIBLE);
+                    includedLayout.setVisibility(View.VISIBLE);
+
+                }
+
 
             }
             if (resultCode == Activity.RESULT_CANCELED) {
@@ -189,6 +207,17 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     }//onActivityResult
 
     private void setUpListeners() {
+
+
+        includedLayout_frame.setOnClickListener(new View.OnClickListener() {
+
+
+            @Override
+            public void onClick(View v) {
+
+                includedLayout_frame.setVisibility(View.GONE);
+            }
+        });
 
         homeButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -204,10 +233,11 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                /* configureThumbnailList(favoriteItems, "videos");
                 currentMenu = FAVORITE_ITEMS;
                 toggleMenuButton(currentMenu);*/
-
-
                 Intent mainIntent = new Intent(MainActivity.this, ParentalChallengeScreen.class);
+                mainIntent.putExtra("Key", "fav");
                 startActivityForResult(mainIntent, 1);
+
+
             }
         });
 
@@ -289,8 +319,10 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         settings.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+
                 Intent setting = new Intent(MainActivity.this, ParentalChallengeScreen.class);
-                startActivity(setting);
+                setting.putExtra("Key", "setting");
+                startActivityForResult(setting, 1);
             }
         });
 
