@@ -2,6 +2,7 @@ package com.thecodebuilders.babysbrilliant;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -34,13 +35,15 @@ public class LoginSignUpActivity extends AppCompatActivity {
     RequestQueue queue;
     ProgressBar progressBar;
     CustomizeDialog customizeDialog;
-    ;
+    SharedPreferences pref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_signup_activity);
         customizeDialog = new CustomizeDialog(LoginSignUpActivity.this);
+         pref = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE);
+
         getSupportActionBar().hide();
         init();
 
@@ -51,11 +54,11 @@ public class LoginSignUpActivity extends AppCompatActivity {
 
         if (v.getId() == R.id.login) {
 
-            Intent mainIntent = new Intent(LoginSignUpActivity.this, MainActivity.class);
+           /* Intent mainIntent = new Intent(LoginSignUpActivity.this, MainActivity.class);
             startActivity(mainIntent);
-            LoginSignUpActivity.this.finish();
+            LoginSignUpActivity.this.finish();*/
 
-        /*    if (email.length() == 0) {
+            if (email.length() == 0) {
                 showDialog("Enter Email id");
             } else if (passwd.length() == 0) {
 
@@ -64,7 +67,7 @@ public class LoginSignUpActivity extends AppCompatActivity {
                 reset_pass.setVisibility(View.GONE);
                 progressBar.setVisibility(View.VISIBLE);
                 getRemoteJSON(Constant.URL + "a=lgn&u=" + email.getText() + "&p=" + passwd.getText());
-            }*/
+            }
 
         } else if (v.getId() == R.id.sign_up) {
 
@@ -110,6 +113,11 @@ public class LoginSignUpActivity extends AppCompatActivity {
                     progressBar.setVisibility(View.GONE);
                     JSONObject result = new JSONObject(response);
                     if (result.getString("res").equalsIgnoreCase("successful")) {
+
+                        SharedPreferences.Editor editor = pref.edit();
+                        editor.putString("user_id", result.getString("id"));
+                        editor.commit(); // commit changes
+
 
                         Intent mainIntent = new Intent(LoginSignUpActivity.this, MainActivity.class);
                         startActivity(mainIntent);

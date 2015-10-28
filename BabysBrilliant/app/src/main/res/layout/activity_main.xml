@@ -261,6 +261,23 @@
         android:visibility="gone"
         layout="@layout/settings" />
 
+        <include
+            android:id="@+id/email_pass_update_lay"
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            layout="@layout/email_pass_update" />
+
+
+        <include
+            android:id="@+id/privacy_policy_lay"
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            layout="@layout/privacy_policy" />
+
+
+
     </FrameLayout>
 
 

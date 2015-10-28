@@ -5,6 +5,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.media.MediaPlayer;
@@ -70,8 +71,10 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     private static RecyclerView thumbnailList;
     RequestQueue queue;
     String assetsString;
-    View includedLayout;
-    FrameLayout includedLayout_frame;
+    View includedSettingLayout;
+    FrameLayout includedSettingLayout_frame;
+    View includedemailPasswordLayout;
+    View includedPrivacyLayout;
 
 
     public static Typeface fontAwesome = Typeface.
@@ -124,6 +127,9 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     static Handler controlsHandler = new Handler();
     static Runnable delayedHide = null;
     static Boolean doHideControls = false;
+    SharedPreferences pref;
+
+    RelativeLayout email_password_update, contact_support, privacy_policy, log_out;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,7 +138,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         setContentView(R.layout.activity_main);
         //http://new.babysbrilliant.com/app/?a=pDBstandard
         assetsURL = Constant.URL + "a=pDBstandard";
-
+        pref = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE);
         homeButton = (ImageView) findViewById(R.id.bblogo);
         playListButton = (ImageView) findViewById(R.id.playlists);
         favoritesButton = (ImageView) findViewById(R.id.favorites);
@@ -155,8 +161,10 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         sectionTitle = (TextView) findViewById(R.id.section_title);
 
-        includedLayout = findViewById(R.id.settings_lay);
-        includedLayout_frame = (FrameLayout) findViewById(R.id.settings_lay_frame);
+
+        includedSettingLayout_frame = (FrameLayout) findViewById(R.id.settings_lay_frame);
+        includedemailPasswordLayout = findViewById(R.id.email_pass_update_lay);
+        includedPrivacyLayout = findViewById(R.id.privacy_policy_lay);
 
         videoToggleButton.setTypeface(MainActivity.fontAwesome);
         videoCloseButton.setTypeface(MainActivity.fontAwesome);
@@ -171,18 +179,83 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         setMenuWidth();
 
+        initSetting();
+
+        setUpSettingListeners();
+
+
         getRemoteJSON();
 
         setUpListeners();
 
         setUpThumbnailList();
 
+
+    }
+
+    public void initSetting() {
+
+        includedSettingLayout = findViewById(R.id.settings_lay);
+
+        email_password_update = (RelativeLayout) includedSettingLayout.findViewById(R.id.email_pass_update);
+        contact_support = (RelativeLayout) includedSettingLayout.findViewById(R.id.contact_support);
+        privacy_policy = (RelativeLayout) includedSettingLayout.findViewById(R.id.privacy_policy);
+        log_out = (RelativeLayout) includedSettingLayout.findViewById(R.id.logOut);
+    }
+
+    public void setUpSettingListeners() {
+
+        email_password_update.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                Intent contact_support = new Intent(MainActivity.this, ParentalChallengeScreen.class);
+                contact_support.putExtra("Key", "email_password_update");
+                startActivityForResult(contact_support, 1);
+
+            }
+        });
+
+        contact_support.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent contact_support = new Intent(MainActivity.this, ParentalChallengeScreen.class);
+                contact_support.putExtra("Key", "contact_support");
+                startActivityForResult(contact_support, 1);
+
+            }
+        });
+
+        privacy_policy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent privacy_policy = new Intent(MainActivity.this, ParentalChallengeScreen.class);
+                privacy_policy.putExtra("Key", "privacy_policy");
+                startActivityForResult(privacy_policy, 1);
+
+            }
+        });
+
+        log_out.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent privacy_policy = new Intent(MainActivity.this, ParentalChallengeScreen.class);
+                privacy_policy.putExtra("Key", "log_out");
+                startActivityForResult(privacy_policy, 1);
+
+            }
+        });
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
 
+        String s = data.getStringExtra("Key");
         if (requestCode == 1) {
             if (resultCode == Activity.RESULT_OK) {
 
@@ -193,9 +266,27 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                 } else if (data.getStringExtra("Key").equalsIgnoreCase("setting")) {
 
 
-                    includedLayout_frame.setVisibility(View.VISIBLE);
-                    includedLayout.setVisibility(View.VISIBLE);
+                    includedSettingLayout_frame.setVisibility(View.VISIBLE);
+                    includedSettingLayout.setVisibility(View.VISIBLE);
 
+                } else if (data.getStringExtra("Key").equalsIgnoreCase("contact_support")) {
+
+
+                } else if (data.getStringExtra("Key").equalsIgnoreCase("email_password_update")) {
+
+                    includedemailPasswordLayout.setVisibility(View.VISIBLE);
+                } else if (data.getStringExtra("Key").equalsIgnoreCase("privacy_policy")) {
+
+                    includedPrivacyLayout.setVisibility(View.VISIBLE);
+                } else if (data.getStringExtra("Key").equalsIgnoreCase("log_out")) {
+
+                    SharedPreferences.Editor editor = pref.edit();
+                    editor.putString("user_id", "");
+                    editor.commit(); // commit changes
+
+                    Intent mainIntent = new Intent(MainActivity.this, LoginSignUpActivity.class);
+                    startActivity(mainIntent);
+                    MainActivity.this.finish();
                 }
 
 
@@ -209,13 +300,17 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     private void setUpListeners() {
 
 
-        includedLayout_frame.setOnClickListener(new View.OnClickListener() {
+        includedSettingLayout_frame.setOnClickListener(new View.OnClickListener() {
 
 
             @Override
             public void onClick(View v) {
 
-                includedLayout_frame.setVisibility(View.GONE);
+
+                includedSettingLayout_frame.setVisibility(View.GONE);
+                includedemailPasswordLayout.setVisibility(View.GONE);
+                includedPrivacyLayout.setVisibility(View.GONE);
+
             }
         });
 
