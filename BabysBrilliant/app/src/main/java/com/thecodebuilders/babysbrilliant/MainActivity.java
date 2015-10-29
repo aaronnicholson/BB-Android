@@ -22,6 +22,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
@@ -71,12 +72,13 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     private static RecyclerView thumbnailList;
     RequestQueue queue;
     String assetsString;
-    View includedSettingLayout;
     FrameLayout includedSettingLayout_frame;
+    View includedSettingLayout;
     View includedemailPasswordLayout;
     View includedPrivacyLayout;
-
-
+    View includedSocialMediaLayout;
+    View includedOurStoryLayout;
+    View includedContactSupportLayout;
     public static Typeface fontAwesome = Typeface.
             createFromAsset(appContext.getAssets(), appContext.getString(R.string.font_awesome));
     public static Typeface proximaBold = Typeface.createFromAsset(appContext.getAssets(), appContext.getString(R.string.proxima_bold));
@@ -129,7 +131,9 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     static Boolean doHideControls = false;
     SharedPreferences pref;
 
-    RelativeLayout email_password_update, contact_support, privacy_policy, log_out;
+    RelativeLayout email_password_update, contact_support, privacy_policy, log_out, loop_playlists,
+            show_intro, our_story, social_media, purchase_history, check_new_content, download_purchase_content;
+    ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,38 +143,6 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         //http://new.babysbrilliant.com/app/?a=pDBstandard
         assetsURL = Constant.URL + "a=pDBstandard";
         pref = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE);
-        homeButton = (ImageView) findViewById(R.id.bblogo);
-        playListButton = (ImageView) findViewById(R.id.playlists);
-        favoritesButton = (ImageView) findViewById(R.id.favorites);
-        moviesButton = (ImageView) findViewById(R.id.movies);
-        musicButton = (ImageView) findViewById(R.id.music);
-        nightLightsButton = (ImageView) findViewById(R.id.nightlights);
-        audioBooksButton = (ImageView) findViewById(R.id.audiobooks);
-        soundBoardsButton = (ImageView) findViewById(R.id.soundboards);
-        hearingImpairedButton = (ImageView) findViewById(R.id.hearingimpaired);
-        settings = (ImageView) findViewById(R.id.settings);
-
-        videoToggleButton = (TextView) findViewById(R.id.video_toggle_button);
-        videoCloseButton = (TextView) findViewById(R.id.video_close_button);
-        videoFFButton = (TextView) findViewById(R.id.video_ff_button);
-        videoRewButton = (TextView) findViewById(R.id.video_rew_button);
-
-        videoView = (VideoView) findViewById(R.id.video_view);
-        videoLayout = (RelativeLayout) findViewById(R.id.video_layout);
-        videoLayout.setVisibility(View.INVISIBLE);
-
-        sectionTitle = (TextView) findViewById(R.id.section_title);
-
-
-        includedSettingLayout_frame = (FrameLayout) findViewById(R.id.settings_lay_frame);
-        includedemailPasswordLayout = findViewById(R.id.email_pass_update_lay);
-        includedPrivacyLayout = findViewById(R.id.privacy_policy_lay);
-
-        videoToggleButton.setTypeface(MainActivity.fontAwesome);
-        videoCloseButton.setTypeface(MainActivity.fontAwesome);
-        videoFFButton.setTypeface(MainActivity.fontAwesome);
-        videoRewButton.setTypeface(MainActivity.fontAwesome);
-        sectionTitle.setTypeface(MainActivity.proximaBold);
 
 
         //do not show the action bar
@@ -179,7 +151,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         setMenuWidth();
 
-        initSetting();
+        initializeLayout();
 
         setUpSettingListeners();
 
@@ -191,17 +163,14 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         setUpThumbnailList();
 
 
+        socialMedia();
+        ourStory();
+        privacyPolicy();
+        contactSupport();
+
+
     }
 
-    public void initSetting() {
-
-        includedSettingLayout = findViewById(R.id.settings_lay);
-
-        email_password_update = (RelativeLayout) includedSettingLayout.findViewById(R.id.email_pass_update);
-        contact_support = (RelativeLayout) includedSettingLayout.findViewById(R.id.contact_support);
-        privacy_policy = (RelativeLayout) includedSettingLayout.findViewById(R.id.privacy_policy);
-        log_out = (RelativeLayout) includedSettingLayout.findViewById(R.id.logOut);
-    }
 
     public void setUpSettingListeners() {
 
@@ -217,24 +186,12 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             }
         });
 
-        contact_support.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
-                Intent contact_support = new Intent(MainActivity.this, ParentalChallengeScreen.class);
-                contact_support.putExtra("Key", "contact_support");
-                startActivityForResult(contact_support, 1);
-
-            }
-        });
 
         privacy_policy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                Intent privacy_policy = new Intent(MainActivity.this, ParentalChallengeScreen.class);
-                privacy_policy.putExtra("Key", "privacy_policy");
-                startActivityForResult(privacy_policy, 1);
 
             }
         });
@@ -249,6 +206,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
             }
         });
+
+
     }
 
     @Override
@@ -271,6 +230,18 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
                 } else if (data.getStringExtra("Key").equalsIgnoreCase("contact_support")) {
 
+                    Intent i = new Intent(Intent.ACTION_SEND);
+                    i.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{ Constant.EMAIL_ADDRESS });
+                    i.putExtra(android.content.Intent.EXTRA_SUBJECT, Constant.SUBJECT);
+                   // i.putExtra(android.content.Intent.EXTRA_TEXT, text);
+                    startActivity(Intent.createChooser(i, "Send email"));
+
+
+                    /*Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
+                            "mailto","abc@gmail.com", null));
+                    emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
+                    startActivity(Intent.createChooser(emailIntent, "Send email..."));*/
+
 
                 } else if (data.getStringExtra("Key").equalsIgnoreCase("email_password_update")) {
 
@@ -278,6 +249,12 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                 } else if (data.getStringExtra("Key").equalsIgnoreCase("privacy_policy")) {
 
                     includedPrivacyLayout.setVisibility(View.VISIBLE);
+
+
+                    WebView story_data = (WebView) includedPrivacyLayout.findViewById(R.id.privacy_policy_webview);
+                    story_data.getSettings().setJavaScriptEnabled(true);
+                    story_data.loadData(getString(R.string.privacy_policy), "text/html", "UTF-8");
+
                 } else if (data.getStringExtra("Key").equalsIgnoreCase("log_out")) {
 
                     SharedPreferences.Editor editor = pref.edit();
@@ -287,6 +264,33 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                     Intent mainIntent = new Intent(MainActivity.this, LoginSignUpActivity.class);
                     startActivity(mainIntent);
                     MainActivity.this.finish();
+                } else if (data.getStringExtra("Key").equalsIgnoreCase("fb_social")) {
+
+
+                    try {
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.facebook.com/BabysBrilliant"));
+                        startActivity(intent);
+                    } catch (Exception e) {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.facebook.com/BabysBrilliant")));
+                    }
+                } else if (data.getStringExtra("Key").equalsIgnoreCase("tw_social")) {
+
+
+                    Intent intent = null;
+                    try {
+                        // get the Twitter app if possible
+                        this.getPackageManager().getPackageInfo("com.twitter.android", 0);
+                        intent = new Intent(Intent.ACTION_VIEW, Uri.parse("twitter://user?user_id=babysbrilliant"));
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    } catch (Exception e) {
+                        // no Twitter app, revert to browser
+                        intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://twitter.com/babysbrilliant"));
+                    }
+                    this.startActivity(intent);
+
+                } else {
+
+
                 }
 
 
@@ -310,6 +314,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                 includedSettingLayout_frame.setVisibility(View.GONE);
                 includedemailPasswordLayout.setVisibility(View.GONE);
                 includedPrivacyLayout.setVisibility(View.GONE);
+                includedSocialMediaLayout.setVisibility(View.GONE);
 
             }
         });
@@ -874,5 +879,140 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         return super.onOptionsItemSelected(item);
     }
 
+
+    public void initializeLayout() {
+
+        homeButton = (ImageView) findViewById(R.id.bblogo);
+        playListButton = (ImageView) findViewById(R.id.playlists);
+        favoritesButton = (ImageView) findViewById(R.id.favorites);
+        moviesButton = (ImageView) findViewById(R.id.movies);
+        musicButton = (ImageView) findViewById(R.id.music);
+        nightLightsButton = (ImageView) findViewById(R.id.nightlights);
+        audioBooksButton = (ImageView) findViewById(R.id.audiobooks);
+        soundBoardsButton = (ImageView) findViewById(R.id.soundboards);
+        hearingImpairedButton = (ImageView) findViewById(R.id.hearingimpaired);
+        settings = (ImageView) findViewById(R.id.settings);
+
+        videoToggleButton = (TextView) findViewById(R.id.video_toggle_button);
+        videoCloseButton = (TextView) findViewById(R.id.video_close_button);
+        videoFFButton = (TextView) findViewById(R.id.video_ff_button);
+        videoRewButton = (TextView) findViewById(R.id.video_rew_button);
+
+        videoView = (VideoView) findViewById(R.id.video_view);
+        videoLayout = (RelativeLayout) findViewById(R.id.video_layout);
+        videoLayout.setVisibility(View.INVISIBLE);
+
+        sectionTitle = (TextView) findViewById(R.id.section_title);
+
+
+        includedSettingLayout_frame = (FrameLayout) findViewById(R.id.settings_lay_frame);
+        includedemailPasswordLayout = findViewById(R.id.email_pass_update_lay);
+        includedPrivacyLayout = findViewById(R.id.privacy_policy_lay);
+        includedContactSupportLayout = findViewById(R.id.contact_support);
+
+        includedOurStoryLayout = findViewById(R.id.our_story_lay);
+        includedSettingLayout = findViewById(R.id.settings_lay);
+        includedSocialMediaLayout = findViewById(R.id.social_media_lay);
+
+        email_password_update = (RelativeLayout) includedSettingLayout.findViewById(R.id.email_pass_update);
+        contact_support = (RelativeLayout) includedSettingLayout.findViewById(R.id.contact_support);
+        privacy_policy = (RelativeLayout) includedSettingLayout.findViewById(R.id.privacy_policy);
+        log_out = (RelativeLayout) includedSettingLayout.findViewById(R.id.logOut);
+
+        loop_playlists = (RelativeLayout) includedSettingLayout.findViewById(R.id.loop_playlists);
+        show_intro = (RelativeLayout) includedSettingLayout.findViewById(R.id.show_intro);
+        our_story = (RelativeLayout) includedSettingLayout.findViewById(R.id.our_story);
+        social_media = (RelativeLayout) includedSettingLayout.findViewById(R.id.social_media);
+        purchase_history = (RelativeLayout) includedSettingLayout.findViewById(R.id.purchase_history);
+        check_new_content = (RelativeLayout) includedSettingLayout.findViewById(R.id.new_content);
+        download_purchase_content = (RelativeLayout) includedSettingLayout.findViewById(R.id.download_purchase_content);
+
+        videoToggleButton.setTypeface(MainActivity.fontAwesome);
+        videoCloseButton.setTypeface(MainActivity.fontAwesome);
+        videoFFButton.setTypeface(MainActivity.fontAwesome);
+        videoRewButton.setTypeface(MainActivity.fontAwesome);
+        sectionTitle.setTypeface(MainActivity.proximaBold);
+    }
+
+    public void socialMedia() {
+
+        social_media.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                includedSocialMediaLayout.setVisibility(View.VISIBLE);
+
+            }
+        });
+
+        includedSocialMediaLayout.findViewById(R.id.fb_social).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent privacy_policy = new Intent(MainActivity.this, ParentalChallengeScreen.class);
+                privacy_policy.putExtra("Key", "fb_social");
+                startActivityForResult(privacy_policy, 1);
+
+            }
+        });
+
+        includedSocialMediaLayout.findViewById(R.id.tw_social).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent privacy_policy = new Intent(MainActivity.this, ParentalChallengeScreen.class);
+                privacy_policy.putExtra("Key", "tw_social");
+                startActivityForResult(privacy_policy, 1);
+            }
+        });
+    }
+
+    public void ourStory() {
+
+        our_story.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                includedOurStoryLayout.setVisibility(View.VISIBLE);
+
+                WebView story_data = (WebView) includedOurStoryLayout.findViewById(R.id.our_story_webview);
+                story_data.getSettings().setJavaScriptEnabled(true);
+                story_data.loadData(getString(R.string.our_story), "text/html", "UTF-8");
+
+            }
+        });
+
+    }
+
+    public void privacyPolicy() {
+
+        privacy_policy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                Intent privacy_policy = new Intent(MainActivity.this, ParentalChallengeScreen.class);
+                privacy_policy.putExtra("Key", "privacy_policy");
+                startActivityForResult(privacy_policy, 1);
+
+
+            }
+        });
+
+    }
+
+    public void contactSupport(){
+
+        contact_support.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent contact_support = new Intent(MainActivity.this, ParentalChallengeScreen.class);
+                contact_support.putExtra("Key", "contact_support");
+                startActivityForResult(contact_support, 1);
+
+            }
+        });
+    }
 
 }

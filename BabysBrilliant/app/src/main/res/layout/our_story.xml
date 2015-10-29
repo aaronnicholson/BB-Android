@@ -45,7 +45,7 @@
                 android:layout_gravity="center"
                 android:layout_weight="0.65"
                 android:gravity="center|left"
-                android:text="Privacy Policy"
+                android:text="Social Media"
                 android:textColor="#070709"
                 android:textSize="18sp" />
 
@@ -55,46 +55,54 @@
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_weight="0.85"
-            android:background="#FFFFFF">
+            android:layout_weight="0.85">
 
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="8dp"
+
+                android:background="#FFFFFF"
                 android:orientation="vertical"
                 android:weightSum="0.85">
 
 
-                <RelativeLayout
-                    android:id="@+id/email_pass_update"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="30dp"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginTop="8dp"
-                    android:background="@drawable/upper_round"
+                    android:layout_height="200dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_marginTop="5dp"
                     android:orientation="horizontal">
 
-                    <com.thecodebuilders.FontFamily.ProximaNovaSoftRegular
+
+                    <ImageView
+
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
 
-                        android:layout_marginLeft="10dp"
-                        android:text="Privacy Policy"
-                        android:textColor="#070709"
-                        android:textSize="18sp" />
+                        android:background="@drawable/bbsettingsourstory" />
 
+                </LinearLayout>
+
+                <RelativeLayout
+                    android:id="@+id/email_pass_update"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginTop="8dp"
+                    android:orientation="vertical">
+
+                    <WebView
+                        android:id="@+id/our_story_webview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"></WebView>
 
                 </RelativeLayout>
-
-                <WebView
-                    android:id="@+id/privacy_policy_webview"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"></WebView>
 
 
             </LinearLayout>

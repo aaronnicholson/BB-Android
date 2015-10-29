@@ -250,32 +250,45 @@
     <FrameLayout
         android:id="@+id/settings_lay_frame"
         android:layout_width="match_parent"
-        android:visibility="gone"
-        android:background="#BF000000"
-        android:layout_height="match_parent">
-
-    <include
-        android:id="@+id/settings_lay"
-        android:layout_width="fill_parent"
         android:layout_height="match_parent"
-        android:visibility="gone"
-        layout="@layout/settings" />
+        android:background="#BF000000"
+        android:visibility="gone">
+
+        <include
+            android:id="@+id/settings_lay"
+            layout="@layout/settings"
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
 
         <include
             android:id="@+id/email_pass_update_lay"
+            layout="@layout/email_pass_update"
             android:layout_width="fill_parent"
             android:layout_height="match_parent"
-            android:visibility="gone"
-            layout="@layout/email_pass_update" />
+            android:visibility="gone" />
 
 
         <include
             android:id="@+id/privacy_policy_lay"
+            layout="@layout/privacy_policy"
             android:layout_width="fill_parent"
             android:layout_height="match_parent"
-            android:visibility="gone"
-            layout="@layout/privacy_policy" />
+            android:visibility="gone" />
 
+        <include
+            android:id="@+id/social_media_lay"
+            layout="@layout/social_media"
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
+
+        <include
+            android:id="@+id/our_story_lay"
+            layout="@layout/our_story"
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
 
 
     </FrameLayout>

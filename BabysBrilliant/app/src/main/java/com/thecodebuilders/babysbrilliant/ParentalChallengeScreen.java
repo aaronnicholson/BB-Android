@@ -120,6 +120,12 @@ public class ParentalChallengeScreen extends AppCompatActivity {
 
         if (v.getId() == R.id.cancel_btn) {
 
+            Intent returnIntent = getIntent();
+            returnIntent.putExtra("Key", "Cancel");
+
+            setResult(Activity.RESULT_OK, returnIntent);
+            finish();
+
             onBackPressed();
 
         } else if (v.getId() == R.id.erase_digit) {
