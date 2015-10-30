@@ -290,6 +290,13 @@
             android:layout_height="match_parent"
             android:visibility="gone" />
 
+        <include
+            android:id="@+id/email_pass_update_lay2"
+            layout="@layout/email_password_update2"
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
+
 
     </FrameLayout>
 

@@ -3,6 +3,7 @@ package com.thecodebuilders.babysbrilliant;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -23,6 +24,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
@@ -31,11 +33,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.thecodebuilders.adapter.PlaylistAdapter;
 import com.thecodebuilders.adapter.PlaylistItemAdapter;
 import com.thecodebuilders.adapter.SectionAdapter;
@@ -52,6 +56,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements PlaylistChooser.PlaylistChooserListener {
     public final static Context appContext = ApplicationContextProvider.getContext();
@@ -65,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     public static final String AUDIO_BOOKS = "audiobooks";
     public static final String SOUND_BOARDS = "soundboard";
     public static final String HEARING_IMPAIRED = "hearing impaired";
+    String SELECT_FLAG;
 
     private static String LOGVAR = "MainActivity";
 
@@ -74,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     String assetsString;
     FrameLayout includedSettingLayout_frame;
     View includedSettingLayout;
-    View includedemailPasswordLayout;
+    View includedemailPasswordLayout, includedemailPasswordLayout2;
     View includedPrivacyLayout;
     View includedSocialMediaLayout;
     View includedOurStoryLayout;
@@ -133,7 +140,10 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     RelativeLayout email_password_update, contact_support, privacy_policy, log_out, loop_playlists,
             show_intro, our_story, social_media, purchase_history, check_new_content, download_purchase_content;
-    ;
+    private ProgressDialog pDialog;
+    private RequestQueue rq;
+    private StringRequest strReq;
+    private  EditText et;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,8 +163,6 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         initializeLayout();
 
-        setUpSettingListeners();
-
 
         getRemoteJSON();
 
@@ -167,48 +175,12 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         ourStory();
         privacyPolicy();
         contactSupport();
+        emailPasswordUpdate();
+        logOut();
 
 
     }
 
-
-    public void setUpSettingListeners() {
-
-        email_password_update.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-
-                Intent contact_support = new Intent(MainActivity.this, ParentalChallengeScreen.class);
-                contact_support.putExtra("Key", "email_password_update");
-                startActivityForResult(contact_support, 1);
-
-            }
-        });
-
-
-
-        privacy_policy.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-
-            }
-        });
-
-        log_out.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Intent privacy_policy = new Intent(MainActivity.this, ParentalChallengeScreen.class);
-                privacy_policy.putExtra("Key", "log_out");
-                startActivityForResult(privacy_policy, 1);
-
-            }
-        });
-
-
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -231,9 +203,9 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                 } else if (data.getStringExtra("Key").equalsIgnoreCase("contact_support")) {
 
                     Intent i = new Intent(Intent.ACTION_SEND);
-                    i.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{ Constant.EMAIL_ADDRESS });
+                    i.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{Constant.EMAIL_ADDRESS});
                     i.putExtra(android.content.Intent.EXTRA_SUBJECT, Constant.SUBJECT);
-                   // i.putExtra(android.content.Intent.EXTRA_TEXT, text);
+                    // i.putExtra(android.content.Intent.EXTRA_TEXT, text);
                     startActivity(Intent.createChooser(i, "Send email"));
 
 
@@ -315,6 +287,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                 includedemailPasswordLayout.setVisibility(View.GONE);
                 includedPrivacyLayout.setVisibility(View.GONE);
                 includedSocialMediaLayout.setVisibility(View.GONE);
+                includedemailPasswordLayout2.setVisibility(View.GONE);
+                includedOurStoryLayout.setVisibility(View.GONE);
 
             }
         });
@@ -907,6 +881,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         includedSettingLayout_frame = (FrameLayout) findViewById(R.id.settings_lay_frame);
         includedemailPasswordLayout = findViewById(R.id.email_pass_update_lay);
+        includedemailPasswordLayout2 = findViewById(R.id.email_pass_update_lay2);
         includedPrivacyLayout = findViewById(R.id.privacy_policy_lay);
         includedContactSupportLayout = findViewById(R.id.contact_support);
 
@@ -918,6 +893,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         contact_support = (RelativeLayout) includedSettingLayout.findViewById(R.id.contact_support);
         privacy_policy = (RelativeLayout) includedSettingLayout.findViewById(R.id.privacy_policy);
         log_out = (RelativeLayout) includedSettingLayout.findViewById(R.id.logOut);
+         et = (EditText) includedemailPasswordLayout2.findViewById(R.id.edit_text);
 
         loop_playlists = (RelativeLayout) includedSettingLayout.findViewById(R.id.loop_playlists);
         show_intro = (RelativeLayout) includedSettingLayout.findViewById(R.id.show_intro);
@@ -1001,7 +977,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     }
 
-    public void contactSupport(){
+    public void contactSupport() {
 
         contact_support.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -1013,6 +989,169 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
             }
         });
+    }
+
+
+    public void emailPasswordUpdate() {
+
+
+
+        email_password_update.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                Intent contact_support = new Intent(MainActivity.this, ParentalChallengeScreen.class);
+                contact_support.putExtra("Key", "email_password_update");
+                startActivityForResult(contact_support, 1);
+
+            }
+        });
+
+        includedemailPasswordLayout.findViewById(R.id.confirm_existing_password).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                SELECT_FLAG="confirm_existing_password";
+                includedemailPasswordLayout2.setVisibility(View.VISIBLE);
+                et.setHint("Please type in your password...");
+            }
+        });
+
+        includedemailPasswordLayout.findViewById(R.id.new_password).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SELECT_FLAG="new_password";
+
+                includedemailPasswordLayout2.setVisibility(View.VISIBLE);
+                et.setHint("Please type in your new password...");
+
+            }
+        });
+
+        includedemailPasswordLayout.findViewById(R.id.new_emailaddress).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                SELECT_FLAG="new_emailaddress";
+                includedemailPasswordLayout2.setVisibility(View.VISIBLE);
+                et.setHint("Please type in your new email...");
+            }
+        });
+
+        includedemailPasswordLayout2.findViewById(R.id.done).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                if(et.getText().length()==0||et.getText().toString().equalsIgnoreCase("")){
+
+                }
+                else{
+                    m(et.getText().toString());
+                }
+            }
+        });
+
+    }
+
+
+    public void logOut() {
+
+        log_out.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent privacy_policy = new Intent(MainActivity.this, ParentalChallengeScreen.class);
+                privacy_policy.putExtra("Key", "log_out");
+                startActivityForResult(privacy_policy, 1);
+
+            }
+        });
+
+
+    }
+
+
+    public void m(final String value) {
+
+
+        rq = Volley.newRequestQueue(MainActivity.this);
+        pDialog = new ProgressDialog(MainActivity.this);
+        pDialog.setMessage("Loading...");
+        pDialog.setCancelable(false);
+        pDialog.show();
+
+        final int a = 1;
+
+        strReq = new StringRequest(Request.Method.POST, "http://new.babysbrilliant.com/app/",
+                new Response.Listener<String>() {
+
+                    @Override
+                    public void onResponse(String arg0) {
+                        // TODO Auto-generated method stub
+                        pDialog.hide();
+                        System.out.println("Error [" + arg0 + "]" + a);
+
+                        System.out.println("Error [" + arg0 + "]");
+                        System.out.println("Error [" + arg0 + "]");
+
+                    }
+
+                }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError arg0) {
+                // TODO Auto-generated method stub
+                System.out.println("Error [" + arg0 + "]");
+            }
+
+        }) {
+
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                // TODO Auto-generated method stub
+                Map<String, String> params = new HashMap<String, String>();
+                if(SELECT_FLAG.equalsIgnoreCase("new_emailaddress")){
+                    params.put("a", "nE");
+                    params.put("n", pref.getString("user_id",""));
+                    params.put("u", "aa@a.a");
+                    params.put("p", "aaa");
+                    params.put("v", value);
+                }
+                else if(SELECT_FLAG.equalsIgnoreCase("new_password")){
+                    params.put("a", "nP");
+                    params.put("n", pref.getString("user_id",""));
+                    params.put("u", "aa@a.a");
+                    params.put("p", "aaa");
+                    params.put("v", value);
+
+                }
+
+                else{
+                    params.put("a", "lgn");
+                    params.put("u", "aa@a.a");
+                    params.put("p", value);
+
+
+                }
+
+
+                return params;
+            }
+
+            // @Override
+            // public Map<String, String> getHeaders() throws AuthFailureError {
+            // Map<String, String> params = new HashMap<String, String>();
+            // // params.put("Content-Type",
+            // "application/x-www-form-urlencoded");
+            // return params;
+            // }
+
+        };
+
+        rq.add(strReq);
     }
 
 }
