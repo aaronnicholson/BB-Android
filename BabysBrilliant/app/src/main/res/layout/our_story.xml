@@ -84,7 +84,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
 
-                        android:background="@drawable/bbsettingsourstory" />
+                        android:background="@drawable/ic_plusone_medium_off_client" />
 
                 </LinearLayout>
 

@@ -31,6 +31,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 import android.widget.VideoView;
 
 import com.android.volley.AuthFailureError;
@@ -86,6 +87,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     View includedSocialMediaLayout;
     View includedOurStoryLayout;
     View includedContactSupportLayout;
+    View includedLoopPlaylistsLayout;
     public static Typeface fontAwesome = Typeface.
             createFromAsset(appContext.getAssets(), appContext.getString(R.string.font_awesome));
     public static Typeface proximaBold = Typeface.createFromAsset(appContext.getAssets(), appContext.getString(R.string.proxima_bold));
@@ -144,6 +146,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     private RequestQueue rq;
     private StringRequest strReq;
     private  EditText et;
+    private ToggleButton toggle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -177,6 +180,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         contactSupport();
         emailPasswordUpdate();
         logOut();
+        loopPlaylists();
 
 
     }
@@ -203,6 +207,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                 } else if (data.getStringExtra("Key").equalsIgnoreCase("contact_support")) {
 
                     Intent i = new Intent(Intent.ACTION_SEND);
+                    i.setType("message/rfc822");
                     i.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{Constant.EMAIL_ADDRESS});
                     i.putExtra(android.content.Intent.EXTRA_SUBJECT, Constant.SUBJECT);
                     // i.putExtra(android.content.Intent.EXTRA_TEXT, text);
@@ -289,6 +294,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                 includedSocialMediaLayout.setVisibility(View.GONE);
                 includedemailPasswordLayout2.setVisibility(View.GONE);
                 includedOurStoryLayout.setVisibility(View.GONE);
+                includedLoopPlaylistsLayout.setVisibility(View.GONE);
 
             }
         });
@@ -888,6 +894,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         includedOurStoryLayout = findViewById(R.id.our_story_lay);
         includedSettingLayout = findViewById(R.id.settings_lay);
         includedSocialMediaLayout = findViewById(R.id.social_media_lay);
+        includedLoopPlaylistsLayout = findViewById(R.id.loop_playlist_lay);
 
         email_password_update = (RelativeLayout) includedSettingLayout.findViewById(R.id.email_pass_update);
         contact_support = (RelativeLayout) includedSettingLayout.findViewById(R.id.contact_support);
@@ -902,6 +909,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         purchase_history = (RelativeLayout) includedSettingLayout.findViewById(R.id.purchase_history);
         check_new_content = (RelativeLayout) includedSettingLayout.findViewById(R.id.new_content);
         download_purchase_content = (RelativeLayout) includedSettingLayout.findViewById(R.id.download_purchase_content);
+
+        toggle = (ToggleButton) includedLoopPlaylistsLayout.findViewById(R.id.toggleButton1);
 
         videoToggleButton.setTypeface(MainActivity.fontAwesome);
         videoCloseButton.setTypeface(MainActivity.fontAwesome);
@@ -1045,10 +1054,9 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             public void onClick(View v) {
 
 
-                if(et.getText().length()==0||et.getText().toString().equalsIgnoreCase("")){
+                if (et.getText().length() == 0 || et.getText().toString().equalsIgnoreCase("")) {
 
-                }
-                else{
+                } else {
                     m(et.getText().toString());
                 }
             }
@@ -1067,6 +1075,20 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                 privacy_policy.putExtra("Key", "log_out");
                 startActivityForResult(privacy_policy, 1);
 
+            }
+        });
+
+
+    }
+
+
+    public void loopPlaylists(){
+
+        loop_playlists.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                includedLoopPlaylistsLayout.setVisibility(View.VISIBLE);
             }
         });
 

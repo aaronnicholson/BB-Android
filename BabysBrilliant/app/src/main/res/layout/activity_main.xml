@@ -297,6 +297,13 @@
             android:layout_height="match_parent"
             android:visibility="gone" />
 
+        <include
+            android:id="@+id/loop_playlist_lay"
+            layout="@layout/loop_playlist"
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
+
 
     </FrameLayout>
 

@@ -42,7 +42,7 @@ public class LoginSignUpActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_signup_activity);
         customizeDialog = new CustomizeDialog(LoginSignUpActivity.this);
-         pref = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE);
+         pref = getApplicationContext().getSharedPreferences("BabyBrilliantPref", MODE_PRIVATE);
 
         getSupportActionBar().hide();
         init();
