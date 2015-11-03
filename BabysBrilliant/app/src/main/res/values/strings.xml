@@ -48,4 +48,5 @@
     <string name="title_activity_parental_challenge_screen">ParentalChallengeScreen</string>
 
     <string name="hello_world">Hello world!</string>
+    <string name="title_activity_show_intro">ShowIntroActivity</string>
 </resources>

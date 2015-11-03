@@ -36,7 +36,7 @@
                 android:layout_gravity="center"
                 android:layout_weight="0.25"
                 android:text="Settings"
-                android:textColor="#070709"
+                android:textColor="#2776C3"
                 android:textSize="14sp" />
 
             <com.thecodebuilders.FontFamily.ProximaNovaSoftRegular
@@ -84,7 +84,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
 
-                        android:background="@drawable/ic_plusone_medium_off_client" />
+                        android:background="@drawable/bbsettingsourstory" />
 
                 </LinearLayout>
 

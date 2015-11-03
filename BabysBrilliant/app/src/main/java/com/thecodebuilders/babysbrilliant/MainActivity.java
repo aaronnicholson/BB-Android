@@ -50,6 +50,7 @@ import com.thecodebuilders.application.ApplicationContextProvider;
 import com.thecodebuilders.model.Playlist;
 import com.thecodebuilders.network.VolleySingleton;
 import com.thecodebuilders.utility.Constant;
+import com.thecodebuilders.utility.CustomizeDialog;
 import com.thecodebuilders.utility.Utils;
 
 import org.json.JSONArray;
@@ -145,8 +146,9 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     private ProgressDialog pDialog;
     private RequestQueue rq;
     private StringRequest strReq;
-    private  EditText et;
+    private EditText et;
     private ToggleButton toggle;
+    private CustomizeDialog customizeDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,7 +157,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         setContentView(R.layout.activity_main);
         //http://new.babysbrilliant.com/app/?a=pDBstandard
         assetsURL = Constant.URL + "a=pDBstandard";
-        pref = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE);
+         customizeDialog = new CustomizeDialog(MainActivity.this);
+        pref = getApplicationContext().getSharedPreferences("BabyBrilliantPref", MODE_PRIVATE);
 
 
         //do not show the action bar
@@ -181,8 +184,21 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         emailPasswordUpdate();
         logOut();
         loopPlaylists();
+        showIntro();
+
+    }
+
+    public void showIntro() {
+
+        show_intro.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                startActivity(new Intent(MainActivity.this, ShowIntroActivity.class).putExtra("Key", "SignUp"));
 
 
+            }
+        });
     }
 
 
@@ -900,7 +916,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         contact_support = (RelativeLayout) includedSettingLayout.findViewById(R.id.contact_support);
         privacy_policy = (RelativeLayout) includedSettingLayout.findViewById(R.id.privacy_policy);
         log_out = (RelativeLayout) includedSettingLayout.findViewById(R.id.logOut);
-         et = (EditText) includedemailPasswordLayout2.findViewById(R.id.edit_text);
+        et = (EditText) includedemailPasswordLayout2.findViewById(R.id.edit_text);
 
         loop_playlists = (RelativeLayout) includedSettingLayout.findViewById(R.id.loop_playlists);
         show_intro = (RelativeLayout) includedSettingLayout.findViewById(R.id.show_intro);
@@ -1004,7 +1020,6 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     public void emailPasswordUpdate() {
 
 
-
         email_password_update.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -1022,7 +1037,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             public void onClick(View v) {
 
 
-                SELECT_FLAG="confirm_existing_password";
+                SELECT_FLAG = "confirm_existing_password";
                 includedemailPasswordLayout2.setVisibility(View.VISIBLE);
                 et.setHint("Please type in your password...");
             }
@@ -1031,7 +1046,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         includedemailPasswordLayout.findViewById(R.id.new_password).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SELECT_FLAG="new_password";
+                SELECT_FLAG = "new_password";
 
                 includedemailPasswordLayout2.setVisibility(View.VISIBLE);
                 et.setHint("Please type in your new password...");
@@ -1043,7 +1058,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             @Override
             public void onClick(View v) {
 
-                SELECT_FLAG="new_emailaddress";
+                SELECT_FLAG = "new_emailaddress";
                 includedemailPasswordLayout2.setVisibility(View.VISIBLE);
                 et.setHint("Please type in your new email...");
             }
@@ -1082,7 +1097,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     }
 
 
-    public void loopPlaylists(){
+    public void loopPlaylists() {
 
         loop_playlists.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -1114,10 +1129,30 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                     public void onResponse(String arg0) {
                         // TODO Auto-generated method stub
                         pDialog.hide();
-                        System.out.println("Error [" + arg0 + "]" + a);
+                        try {
+                            JSONObject result = new JSONObject(arg0);
+                            SharedPreferences.Editor editor = pref.edit();
+                            if (result.getString("res").equalsIgnoreCase("successful")) {
+                                if (SELECT_FLAG.equalsIgnoreCase("new_emailaddress")) {
 
-                        System.out.println("Error [" + arg0 + "]");
-                        System.out.println("Error [" + arg0 + "]");
+                                    editor.putString("user_name", value);
+                                    editor.commit();
+                                    showDialog("","Changed Successfully");
+
+                                } else if (SELECT_FLAG.equalsIgnoreCase("new_password")) {
+                                    editor.putString("user_password", value);
+                                    editor.commit();
+                                    showDialog("", "Changed Successfully");
+
+                                } else {
+
+                                   // showDialog("","Changed Successfully");
+                                }
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
 
                     }
 
@@ -1135,25 +1170,22 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             protected Map<String, String> getParams() throws AuthFailureError {
                 // TODO Auto-generated method stub
                 Map<String, String> params = new HashMap<String, String>();
-                if(SELECT_FLAG.equalsIgnoreCase("new_emailaddress")){
+                if (SELECT_FLAG.equalsIgnoreCase("new_emailaddress")) {
                     params.put("a", "nE");
-                    params.put("n", pref.getString("user_id",""));
-                    params.put("u", "aa@a.a");
-                    params.put("p", "aaa");
+                    params.put("n", pref.getString("user_id", ""));
+                    params.put("u", pref.getString("user_name", ""));
+                    params.put("p", pref.getString("user_password", ""));
                     params.put("v", value);
-                }
-                else if(SELECT_FLAG.equalsIgnoreCase("new_password")){
+                } else if (SELECT_FLAG.equalsIgnoreCase("new_password")) {
                     params.put("a", "nP");
-                    params.put("n", pref.getString("user_id",""));
-                    params.put("u", "aa@a.a");
-                    params.put("p", "aaa");
+                    params.put("n", pref.getString("user_id", ""));
+                    params.put("u", pref.getString("user_name", ""));
+                    params.put("p", pref.getString("user_password", ""));
                     params.put("v", value);
 
-                }
-
-                else{
+                } else {
                     params.put("a", "lgn");
-                    params.put("u", "aa@a.a");
+                    params.put("u", pref.getString("user_name", ""));
                     params.put("p", value);
 
 
@@ -1174,6 +1206,14 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         };
 
         rq.add(strReq);
+    }
+
+    public void showDialog(String Title,String msg) {
+       
+
+        customizeDialog.setTitle(Title);
+        customizeDialog.setMessage(msg);
+        customizeDialog.show();
     }
 
 }
