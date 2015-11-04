@@ -1,6 +1,7 @@
 package com.thecodebuilders.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -11,6 +12,7 @@ import android.view.ViewGroup;
 import com.thecodebuilders.application.ApplicationContextProvider;
 import com.thecodebuilders.babysbrilliant.ListItem;
 import com.thecodebuilders.babysbrilliant.MainActivity;
+import com.thecodebuilders.babysbrilliant.ParentalChallengeScreen;
 import com.thecodebuilders.babysbrilliant.R;
 import com.thecodebuilders.network.VolleySingleton;
 
@@ -100,7 +102,11 @@ public class PlaylistAdapter extends RecyclerView.Adapter<ElementViewHolder> {
         viewHolder.deletePlaylistIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mainActivity.removePlaylist(position);
+
+                /*Intent mainIntent1 = new Intent(mainIntent, ParentalChallengeScreen.class);
+                mainIntent.putExtra("Key", "fav");*/
+                mainActivity.startActivityForResult(new Intent(mainActivity, ParentalChallengeScreen.class).putExtra("Key", "PlayListAdapter").putExtra("pos", position), 1);
+               // mainActivity.removePlaylist(position);
             }
         });
         viewHolder.editPlaylistIcon.setOnClickListener(new View.OnClickListener() {

@@ -50,6 +50,9 @@
                 android:textSize="18sp" />
 
 
+
+
+
         </LinearLayout>
 
         <ScrollView
@@ -103,7 +106,7 @@
                 </RelativeLayout>
 
                 <RelativeLayout
-                    android:id="@+id/fiftin_min_timer"
+                    android:id="@+id/fiftin_min_timer_lay"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
                     android:layout_marginLeft="10dp"
@@ -113,20 +116,34 @@
 
                     android:orientation="horizontal">
 
-                    <com.thecodebuilders.FontFamily.ProximaNovaSoftRegular
+                  <!--  <com.thecodebuilders.FontFamily.ProximaNovaSoftRegular
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_marginLeft="10dp"
                         android:text="15 Minute Timer"
                         android:textColor="#070709"
+                        android:textSize="18sp" />-->
+
+
+                    <CheckedTextView
+                        android:id="@+id/checked1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="10dp"
+                        android:text="15 Minute Timer"
+                        android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+                        android:checked="false"
+                        android:textColor="#070709"
                         android:textSize="18sp" />
+
 
 
                 </RelativeLayout>
 
                 <RelativeLayout
-                    android:id="@+id/thirty_min_timer"
+                    android:id="@+id/thirty_min_timer_lay"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
                     android:layout_marginLeft="10dp"
@@ -136,20 +153,32 @@
                     android:background="#FFFFFF"
                     android:orientation="horizontal">
 
-                    <com.thecodebuilders.FontFamily.ProximaNovaSoftRegular
+                    <!--<com.thecodebuilders.FontFamily.ProximaNovaSoftRegular
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_marginLeft="10dp"
                         android:text="30 Minute Timer"
                         android:textColor="#070709"
+                        android:textSize="18sp" />-->
+
+                    <CheckedTextView
+                        android:id="@+id/checked2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="10dp"
+                        android:text="30 Minute Timer"
+                        android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+                        android:checked="false"
+                        android:textColor="#070709"
                         android:textSize="18sp" />
 
 
                 </RelativeLayout>
 
                 <RelativeLayout
-                    android:id="@+id/fourty_five_min_timer"
+                    android:id="@+id/fourty_five_min_timer_lay"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
                     android:layout_marginLeft="10dp"
@@ -158,20 +187,32 @@
                     android:background="#FFFFFF"
                     android:orientation="horizontal">
 
-                    <com.thecodebuilders.FontFamily.ProximaNovaSoftRegular
+                  <!--  <com.thecodebuilders.FontFamily.ProximaNovaSoftRegular
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_marginLeft="10dp"
                         android:text="45 Minute Timer"
                         android:textColor="#070709"
+                        android:textSize="18sp" />-->
+
+                    <CheckedTextView
+                        android:id="@+id/checked3"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="10dp"
+                        android:text="45 Minute Timer"
+                        android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+                        android:checked="false"
+                        android:textColor="#070709"
                         android:textSize="18sp" />
 
 
                 </RelativeLayout>
 
                 <RelativeLayout
-                    android:id="@+id/sixty_min_timer"
+                    android:id="@+id/sixty_min_timer_lay"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
                     android:layout_marginLeft="10dp"
@@ -180,12 +221,24 @@
                     android:background="#FFFFFF"
                     android:orientation="horizontal">
 
-                    <com.thecodebuilders.FontFamily.ProximaNovaSoftRegular
+                    <!--<com.thecodebuilders.FontFamily.ProximaNovaSoftRegular
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_marginLeft="10dp"
                         android:text="60 Minute Timer"
+                        android:textColor="#070709"
+                        android:textSize="18sp" />-->
+
+                    <CheckedTextView
+                        android:id="@+id/checked4"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="10dp"
+                        android:text="60 Minute Timer"
+                        android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+                        android:checked="false"
                         android:textColor="#070709"
                         android:textSize="18sp" />
 
@@ -193,7 +246,7 @@
                 </RelativeLayout>
 
                 <RelativeLayout
-                    android:id="@+id/ninty_min_timer"
+                    android:id="@+id/ninty_min_timer_lay"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
                     android:layout_marginLeft="10dp"
@@ -203,12 +256,24 @@
                     android:background="@drawable/lower_round"
                     android:orientation="horizontal">
 
-                    <com.thecodebuilders.FontFamily.ProximaNovaSoftRegular
+                 <!--   <com.thecodebuilders.FontFamily.ProximaNovaSoftRegular
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_marginLeft="10dp"
                         android:text="90 Minute Timer"
+                        android:textColor="#070709"
+                        android:textSize="18sp" />-->
+
+                    <CheckedTextView
+                        android:id="@+id/checked5"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="10dp"
+                        android:text="90 Minute Timer"
+                        android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+                        android:checked="false"
                         android:textColor="#070709"
                         android:textSize="18sp" />
 

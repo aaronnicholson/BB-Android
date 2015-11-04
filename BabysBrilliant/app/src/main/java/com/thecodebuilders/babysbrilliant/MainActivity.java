@@ -24,6 +24,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
+import android.widget.CheckedTextView;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
@@ -143,12 +144,15 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     RelativeLayout email_password_update, contact_support, privacy_policy, log_out, loop_playlists,
             show_intro, our_story, social_media, purchase_history, check_new_content, download_purchase_content;
+
+    RelativeLayout fiftin_min_timer_lay,thirty_min_timer_lay,fourty_five_min_timer_lay,sixty_min_timer_lay,ninty_min_timer_lay;
     private ProgressDialog pDialog;
     private RequestQueue rq;
     private StringRequest strReq;
     private EditText et;
     private ToggleButton toggle;
     private CustomizeDialog customizeDialog;
+    CheckedTextView checked1,checked2,checked3,checked4,checked5;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -281,7 +285,18 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                     }
                     this.startActivity(intent);
 
-                } else {
+                }
+                else if(data.getStringExtra("Key").equalsIgnoreCase("PlayListAdapter")){
+
+                    removePlaylist(data.getIntExtra("pos",0));
+                }
+
+                else if(data.getStringExtra("Key").equalsIgnoreCase("PlayListItemAdapter")){
+
+                    removeItemFromPlaylist(data.getIntExtra("pos",0));
+                }
+
+                else {
 
 
                 }
@@ -928,6 +943,19 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         toggle = (ToggleButton) includedLoopPlaylistsLayout.findViewById(R.id.toggleButton1);
 
+
+        fiftin_min_timer_lay = (RelativeLayout) includedLoopPlaylistsLayout.findViewById(R.id.fiftin_min_timer_lay);
+        thirty_min_timer_lay = (RelativeLayout) includedLoopPlaylistsLayout.findViewById(R.id.thirty_min_timer_lay);
+        fourty_five_min_timer_lay = (RelativeLayout) includedLoopPlaylistsLayout.findViewById(R.id.fourty_five_min_timer_lay);
+        sixty_min_timer_lay = (RelativeLayout) includedLoopPlaylistsLayout.findViewById(R.id.sixty_min_timer_lay);
+        ninty_min_timer_lay = (RelativeLayout) includedLoopPlaylistsLayout.findViewById(R.id.ninty_min_timer_lay);
+
+        checked1 = (CheckedTextView) findViewById(R.id.checked1);
+         checked2 = (CheckedTextView) findViewById(R.id.checked2);
+          checked3 = (CheckedTextView) findViewById(R.id.checked3);
+          checked4 = (CheckedTextView) findViewById(R.id.checked4);
+          checked5 = (CheckedTextView) findViewById(R.id.checked5);
+
         videoToggleButton.setTypeface(MainActivity.fontAwesome);
         videoCloseButton.setTypeface(MainActivity.fontAwesome);
         videoFFButton.setTypeface(MainActivity.fontAwesome);
@@ -1104,6 +1132,92 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             public void onClick(View v) {
 
                 includedLoopPlaylistsLayout.setVisibility(View.VISIBLE);
+            }
+        });
+
+
+
+        fiftin_min_timer_lay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!checked1.isChecked()) {
+                    checked1.setChecked(true);
+                    checked2.setChecked(false);
+                    checked3.setChecked(false);
+                    checked4.setChecked(false);
+                    checked5.setChecked(false);
+
+                }
+
+
+
+            }
+        });
+
+
+
+        thirty_min_timer_lay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!checked2.isChecked()) {
+                    checked2.setChecked(true);
+                    checked1.setChecked(false);
+                    checked3.setChecked(false);
+                    checked4.setChecked(false);
+                    checked5.setChecked(false);
+
+                }
+            }
+        });
+
+
+
+        fourty_five_min_timer_lay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!checked3.isChecked()) {
+                    checked3.setChecked(true);
+                    checked2.setChecked(false);
+                    checked1.setChecked(false);
+                    checked4.setChecked(false);
+                    checked5.setChecked(false);
+
+                }
+
+            }
+        });
+
+
+
+        sixty_min_timer_lay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!checked4.isChecked()) {
+                    checked4.setChecked(true);
+                    checked2.setChecked(false);
+                    checked3.setChecked(false);
+                    checked1.setChecked(false);
+                    checked5.setChecked(false);
+
+                }
+
+            }
+        });
+
+
+
+        ninty_min_timer_lay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!checked5.isChecked()) {
+                    checked5.setChecked(true);
+                    checked2.setChecked(false);
+                    checked3.setChecked(false);
+                    checked4.setChecked(false);
+                    checked1.setChecked(false);
+
+                }
+
             }
         });
 
