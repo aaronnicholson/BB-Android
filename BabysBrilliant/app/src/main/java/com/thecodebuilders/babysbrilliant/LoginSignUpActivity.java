@@ -87,6 +87,14 @@ public class LoginSignUpActivity extends AppCompatActivity {
         }
     }
 
+    public void showDialog(String msg) {
+        CustomizeDialog customizeDialog = new CustomizeDialog(LoginSignUpActivity.this);
+
+        customizeDialog.setTitle("Alert");
+        customizeDialog.setMessage(msg);
+        customizeDialog.show();
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -172,11 +180,13 @@ public class LoginSignUpActivity extends AppCompatActivity {
         passwd.setText("21242124");
     }
 
-    public void showDialog(String msg) {
+ /*   public void showDialog(String msg) {
         CustomizeDialog customizeDialog = new CustomizeDialog(LoginSignUpActivity.this);
 
         customizeDialog.setTitle("Alert");
         customizeDialog.setMessage(msg);
         customizeDialog.show();
-    }
+    }*/
+
+
 }

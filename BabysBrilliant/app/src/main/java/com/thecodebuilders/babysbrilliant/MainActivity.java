@@ -192,18 +192,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     }
 
-    public void showIntro() {
 
-        show_intro.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                startActivity(new Intent(MainActivity.this, ShowIntroActivity.class).putExtra("Key", "SignUp"));
-
-
-            }
-        });
-    }
 
 
     @Override
@@ -1015,6 +1004,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     public void privacyPolicy() {
 
+
         privacy_policy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -1100,7 +1090,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                 if (et.getText().length() == 0 || et.getText().toString().equalsIgnoreCase("")) {
 
                 } else {
-                    m(et.getText().toString());
+                    AsynEditPassword(et.getText().toString());
                 }
             }
         });
@@ -1225,7 +1215,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     }
 
 
-    public void m(final String value) {
+    public void AsynEditPassword(final String value) {
 
 
         rq = Volley.newRequestQueue(MainActivity.this);
@@ -1328,6 +1318,19 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         customizeDialog.setTitle(Title);
         customizeDialog.setMessage(msg);
         customizeDialog.show();
+    }
+
+    public void showIntro() {
+
+        show_intro.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                startActivity(new Intent(MainActivity.this, ShowIntroActivity.class).putExtra("Key", "SignUp"));
+
+
+            }
+        });
     }
 
 }

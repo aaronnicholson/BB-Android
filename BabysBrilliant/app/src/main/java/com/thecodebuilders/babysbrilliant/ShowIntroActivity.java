@@ -68,18 +68,7 @@ public class ShowIntroActivity extends AppCompatActivity {
     }
 
 
-    @Override
-    public void onBackPressed() {
 
-
-        if (Key.equalsIgnoreCase("SignUp")) {
-
-            startActivity(new Intent(ShowIntroActivity.this, MainActivity.class));
-            ShowIntroActivity.this.finish();
-        } else {
-            super.onBackPressed();
-        }
-    }
 
     private class MyPagerAdapter extends PagerAdapter {
 
@@ -142,5 +131,18 @@ public class ShowIntroActivity extends AppCompatActivity {
             container.removeView((LinearLayout) object);
         }
 
+    }
+
+    @Override
+    public void onBackPressed() {
+
+
+        if (Key.equalsIgnoreCase("SignUp")) {
+
+            startActivity(new Intent(ShowIntroActivity.this, MainActivity.class));
+            ShowIntroActivity.this.finish();
+        } else {
+            super.onBackPressed();
+        }
     }
 }
