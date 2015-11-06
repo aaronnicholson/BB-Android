@@ -20,7 +20,7 @@
             android:layout_height="0dp"
             android:layout_gravity="center"
             android:layout_weight="0.15"
-            android:background="#F2F2F2"
+            android:background="@drawable/upper_round"
             android:gravity="center"
             android:orientation="horizontal"
             android:weightSum="1">
@@ -78,11 +78,11 @@
 
 
                     <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
                         android:layout_alignParentRight="true"
                         android:layout_marginRight="10dp"
-                        android:background="@drawable/favorites" />
+                        android:background="@drawable/right_arrow" />
 
 
                 </RelativeLayout>
@@ -109,11 +109,11 @@
 
 
                     <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
                         android:layout_alignParentRight="true"
                         android:layout_marginRight="10dp"
-                        android:background="@drawable/favorites" />
+                        android:background="@drawable/right_arrow" />
 
 
                 </RelativeLayout>
@@ -140,11 +140,11 @@
 
 
                     <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
                         android:layout_alignParentRight="true"
                         android:layout_marginRight="10dp"
-                        android:background="@drawable/favorites" />
+                        android:background="@drawable/right_arrow" />
 
 
                 </RelativeLayout>
@@ -171,11 +171,11 @@
 
 
                     <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
                         android:layout_alignParentRight="true"
                         android:layout_marginRight="10dp"
-                        android:background="@drawable/favorites" />
+                        android:background="@drawable/right_arrow" />
 
 
                 </RelativeLayout>
@@ -202,11 +202,11 @@
 
 
                     <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
                         android:layout_alignParentRight="true"
                         android:layout_marginRight="10dp"
-                        android:background="@drawable/favorites" />
+                        android:background="@drawable/right_arrow" />
 
 
                 </RelativeLayout>
@@ -233,11 +233,11 @@
 
 
                     <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
                         android:layout_alignParentRight="true"
                         android:layout_marginRight="10dp"
-                        android:background="@drawable/favorites" />
+                        android:background="@drawable/right_arrow" />
 
 
                 </RelativeLayout>
@@ -264,11 +264,11 @@
 
 
                     <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
                         android:layout_alignParentRight="true"
                         android:layout_marginRight="10dp"
-                        android:background="@drawable/favorites" />
+                        android:background="@drawable/right_arrow" />
 
 
                 </RelativeLayout>
@@ -295,11 +295,11 @@
 
 
                     <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
                         android:layout_alignParentRight="true"
                         android:layout_marginRight="10dp"
-                        android:background="@drawable/favorites" />
+                        android:background="@drawable/right_arrow" />
 
 
                 </RelativeLayout>
@@ -327,11 +327,11 @@
 
 
                     <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
                         android:layout_alignParentRight="true"
                         android:layout_marginRight="10dp"
-                        android:background="@drawable/favorites" />
+                        android:background="@drawable/right_arrow" />
 
 
                 </RelativeLayout>
@@ -359,11 +359,11 @@
 
 
                     <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
                         android:layout_alignParentRight="true"
                         android:layout_marginRight="10dp"
-                        android:background="@drawable/favorites" />
+                        android:background="@drawable/right_arrow" />
 
 
                 </RelativeLayout>
@@ -391,11 +391,11 @@
 
 
                     <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
                         android:layout_alignParentRight="true"
                         android:layout_marginRight="10dp"
-                        android:background="@drawable/favorites" />
+                        android:background="@drawable/right_arrow" />
 
 
                 </RelativeLayout>

@@ -114,11 +114,30 @@ public class ParentalChallengeScreen extends AppCompatActivity {
             digit_fourth.setText(TEXT);
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        Intent returnIntent = getIntent();
+        returnIntent.putExtra("Key", "Cancel");
+
+        setResult(Activity.RESULT_OK, returnIntent);
+        finish();
+
+
+    }
+
     public void Click(View v) {
 
         TextView t = (TextView) v;
 
         if (v.getId() == R.id.cancel_btn) {
+
+            Intent returnIntent = getIntent();
+            returnIntent.putExtra("Key", "Cancel");
+
+            setResult(Activity.RESULT_OK, returnIntent);
+            finish();
 
             onBackPressed();
 

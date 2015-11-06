@@ -2,6 +2,7 @@ package com.thecodebuilders.babysbrilliant;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -27,20 +28,22 @@ import org.json.JSONObject;
  */
 public class LoginSignUpActivity extends AppCompatActivity {
 
-    TextView login, reset_pass, sign_up;
+    TextView login , reset_pass, sign_up;
 
     EditText email, passwd;
     private static String LOGVAR = "LoginSignUpActivity";
     RequestQueue queue;
     ProgressBar progressBar;
-    CustomizeDialog customizeDialog;
-    ;
+
+    SharedPreferences pref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_signup_activity);
-        customizeDialog = new CustomizeDialog(LoginSignUpActivity.this);
+
+        pref = getApplicationContext().getSharedPreferences("BabyBrilliantPref", MODE_PRIVATE);
+
         getSupportActionBar().hide();
         init();
 
@@ -51,11 +54,11 @@ public class LoginSignUpActivity extends AppCompatActivity {
 
         if (v.getId() == R.id.login) {
 
-            Intent mainIntent = new Intent(LoginSignUpActivity.this, MainActivity.class);
+           /* Intent mainIntent = new Intent(LoginSignUpActivity.this, MainActivity.class);
             startActivity(mainIntent);
-            LoginSignUpActivity.this.finish();
+            LoginSignUpActivity.this.finish();*/
 
-        /*    if (email.length() == 0) {
+            if (email.length() == 0) {
                 showDialog("Enter Email id");
             } else if (passwd.length() == 0) {
 
@@ -63,8 +66,8 @@ public class LoginSignUpActivity extends AppCompatActivity {
             } else {
                 reset_pass.setVisibility(View.GONE);
                 progressBar.setVisibility(View.VISIBLE);
-                getRemoteJSON(Constant.URL + "a=lgn&u=" + email.getText() + "&p=" + passwd.getText());
-            }*/
+                getRemoteJSON(Constant.URL + "a=lgn&u=" + email.getText().toString() + "&p=" + passwd.getText().toString(), email.getText().toString(), passwd.getText().toString(), "SignIn");
+            }
 
         } else if (v.getId() == R.id.sign_up) {
 
@@ -84,6 +87,14 @@ public class LoginSignUpActivity extends AppCompatActivity {
         }
     }
 
+    public void showDialog(String msg) {
+        CustomizeDialog customizeDialog = new CustomizeDialog(LoginSignUpActivity.this);
+
+        customizeDialog.setTitle("Alert");
+        customizeDialog.setMessage(msg);
+        customizeDialog.show();
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -91,7 +102,7 @@ public class LoginSignUpActivity extends AppCompatActivity {
             if (resultCode == Activity.RESULT_OK) {
                 reset_pass.setVisibility(View.GONE);
                 progressBar.setVisibility(View.VISIBLE);
-                getRemoteJSON(Constant.URL + "a=sup&n=" + email.getText() + "&u=" + email.getText() + "&p=" + passwd.getText());
+                getRemoteJSON(Constant.URL + "a=sup&n=" + email.getText().toString() + "&u=" + email.getText().toString() + "&p=" + passwd.getText(), email.getText().toString(), passwd.getText().toString(), "SignUp");
             }
             if (resultCode == Activity.RESULT_CANCELED) {
                 //Write your code if there's no result
@@ -99,7 +110,7 @@ public class LoginSignUpActivity extends AppCompatActivity {
         }
     }//onActivityResult
 
-    public void getRemoteJSON(String assetsURL) {
+    public void getRemoteJSON(String assetsURL, final String username, final String password, final String type) {
         queue = VolleySingleton.getInstance().getRequestQueue();
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, assetsURL, new Response.Listener<String>() {
@@ -111,13 +122,28 @@ public class LoginSignUpActivity extends AppCompatActivity {
                     JSONObject result = new JSONObject(response);
                     if (result.getString("res").equalsIgnoreCase("successful")) {
 
-                        Intent mainIntent = new Intent(LoginSignUpActivity.this, MainActivity.class);
-                        startActivity(mainIntent);
-                        LoginSignUpActivity.this.finish();
-                    }
-                    else {
+
+                        if (type.equalsIgnoreCase("SignUp")) {
+
+                            Intent mainIntent = new Intent(LoginSignUpActivity.this, ShowIntroActivity.class);
+                            mainIntent.putExtra("Key","SignUp");
+                            startActivity(mainIntent);
+                            LoginSignUpActivity.this.finish();
+                        } else {
+
+                            Intent mainIntent = new Intent(LoginSignUpActivity.this, MainActivity.class);
+                            startActivity(mainIntent);
+                            LoginSignUpActivity.this.finish();
+                        }
+                    } else {
                         showDialog("Something went wrong!");
                     }
+
+                    SharedPreferences.Editor editor = pref.edit();
+                    editor.putString("user_id", result.getString("id"));
+                    editor.putString("user_name", username);
+                    editor.putString("user_password", password);
+                    editor.commit(); // commit changes
 
                 } catch (Throwable t) {
                     Log.e(LOGVAR, "Reverting to LOCAL JSON");
@@ -149,12 +175,18 @@ public class LoginSignUpActivity extends AppCompatActivity {
         passwd = (EditText) findViewById(R.id.et_passwd);
 
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
+
+        email.setText("test@tl3.com");
+        passwd.setText("21242124");
     }
 
-    public void showDialog(String msg) {
+ /*   public void showDialog(String msg) {
+        CustomizeDialog customizeDialog = new CustomizeDialog(LoginSignUpActivity.this);
 
         customizeDialog.setTitle("Alert");
         customizeDialog.setMessage(msg);
         customizeDialog.show();
-    }
+    }*/
+
+
 }
