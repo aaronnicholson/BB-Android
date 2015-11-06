@@ -28,17 +28,17 @@
         android:largeHeap="true"
         android:theme="@style/Theme.AppCompat" >
         <activity
-            android:name=".MainActivity"
+            android:name="com.thecodebuilders.babysbrilliant.MainActivity"
             android:label="@string/app_name"
             android:screenOrientation="landscape"
             android:theme="@style/Theme.AppCompat" >
         </activity>
         <activity
-            android:name=".ParentalChallengeScreen"
+            android:name="com.thecodebuilders.babysbrilliant.ParentalChallengeScreen"
             android:label="@string/title_activity_parental_challenge_screen"
             android:screenOrientation="landscape" />
         <activity
-            android:name=".SplashScreen"
+            android:name="com.thecodebuilders.babysbrilliant.SplashScreen"
             android:label="@string/app_name"
             android:screenOrientation="landscape" >
             <intent-filter>
@@ -48,7 +48,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".LoginSignUpActivity"
+            android:name="com.thecodebuilders.babysbrilliant.LoginSignUpActivity"
             android:screenOrientation="landscape" >
         </activity>
 
@@ -57,10 +57,17 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".ShowIntroActivity"
+            android:name="com.thecodebuilders.babysbrilliant.ShowIntroActivity"
             android:screenOrientation="landscape"
             android:label="@string/title_activity_show_intro" >
         </activity>
+
+
     </application>
+
+
+
+
+
 
 </manifest>

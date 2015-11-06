@@ -145,14 +145,16 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     RelativeLayout email_password_update, contact_support, privacy_policy, log_out, loop_playlists,
             show_intro, our_story, social_media, purchase_history, check_new_content, download_purchase_content;
 
-    RelativeLayout fiftin_min_timer_lay,thirty_min_timer_lay,fourty_five_min_timer_lay,sixty_min_timer_lay,ninty_min_timer_lay;
+    RelativeLayout fiftin_min_timer_lay, thirty_min_timer_lay, fourty_five_min_timer_lay, sixty_min_timer_lay, ninty_min_timer_lay;
     private ProgressDialog pDialog;
     private RequestQueue rq;
     private StringRequest strReq;
     private EditText et;
     private ToggleButton toggle;
     private CustomizeDialog customizeDialog;
-    CheckedTextView checked1,checked2,checked3,checked4,checked5;
+    CheckedTextView checked1, checked2, checked3, checked4, checked5;
+    private static final String TAG = "Android BillingService";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -161,7 +163,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         setContentView(R.layout.activity_main);
         //http://new.babysbrilliant.com/app/?a=pDBstandard
         assetsURL = Constant.URL + "a=pDBstandard";
-         customizeDialog = new CustomizeDialog(MainActivity.this);
+        customizeDialog = new CustomizeDialog(MainActivity.this);
         pref = getApplicationContext().getSharedPreferences("BabyBrilliantPref", MODE_PRIVATE);
 
 
@@ -190,9 +192,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         loopPlaylists();
         showIntro();
 
+
     }
-
-
 
 
     @Override
@@ -274,18 +275,13 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                     }
                     this.startActivity(intent);
 
-                }
-                else if(data.getStringExtra("Key").equalsIgnoreCase("PlayListAdapter")){
+                } else if (data.getStringExtra("Key").equalsIgnoreCase("PlayListAdapter")) {
 
-                    removePlaylist(data.getIntExtra("pos",0));
-                }
+                    removePlaylist(data.getIntExtra("pos", 0));
+                } else if (data.getStringExtra("Key").equalsIgnoreCase("PlayListItemAdapter")) {
 
-                else if(data.getStringExtra("Key").equalsIgnoreCase("PlayListItemAdapter")){
-
-                    removeItemFromPlaylist(data.getIntExtra("pos",0));
-                }
-
-                else {
+                    removeItemFromPlaylist(data.getIntExtra("pos", 0));
+                } else {
 
 
                 }
@@ -940,10 +936,10 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         ninty_min_timer_lay = (RelativeLayout) includedLoopPlaylistsLayout.findViewById(R.id.ninty_min_timer_lay);
 
         checked1 = (CheckedTextView) findViewById(R.id.checked1);
-         checked2 = (CheckedTextView) findViewById(R.id.checked2);
-          checked3 = (CheckedTextView) findViewById(R.id.checked3);
-          checked4 = (CheckedTextView) findViewById(R.id.checked4);
-          checked5 = (CheckedTextView) findViewById(R.id.checked5);
+        checked2 = (CheckedTextView) findViewById(R.id.checked2);
+        checked3 = (CheckedTextView) findViewById(R.id.checked3);
+        checked4 = (CheckedTextView) findViewById(R.id.checked4);
+        checked5 = (CheckedTextView) findViewById(R.id.checked5);
 
         videoToggleButton.setTypeface(MainActivity.fontAwesome);
         videoCloseButton.setTypeface(MainActivity.fontAwesome);
@@ -1126,7 +1122,6 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         });
 
 
-
         fiftin_min_timer_lay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -1140,10 +1135,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                 }
 
 
-
             }
         });
-
 
 
         thirty_min_timer_lay.setOnClickListener(new View.OnClickListener() {
@@ -1159,7 +1152,6 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                 }
             }
         });
-
 
 
         fourty_five_min_timer_lay.setOnClickListener(new View.OnClickListener() {
@@ -1178,7 +1170,6 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         });
 
 
-
         sixty_min_timer_lay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -1193,7 +1184,6 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
             }
         });
-
 
 
         ninty_min_timer_lay.setOnClickListener(new View.OnClickListener() {
@@ -1241,7 +1231,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
                                     editor.putString("user_name", value);
                                     editor.commit();
-                                    showDialog("","Changed Successfully");
+                                    showDialog("", "Changed Successfully");
 
                                 } else if (SELECT_FLAG.equalsIgnoreCase("new_password")) {
                                     editor.putString("user_password", value);
@@ -1250,7 +1240,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
                                 } else {
 
-                                   // showDialog("","Changed Successfully");
+                                    // showDialog("","Changed Successfully");
                                 }
                             }
                         } catch (JSONException e) {
@@ -1312,8 +1302,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         rq.add(strReq);
     }
 
-    public void showDialog(String Title,String msg) {
-       
+    public void showDialog(String Title, String msg) {
+
 
         customizeDialog.setTitle(Title);
         customizeDialog.setMessage(msg);

@@ -28,7 +28,7 @@ import org.json.JSONObject;
  */
 public class LoginSignUpActivity extends AppCompatActivity {
 
-    TextView login, reset_pass, sign_up;
+    TextView login , reset_pass, sign_up;
 
     EditText email, passwd;
     private static String LOGVAR = "LoginSignUpActivity";
