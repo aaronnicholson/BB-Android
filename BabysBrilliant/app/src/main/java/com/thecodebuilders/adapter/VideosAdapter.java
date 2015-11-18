@@ -16,6 +16,7 @@ import com.thecodebuilders.babysbrilliant.R;
 import com.thecodebuilders.model.Playlist;
 import com.thecodebuilders.network.VolleySingleton;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -227,7 +228,11 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
             //TODO: do actual purchase round trip here
             listItem.setIsPurchased(true);
             setLookToPurchased(thisViewHolder);
-            mainActivity.addToPurchased(listItem.getRawJSON());
+            try {
+                mainActivity.addToPurchased(listItem.getRawJSON());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
 

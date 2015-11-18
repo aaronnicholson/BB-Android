@@ -48,6 +48,10 @@ import com.thecodebuilders.adapter.SectionAdapter;
 import com.thecodebuilders.adapter.ThumbnailListAdapter;
 import com.thecodebuilders.adapter.VideosAdapter;
 import com.thecodebuilders.application.ApplicationContextProvider;
+import com.thecodebuilders.innapppurchase.IabHelper;
+import com.thecodebuilders.innapppurchase.IabResult;
+import com.thecodebuilders.innapppurchase.Inventory;
+import com.thecodebuilders.innapppurchase.Purchase;
 import com.thecodebuilders.model.Playlist;
 import com.thecodebuilders.network.VolleySingleton;
 import com.thecodebuilders.utility.Constant;
@@ -154,6 +158,9 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     private CustomizeDialog customizeDialog;
     CheckedTextView checked1, checked2, checked3, checked4, checked5;
     private static final String TAG = "Android BillingService";
+    IabHelper mHelper;
+    String ITEM_SKU;
+    JSONObject productJSON;
 
 
     @Override
@@ -170,6 +177,17 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         //do not show the action bar
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
+
+        mHelper = new IabHelper(getApplicationContext(), Constant.base64EncodedPublicKey);
+        mHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
+            @Override
+            public void onIabSetupFinished(IabResult result) {
+                if (!result.isSuccess())
+                    Log.d("", "In-app Billing setup fail" + result);
+                else
+                    Log.d("", "In-app Billing is set up OK");
+            }
+        });
 
         setMenuWidth();
 
@@ -200,8 +218,9 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
 
-        String s = data.getStringExtra("Key");
+
         if (requestCode == 1) {
+            String s = data.getStringExtra("Key");
             if (resultCode == Activity.RESULT_OK) {
 
                 if (data.getStringExtra("Key").equalsIgnoreCase("fav")) {
@@ -281,7 +300,20 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                 } else if (data.getStringExtra("Key").equalsIgnoreCase("PlayListItemAdapter")) {
 
                     removeItemFromPlaylist(data.getIntExtra("pos", 0));
-                } else {
+                } else if(data.getStringExtra("Key").equalsIgnoreCase("Purchase")){
+
+                    try {
+                        ITEM_SKU = productJSON.getString("id");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    mHelper.launchPurchaseFlow(MainActivity.this, ITEM_SKU, 10001,
+                            mPurchaseFinishedListener, "mypurchasetoken");
+
+                    //  purchasedItems.put(productJSON);
+                }
+
+                else {
 
 
                 }
@@ -291,6 +323,13 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             if (resultCode == Activity.RESULT_CANCELED) {
                 //Write your code if there's no result
             }
+        }
+        else {
+            if (!mHelper.handleActivityResult(requestCode,
+                    resultCode, data)) {
+                super.onActivityResult(requestCode, resultCode, data);
+            }
+
         }
     }//onActivityResult
 
@@ -648,11 +687,71 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     }
 
-    public static void addToPurchased(JSONObject productJSON) {
+    public  void addToPurchased(JSONObject productJSON) throws JSONException {
         //TODO: run through actual app store purchase routine
         //TODO: check for duplicate purchase
         //TODO: save to user database
-        purchasedItems.put(productJSON);
+        this.productJSON = productJSON;
+        Intent purchase = new Intent(MainActivity.this, ParentalChallengeScreen.class);
+        purchase.putExtra("Key", "Purchase");
+        startActivityForResult(purchase, 1);
+
+
+    }
+
+    IabHelper.OnIabPurchaseFinishedListener mPurchaseFinishedListener
+            = new IabHelper.OnIabPurchaseFinishedListener() {
+        public void onIabPurchaseFinished(IabResult result,
+                                          Purchase purchase)
+        {
+            if (result.isFailure()) {
+                // Handle error
+                return;
+            }
+            else if (purchase.getSku().equals(ITEM_SKU)) {
+                consumeItem();
+                // buyButton.setEnabled(false);
+            }
+
+        }
+    };
+
+    public void consumeItem() {
+        mHelper.queryInventoryAsync(mReceivedInventoryListener);
+    }
+
+    IabHelper.QueryInventoryFinishedListener mReceivedInventoryListener
+            = new IabHelper.QueryInventoryFinishedListener() {
+        public void onQueryInventoryFinished(IabResult result,
+                                             Inventory inventory) {
+
+            if (result.isFailure()) {
+                // Handle failure
+            } else {
+                mHelper.consumeAsync(inventory.getPurchase(ITEM_SKU),
+                        mConsumeFinishedListener);
+            }
+        }
+    };
+
+    IabHelper.OnConsumeFinishedListener mConsumeFinishedListener =
+            new IabHelper.OnConsumeFinishedListener() {
+                public void onConsumeFinished(Purchase purchase,
+                                              IabResult result) {
+
+                    if (result.isSuccess()) {
+                        // clickButton.setEnabled(true);
+                    } else {
+                        // handle error
+                    }
+                }
+            };
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mHelper != null) mHelper.dispose();
+        mHelper = null;
     }
 
     public static void addToFavorites(JSONObject productJSON) {

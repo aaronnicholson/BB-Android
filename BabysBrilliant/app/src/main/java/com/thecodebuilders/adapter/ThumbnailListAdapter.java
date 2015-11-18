@@ -350,7 +350,11 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
             } else {
                 listItem.setIsPurchased(true);
                 setLookToPurchased(thisViewHolder);
-                mainActivity.addToPurchased(listItem.getRawJSON());
+                try {
+                    mainActivity.addToPurchased(listItem.getRawJSON());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         } else {
             //send the list of products for the clicked subcategory to make a new view showing them
