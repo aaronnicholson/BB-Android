@@ -29,6 +29,7 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,6 +45,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.thecodebuilders.adapter.PlaylistAdapter;
 import com.thecodebuilders.adapter.PlaylistItemAdapter;
+import com.thecodebuilders.adapter.PurchaseHistoryAdapter;
 import com.thecodebuilders.adapter.SectionAdapter;
 import com.thecodebuilders.adapter.ThumbnailListAdapter;
 import com.thecodebuilders.adapter.VideosAdapter;
@@ -94,6 +96,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     View includedOurStoryLayout;
     View includedContactSupportLayout;
     View includedLoopPlaylistsLayout;
+    View includedPurchaseHistoryLayout;
     public static Typeface fontAwesome = Typeface.
             createFromAsset(appContext.getAssets(), appContext.getString(R.string.font_awesome));
     public static Typeface proximaBold = Typeface.createFromAsset(appContext.getAssets(), appContext.getString(R.string.proxima_bold));
@@ -194,7 +197,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         initializeLayout();
 
 
-        getRemoteJSON();
+        getRemoteJSON("Main", assetsURL);
 
         setUpListeners();
 
@@ -209,6 +212,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         logOut();
         loopPlaylists();
         showIntro();
+        purchaseHistory();
 
 
     }
@@ -216,7 +220,6 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
 
 
         if (requestCode == 1) {
@@ -300,7 +303,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                 } else if (data.getStringExtra("Key").equalsIgnoreCase("PlayListItemAdapter")) {
 
                     removeItemFromPlaylist(data.getIntExtra("pos", 0));
-                } else if(data.getStringExtra("Key").equalsIgnoreCase("Purchase")){
+                } else if (data.getStringExtra("Key").equalsIgnoreCase("Purchase")) {
 
                     try {
                         ITEM_SKU = productJSON.getString("id");
@@ -310,10 +313,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                     mHelper.launchPurchaseFlow(MainActivity.this, ITEM_SKU, 10001,
                             mPurchaseFinishedListener, "mypurchasetoken");
 
-                    //  purchasedItems.put(productJSON);
-                }
-
-                else {
+                    purchasedItems.put(productJSON);
+                } else {
 
 
                 }
@@ -323,8 +324,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             if (resultCode == Activity.RESULT_CANCELED) {
                 //Write your code if there's no result
             }
-        }
-        else {
+        } else {
             if (!mHelper.handleActivityResult(requestCode,
                     resultCode, data)) {
                 super.onActivityResult(requestCode, resultCode, data);
@@ -350,6 +350,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                 includedemailPasswordLayout2.setVisibility(View.GONE);
                 includedOurStoryLayout.setVisibility(View.GONE);
                 includedLoopPlaylistsLayout.setVisibility(View.GONE);
+                includedPurchaseHistoryLayout.setVisibility(View.GONE);
 
             }
         });
@@ -687,7 +688,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     }
 
-    public  void addToPurchased(JSONObject productJSON) throws JSONException {
+    public void addToPurchased(JSONObject productJSON) throws JSONException {
         //TODO: run through actual app store purchase routine
         //TODO: check for duplicate purchase
         //TODO: save to user database
@@ -702,13 +703,11 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     IabHelper.OnIabPurchaseFinishedListener mPurchaseFinishedListener
             = new IabHelper.OnIabPurchaseFinishedListener() {
         public void onIabPurchaseFinished(IabResult result,
-                                          Purchase purchase)
-        {
+                                          Purchase purchase) {
             if (result.isFailure()) {
                 // Handle error
                 return;
-            }
-            else if (purchase.getSku().equals(ITEM_SKU)) {
+            } else if (purchase.getSku().equals(ITEM_SKU)) {
                 consumeItem();
                 // buyButton.setEnabled(false);
             }
@@ -886,14 +885,27 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     }
 
     //retrieve the data model from the server
-    public void getRemoteJSON() {
+    public void getRemoteJSON(final String From, String url) {
         queue = VolleySingleton.getInstance().getRequestQueue();
+        if (From.equalsIgnoreCase("Purchase")) {
+            pDialog = new ProgressDialog(MainActivity.this);
+            pDialog.setMessage("Loading...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
 
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, assetsURL, new Response.Listener<String>() {
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
+
                 try {
-                    processJSON(response);
+                    if (From.equalsIgnoreCase("Main")) {
+                        processJSON(response);
+                    } else if (From.equalsIgnoreCase("Purchase")) {
+                        pDialog.hide();
+                        purchaseJson(response);
+                    }
+
 
                     //TODO: Save remote JSON to local JSON
 
@@ -913,6 +925,27 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         });
 
         queue.add(stringRequest);
+    }
+
+    public void purchaseJson(String response) throws JSONException {
+
+       // JSONObject jsonData = new JSONObject(Uri.decode(response));
+        ArrayList<HashMap<String, String>> arraylist = new ArrayList<HashMap<String, String>>();
+
+        JSONArray arr = new JSONArray(Uri.decode(response));
+        int lengt = arr.length();
+        for (int i = 0; i < arr.length(); i++) {
+            HashMap<String, String> hash = new HashMap<String, String>();
+            JSONObject json = arr.getJSONObject(i);
+            hash.put("title", json.getString("title"));
+            hash.put("date", json.getString("date"));
+            arraylist.add(hash);
+        }
+        ListView lv = (ListView) includedPurchaseHistoryLayout.findViewById(R.id.listView);
+        PurchaseHistoryAdapter pHA = new PurchaseHistoryAdapter(MainActivity.this, arraylist);
+        lv.setAdapter(pHA);
+
+
     }
 
     private void processJSON(String response) throws JSONException {
@@ -1010,6 +1043,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         includedSettingLayout = findViewById(R.id.settings_lay);
         includedSocialMediaLayout = findViewById(R.id.social_media_lay);
         includedLoopPlaylistsLayout = findViewById(R.id.loop_playlist_lay);
+        includedPurchaseHistoryLayout = findViewById(R.id.purchase_history_lay);
 
         email_password_update = (RelativeLayout) includedSettingLayout.findViewById(R.id.email_pass_update);
         contact_support = (RelativeLayout) includedSettingLayout.findViewById(R.id.contact_support);
@@ -1407,6 +1441,20 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         customizeDialog.setTitle(Title);
         customizeDialog.setMessage(msg);
         customizeDialog.show();
+    }
+
+
+    public void purchaseHistory() {
+
+        purchase_history.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                includedPurchaseHistoryLayout.setVisibility(View.VISIBLE);
+                getRemoteJSON("Purchase", Constant.URL + "a=pH&u=" + pref.getString("user_id", ""));
+
+            }
+        });
     }
 
     public void showIntro() {

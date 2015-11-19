@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+
     package="com.thecodebuilders.babysbrilliant" >
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -26,20 +27,29 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
+
         android:theme="@style/Theme.AppCompat" >
         <activity
             android:name="com.thecodebuilders.babysbrilliant.MainActivity"
             android:label="@string/app_name"
             android:screenOrientation="landscape"
+            android:configChanges="orientation|screenSize"
             android:theme="@style/Theme.AppCompat" >
         </activity>
         <activity
             android:name="com.thecodebuilders.babysbrilliant.ParentalChallengeScreen"
             android:label="@string/title_activity_parental_challenge_screen"
+            android:configChanges="orientation|screenSize"
+            android:screenOrientation="landscape" />
+
+        <activity
+            android:name="com.thecodebuilders.babysbrilliant.PurchaseHistory"
+            android:configChanges="orientation|screenSize"
             android:screenOrientation="landscape" />
         <activity
             android:name="com.thecodebuilders.babysbrilliant.SplashScreen"
             android:label="@string/app_name"
+            android:configChanges="orientation|screenSize"
             android:screenOrientation="landscape" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -49,6 +59,7 @@
         </activity>
         <activity
             android:name="com.thecodebuilders.babysbrilliant.LoginSignUpActivity"
+            android:configChanges="orientation|screenSize"
             android:screenOrientation="landscape" >
         </activity>
 
@@ -57,8 +68,10 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
+
             android:name="com.thecodebuilders.babysbrilliant.ShowIntroActivity"
             android:screenOrientation="landscape"
+            android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_show_intro" >
         </activity>
 
