@@ -13,6 +13,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -41,6 +42,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.thecodebuilders.adapter.PlaylistAdapter;
@@ -55,6 +57,7 @@ import com.thecodebuilders.innapppurchase.IabResult;
 import com.thecodebuilders.innapppurchase.Inventory;
 import com.thecodebuilders.innapppurchase.Purchase;
 import com.thecodebuilders.model.Playlist;
+import com.thecodebuilders.network.InputStreamVolleyRequest;
 import com.thecodebuilders.network.VolleySingleton;
 import com.thecodebuilders.utility.Constant;
 import com.thecodebuilders.utility.CustomizeDialog;
@@ -64,6 +67,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -164,6 +173,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     IabHelper mHelper;
     String ITEM_SKU;
     JSONObject productJSON;
+    InputStreamVolleyRequest request;
 
 
     @Override
@@ -217,6 +227,78 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     }
 
+    public void downloadVideo(final String videoName) {
+        String mUrl;
+        mUrl = "https://s3-us-west-1.amazonaws.com/babysbrilliant-media/" + videoName;
+
+        request = new InputStreamVolleyRequest(Request.Method.GET, mUrl, new Response.Listener<byte[]>() {
+
+            @Override
+            public void onResponse(byte[] response) {
+
+                HashMap<String, Object> map = new HashMap<String, Object>();
+                try {
+                    if (response != null) {
+
+                        File myDirectory = new File(
+                                Environment.getExternalStorageDirectory(), "BABYBRILLIANT");
+
+                        if (!myDirectory.exists()) {
+                            myDirectory.mkdirs();
+                        }
+
+                        //Read file name from headers
+
+
+                        try {
+                            long lenghtOfFile = response.length;
+
+                            //covert reponse to input stream
+                            InputStream input = new ByteArrayInputStream(response);
+
+                            File file = new File(myDirectory, videoName+".mp4");
+                            //map.put("resume_path", file.toString());
+                            OutputStream output = new FileOutputStream(file);
+                            byte data[] = new byte[1024];
+
+                            long total = 0;
+
+                            int count;
+                            while ((count = input.read(data)) != -1) {
+                                total += count;
+                                output.write(data, 0, count);
+
+                            }
+
+                            output.flush();
+
+                            output.close();
+                            input.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+
+                        }
+                    }
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    Log.d("KEY_ERROR", "UNABLE TO DOWNLOAD FILE");
+                    e.printStackTrace();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+
+                Log.d("KEY_ERROR", "UNABLE TO DOWNLOAD FILE");
+            }
+        }, null);
+        RequestQueue mRequestQueue = Volley.newRequestQueue(getApplicationContext(),
+                new HurlStack());
+        mRequestQueue.add(request);
+    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -244,6 +326,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                     i.putExtra(android.content.Intent.EXTRA_SUBJECT, Constant.SUBJECT);
                     // i.putExtra(android.content.Intent.EXTRA_TEXT, text);
                     startActivity(Intent.createChooser(i, "Send email"));
+
+
 
 
                     /*Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
@@ -320,8 +404,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                 }
 
 
-            }
-            if (resultCode == Activity.RESULT_CANCELED) {
+            } else if (resultCode == Activity.RESULT_CANCELED) {
                 //Write your code if there's no result
             }
         } else {
@@ -894,6 +977,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             pDialog.show();
         }
 
+
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -929,7 +1013,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     public void purchaseJson(String response) throws JSONException {
 
-       // JSONObject jsonData = new JSONObject(Uri.decode(response));
+        // JSONObject jsonData = new JSONObject(Uri.decode(response));
         ArrayList<HashMap<String, String>> arraylist = new ArrayList<HashMap<String, String>>();
 
         JSONArray arr = new JSONArray(Uri.decode(response));
