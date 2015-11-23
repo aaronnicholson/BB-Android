@@ -108,6 +108,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     View includedLoopPlaylistsLayout;
     View includedPurchaseHistoryLayout;
     View includedDownloadPuchaseContentLayout;
+    View includedCheckNewContentLayout;
+
     public static Typeface fontAwesome = Typeface.
             createFromAsset(appContext.getAssets(), appContext.getString(R.string.font_awesome));
     public static Typeface proximaBold = Typeface.createFromAsset(appContext.getAssets(), appContext.getString(R.string.proxima_bold));
@@ -1191,6 +1193,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         includedLoopPlaylistsLayout = findViewById(R.id.loop_playlist_lay);
         includedPurchaseHistoryLayout = findViewById(R.id.purchase_history_lay);
         includedDownloadPuchaseContentLayout = findViewById(R.id.download_purchase_content_lay);
+        includedCheckNewContentLayout = findViewById(R.id.check_new_content_lay);
 
         email_password_update = (RelativeLayout) includedSettingLayout.findViewById(R.id.email_pass_update);
         contact_support = (RelativeLayout) includedSettingLayout.findViewById(R.id.contact_support);

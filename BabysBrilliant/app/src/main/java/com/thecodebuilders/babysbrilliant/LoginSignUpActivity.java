@@ -140,6 +140,9 @@ public class LoginSignUpActivity extends AppCompatActivity {
                     }
 
                     SharedPreferences.Editor editor = pref.edit();
+
+
+
                     editor.putString("user_id", result.getString("id"));
                     editor.putString("user_name", username);
                     editor.putString("user_password", password);

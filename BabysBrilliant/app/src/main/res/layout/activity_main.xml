@@ -318,6 +318,13 @@
             android:layout_height="match_parent"
             android:visibility="gone" />
 
+        <include
+            android:id="@+id/check_new_content_lay"
+            layout="@layout/check_for_new_content"
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
+
 
     </FrameLayout>
 
