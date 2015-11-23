@@ -45,6 +45,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.thecodebuilders.adapter.DownloadPurchaseContentAdapter;
 import com.thecodebuilders.adapter.PlaylistAdapter;
 import com.thecodebuilders.adapter.PlaylistItemAdapter;
 import com.thecodebuilders.adapter.PurchaseHistoryAdapter;
@@ -106,6 +107,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     View includedContactSupportLayout;
     View includedLoopPlaylistsLayout;
     View includedPurchaseHistoryLayout;
+    View includedDownloadPuchaseContentLayout;
     public static Typeface fontAwesome = Typeface.
             createFromAsset(appContext.getAssets(), appContext.getString(R.string.font_awesome));
     public static Typeface proximaBold = Typeface.createFromAsset(appContext.getAssets(), appContext.getString(R.string.proxima_bold));
@@ -127,6 +129,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     public static ArrayList<JSONObject> favoriteItems = new ArrayList<>();
     //TODO: fetch and populated pre-purchased items from user db
     public static JSONArray purchasedItems = new JSONArray();
+    public static JSONArray downlaodItems = new JSONArray();
     public static ArrayList<Playlist> playlists = new ArrayList<>();
     public int activePlaylist = 0;
     public JSONObject pendingPlaylistItem;
@@ -223,7 +226,59 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         loopPlaylists();
         showIntro();
         purchaseHistory();
+        downlaodPurchaseContent();
 
+
+    }
+
+    public void downlaodPurchaseContent() {
+
+        download_purchase_content.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                includedDownloadPuchaseContentLayout.setVisibility(View.VISIBLE);
+                if (downlaodItems.length() == 0 && purchasedItems.length() == 0) {
+
+                    Toast.makeText(getApplicationContext(), "dfsf", Toast.LENGTH_SHORT).show();
+                } else {
+
+                    ArrayList<HashMap<String, String>> arraylist = new ArrayList<HashMap<String, String>>();
+
+
+                    for (int i = 0; i < downlaodItems.length(); i++) {
+                        HashMap<String, String> hash = new HashMap<String, String>();
+                        JSONObject download_json = null;
+                        JSONObject puchased_json1 = null;
+
+
+                        try {
+                            JSONArray a =purchasedItems;
+                            JSONArray b =downlaodItems;
+                            puchased_json1 = purchasedItems.getJSONObject(i);
+
+                            download_json = downlaodItems.getJSONObject(i);
+                            if (puchased_json1.getString("title").equalsIgnoreCase(download_json.getString("title"))) {
+                                hash.put("title", download_json.getString("title"));
+                                arraylist.add(hash);
+                            }
+
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+
+                    ListView lv = (ListView) includedDownloadPuchaseContentLayout.findViewById(R.id.listView);
+                    DownloadPurchaseContentAdapter pHA = new DownloadPurchaseContentAdapter(MainActivity.this, arraylist);
+                    lv.setAdapter(pHA);
+
+
+                }
+
+            }
+        });
 
     }
 
@@ -256,7 +311,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                             //covert reponse to input stream
                             InputStream input = new ByteArrayInputStream(response);
 
-                            File file = new File(myDirectory, videoName+".mp4");
+                            File file = new File(myDirectory, videoName + ".mp4");
                             //map.put("resume_path", file.toString());
                             OutputStream output = new FileOutputStream(file);
                             byte data[] = new byte[1024];
@@ -434,6 +489,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                 includedOurStoryLayout.setVisibility(View.GONE);
                 includedLoopPlaylistsLayout.setVisibility(View.GONE);
                 includedPurchaseHistoryLayout.setVisibility(View.GONE);
+                includedDownloadPuchaseContentLayout.setVisibility(View.GONE);
 
             }
         });
@@ -986,6 +1042,11 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                     if (From.equalsIgnoreCase("Main")) {
                         processJSON(response);
                     } else if (From.equalsIgnoreCase("Purchase")) {
+
+                         JSONArray downlaodItems1 = new JSONArray(Uri.decode(response));
+                       JSONArray purchasedItems1 = new JSONArray(Uri.decode(response));
+                        downlaodItems = downlaodItems1;
+                        purchasedItems = purchasedItems1;
                         pDialog.hide();
                         purchaseJson(response);
                     }
@@ -1025,6 +1086,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             hash.put("date", json.getString("date"));
             arraylist.add(hash);
         }
+
         ListView lv = (ListView) includedPurchaseHistoryLayout.findViewById(R.id.listView);
         PurchaseHistoryAdapter pHA = new PurchaseHistoryAdapter(MainActivity.this, arraylist);
         lv.setAdapter(pHA);
@@ -1128,6 +1190,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         includedSocialMediaLayout = findViewById(R.id.social_media_lay);
         includedLoopPlaylistsLayout = findViewById(R.id.loop_playlist_lay);
         includedPurchaseHistoryLayout = findViewById(R.id.purchase_history_lay);
+        includedDownloadPuchaseContentLayout = findViewById(R.id.download_purchase_content_lay);
 
         email_password_update = (RelativeLayout) includedSettingLayout.findViewById(R.id.email_pass_update);
         contact_support = (RelativeLayout) includedSettingLayout.findViewById(R.id.contact_support);
