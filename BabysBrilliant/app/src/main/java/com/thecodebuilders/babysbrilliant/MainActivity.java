@@ -31,6 +31,7 @@ import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.MediaController;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,7 +50,9 @@ import com.thecodebuilders.adapter.DownloadPurchaseContentAdapter;
 import com.thecodebuilders.adapter.PlaylistAdapter;
 import com.thecodebuilders.adapter.PlaylistItemAdapter;
 import com.thecodebuilders.adapter.PurchaseHistoryAdapter;
+import com.thecodebuilders.adapter.PurchasedAdapter;
 import com.thecodebuilders.adapter.SectionAdapter;
+import com.thecodebuilders.adapter.SoundBoardsAdapter;
 import com.thecodebuilders.adapter.ThumbnailListAdapter;
 import com.thecodebuilders.adapter.VideosAdapter;
 import com.thecodebuilders.application.ApplicationContextProvider;
@@ -70,9 +73,11 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -206,7 +211,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                     Log.d("", "In-app Billing is set up OK");
             }
         });
-
+        createRawFile();
         setMenuWidth();
 
         initializeLayout();
@@ -233,6 +238,63 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     }
 
+    public void createRawFile() {
+
+
+      //  File file = new File(Environment.getExternalStorageDirectory() + File.separator + "raw.txt");
+
+
+        try {
+
+            FileOutputStream fOut = openFileOutput("raw.txt", MODE_WORLD_READABLE);
+            
+            String s = getResources().getString(R.string.raw_json);
+
+            fOut.write(s.getBytes());
+            fOut.close();
+            Toast.makeText(getBaseContext(),"file saved",Toast.LENGTH_SHORT).show();
+        }
+
+        catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+
+
+    }
+
+    public String readFile() {
+        String s="";
+        StringBuffer stringBuffer = new StringBuffer();
+
+        // Attaching BufferedReader to the FileInputStream by the help of
+        // InputStreamReader
+        try {
+            FileInputStream fileIn=openFileInput("raw.txt");
+            InputStreamReader InputRead= new InputStreamReader(fileIn);
+
+            char[] inputBuffer= new char[100000];
+
+            int charRead;
+
+            while ((charRead=InputRead.read(inputBuffer))>0) {
+                // char to string conversion
+                String readstring=String.copyValueOf(inputBuffer,0,charRead);
+                s +=readstring;
+
+            }
+            InputRead.close();
+            Toast.makeText(getBaseContext(), s,Toast.LENGTH_SHORT).show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return s;
+    }
+
+
     public void downlaodPurchaseContent() {
 
         download_purchase_content.setOnClickListener(new View.OnClickListener() {
@@ -255,8 +317,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
 
                         try {
-                            JSONArray a =purchasedItems;
-                            JSONArray b =downlaodItems;
+                            JSONArray a = purchasedItems;
+                            JSONArray b = downlaodItems;
                             puchased_json1 = purchasedItems.getJSONObject(i);
 
                             download_json = downlaodItems.getJSONObject(i);
@@ -811,18 +873,18 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         } else if (adapterType == "playlistItems") {
             PlaylistItemAdapter adapter = new PlaylistItemAdapter(listData, this);
             thumbnailList.setAdapter(adapter);
-        }
-        /* else if (adapterType == "purchased") {
+        } else if (adapterType == "purchased") {
             PurchasedAdapter adapter = new PurchasedAdapter(listData, this);
             thumbnailList.setAdapter(adapter);
-        }  else if (adapterType == "favorites") {
+        }
+       /* else if (adapterType == "favorites") {
             FavoritesAdapter adapter = new FavoritesAdapter(listData, this);
             thumbnailList.setAdapter(adapter);
-        } else if (adapterType == "soundBoards") {
+        } */
+        else if (adapterType == "soundBoards") {
             SoundBoardsAdapter adapter = new SoundBoardsAdapter(listData, this);
             thumbnailList.setAdapter(adapter);
-        } */
-        else {
+        } else {
             ThumbnailListAdapter adapter = new ThumbnailListAdapter(listData, this);
             thumbnailList.setAdapter(adapter);
         }
@@ -978,14 +1040,42 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 //        downloadItem(url);
 
 
-        videoToggleButton.setText(appContext.getString(R.string.video_pause));
+       /* videoToggleButton.setText(appContext.getString(R.string.video_pause));
         videoLayout.setVisibility(View.VISIBLE);
         videoView.setVideoPath(url);
         videoView.requestFocus();
         videoView.start();
 
         videoView.setAlpha(0); //hide prior to media being ready
-        //TODO: show preloader
+        //TODO: show preloader*/
+
+        try {
+            // Start the MediaController
+            MediaController mediacontroller = new MediaController(
+                    MainActivity.this);
+            mediacontroller.setAnchorView(videoView);
+            // Get the URL from String VideoURL
+            Uri video = Uri.parse(url);
+            videoView.setMediaController(mediacontroller);
+            videoView.setVideoURI(video);
+            videoView.start();
+            videoView.setAlpha(0);
+
+
+        } catch (Exception e) {
+            Log.e("Error", e.getMessage());
+            e.printStackTrace();
+        }
+
+      /*  videoView.requestFocus();
+        videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            // Close the progress bar and play the video
+            public void onPrepared(MediaPlayer mp) {
+                // pDialog.dismiss();
+                videoView.start();
+                videoView.setAlpha(0);
+            }
+        });*/
 
         showControls();
     }
@@ -1045,8 +1135,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                         processJSON(response);
                     } else if (From.equalsIgnoreCase("Purchase")) {
 
-                         JSONArray downlaodItems1 = new JSONArray(Uri.decode(response));
-                       JSONArray purchasedItems1 = new JSONArray(Uri.decode(response));
+                        JSONArray downlaodItems1 = new JSONArray(Uri.decode(response));
+                        JSONArray purchasedItems1 = new JSONArray(Uri.decode(response));
                         downlaodItems = downlaodItems1;
                         purchasedItems = purchasedItems1;
                         pDialog.hide();
@@ -1055,6 +1145,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
 
                     //TODO: Save remote JSON to local JSON
+                    //  Constant.raw_json= response;
+
 
                 } catch (Throwable t) {
                     Log.e(LOGVAR, "Reverting to LOCAL JSON");
@@ -1120,7 +1212,10 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     private void getLocalJSON() {
         try {
             //TODO: pull this out of strings and into a flat file.
-            processJSON(getString(R.string.raw_json));
+
+
+            // processJSON(getString(R.string.our_story));
+            processJSON(readFile());
 
         } catch (Throwable t) {
             //Log.e(LOGVAR, "Could not parse LOCAL malformed JSON");

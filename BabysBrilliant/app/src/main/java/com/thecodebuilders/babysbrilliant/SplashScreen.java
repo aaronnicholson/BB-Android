@@ -38,9 +38,9 @@ public class SplashScreen extends AppCompatActivity {
             public void run() {
                 // Create an Intent that will start the Menu-Activity.
 
-                Intent mainIntent = new Intent(SplashScreen.this, MainActivity.class);
+              /*  Intent mainIntent = new Intent(SplashScreen.this, MainActivity.class);
                 startActivity(mainIntent);
-                SplashScreen.this.finish();
+                SplashScreen.this.finish();*/
 
               /*  if (pref.getString("user_id", "").length() == 0 && pref.getString("user_id", "").equalsIgnoreCase("")) {
 
@@ -55,9 +55,9 @@ public class SplashScreen extends AppCompatActivity {
 
                 }*/
 
-               /* Intent mainIntent = new Intent(SplashScreen.this, MainActivity.class);
+                Intent mainIntent = new Intent(SplashScreen.this, MainActivity.class);
                 startActivity(mainIntent);
-                SplashScreen.this.finish();*/
+                SplashScreen.this.finish();
 
             }
         }, SPLASH_DISPLAY_LENGTH);

@@ -128,14 +128,15 @@ public class SectionAdapter extends RecyclerView.Adapter<ElementViewHolder> {
 
         }
 
-       CommonAdapterUtility.setThumbnailImage(listItem,viewHolder.thumbnailImage);
+        CommonAdapterUtility.setThumbnailImage(listItem, viewHolder.thumbnailImage);
 
         viewHolder.itemView.setTag(listItem);
     }
 
     private void previewClicked(int position) {
         ListItem listItem = elements.get(position);
-        if (!listItem.getMediaFile().equals("")) mainActivity.playVideo(listItem.getMediaFile());
+        if (!listItem.getMediaFile().equals(""))
+            mainActivity.playVideo(listItem.getMediaFile());
     }
 
     private void thumbnailClicked(int position) {

@@ -18,7 +18,7 @@ public class ElementViewHolder extends RecyclerView.ViewHolder {
     public final TextView priceText;
     public final RelativeLayout textBackground;
     public final ImageView favoritesIcon;
-    public final ImageView playlistIcon;
+    public final ImageView playlistIcon,downloadIcon;
     public final TextView previewIcon;
     public final TextView deletePlaylistIcon;
     public final TextView deletePlaylistItemIcon;
@@ -44,6 +44,8 @@ public class ElementViewHolder extends RecyclerView.ViewHolder {
         bumpRightIcon = (TextView) itemView.findViewById(R.id.bump_right);
         videoView = (TextureView) itemView.findViewById(R.id.video_view_inline);
         listItemContainer = (RelativeLayout) itemView.findViewById(R.id.list_item_container);
+        //Added by Rahul
+        downloadIcon = (ImageView) itemView.findViewById(R.id.download_icon);
     }
 
 }
