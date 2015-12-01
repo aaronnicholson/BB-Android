@@ -42,7 +42,7 @@ public class SplashScreen extends AppCompatActivity {
                 startActivity(mainIntent);
                 SplashScreen.this.finish();*/
 
-              /*  if (pref.getString("user_id", "").length() == 0 && pref.getString("user_id", "").equalsIgnoreCase("")) {
+                if (pref.getString("user_id", "").length() == 0 && pref.getString("user_id", "").equalsIgnoreCase("")) {
 
                     Intent mainIntent = new Intent(SplashScreen.this, LoginSignUpActivity.class);
                     startActivity(mainIntent);
@@ -53,11 +53,11 @@ public class SplashScreen extends AppCompatActivity {
                     SplashScreen.this.finish();
 
 
-                }*/
+                }
 
-                Intent mainIntent = new Intent(SplashScreen.this, MainActivity.class);
+               /* Intent mainIntent = new Intent(SplashScreen.this, MainActivity.class);
                 startActivity(mainIntent);
-                SplashScreen.this.finish();
+                SplashScreen.this.finish();*/
 
             }
         }, SPLASH_DISPLAY_LENGTH);

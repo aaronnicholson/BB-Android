@@ -29,6 +29,7 @@
         android:layout_alignParentRight="true"
         android:layout_marginRight="10dp"
         android:gravity="center"
+        android:clickable="true"
         android:text="Purchase History"
         android:textColor="#070709"
         android:textSize="12sp" />

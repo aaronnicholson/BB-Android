@@ -77,8 +77,8 @@
                 android:id="@+id/et_email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textEmailAddress"
                 android:imeOptions="flagNoExtractUi"
+                android:inputType="textEmailAddress"
                 android:textColor="#312F30" />
 
             <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
@@ -92,8 +92,8 @@
                 android:id="@+id/et_passwd"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textPassword"
                 android:imeOptions="flagNoExtractUi"
+                android:inputType="textPassword"
                 android:textColor="#312F30" />
 
             <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
@@ -135,6 +135,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.2"
+            android:clickable="true"
             android:gravity="center|left"
             android:onClick="Click"
             android:text="LOG IN"
@@ -147,6 +148,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.2"
             android:gravity="center"
+            android:clickable="true"
             android:onClick="Click"
             android:text="RESET PASSWORD"
             android:textColor="#312F30"
@@ -169,6 +171,7 @@
             android:layout_weight="0.2"
             android:gravity="center|right"
             android:onClick="Click"
+            android:clickable="true"
             android:text="SIGN UP"
             android:textColor="#312F30"
             android:textSize="18sp" />

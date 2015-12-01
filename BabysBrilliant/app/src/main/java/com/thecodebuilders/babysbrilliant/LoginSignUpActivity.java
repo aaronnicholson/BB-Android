@@ -28,7 +28,7 @@ import org.json.JSONObject;
  */
 public class LoginSignUpActivity extends AppCompatActivity {
 
-    TextView login , reset_pass, sign_up;
+    TextView login, reset_pass, sign_up;
 
     EditText email, passwd;
     private static String LOGVAR = "LoginSignUpActivity";
@@ -61,7 +61,6 @@ public class LoginSignUpActivity extends AppCompatActivity {
             if (email.length() == 0) {
                 showDialog("Enter Email id");
             } else if (passwd.length() == 0) {
-
                 showDialog("Enter Password");
             } else {
                 reset_pass.setVisibility(View.GONE);
@@ -126,7 +125,7 @@ public class LoginSignUpActivity extends AppCompatActivity {
                         if (type.equalsIgnoreCase("SignUp")) {
 
                             Intent mainIntent = new Intent(LoginSignUpActivity.this, ShowIntroActivity.class);
-                            mainIntent.putExtra("Key","SignUp");
+                            mainIntent.putExtra("Key", "SignUp");
                             startActivity(mainIntent);
                             LoginSignUpActivity.this.finish();
                         } else {
@@ -140,7 +139,6 @@ public class LoginSignUpActivity extends AppCompatActivity {
                     }
 
                     SharedPreferences.Editor editor = pref.edit();
-
 
 
                     editor.putString("user_id", result.getString("id"));
@@ -178,6 +176,15 @@ public class LoginSignUpActivity extends AppCompatActivity {
         passwd = (EditText) findViewById(R.id.et_passwd);
 
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
+
+        /*login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                reset_pass.setVisibility(View.GONE);
+                progressBar.setVisibility(View.VISIBLE);
+                getRemoteJSON(Constant.URL + "a=lgn&u=" + email.getText().toString() + "&p=" + passwd.getText().toString(), email.getText().toString(), passwd.getText().toString(), "SignIn");
+            }
+        });*/
 
         email.setText("test@tl3.com");
         passwd.setText("21242124");

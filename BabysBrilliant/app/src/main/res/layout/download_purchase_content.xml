@@ -36,6 +36,7 @@
                 android:layout_gravity="center"
                 android:layout_weight="0.25"
                 android:text="Settings"
+                android:clickable="true"
                 android:textColor="#2776C3"
                 android:textSize="14sp" />
 
@@ -58,6 +59,7 @@
             android:layout_gravity="center"
             android:layout_marginTop="10dp"
             android:gravity="center|left"
+            android:clickable="true"
             android:text="Download All"
             android:textColor="#2776C3"
             android:textSize="14sp" />

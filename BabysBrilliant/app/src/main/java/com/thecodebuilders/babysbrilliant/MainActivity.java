@@ -241,51 +241,48 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     public void createRawFile() {
 
 
-      //  File file = new File(Environment.getExternalStorageDirectory() + File.separator + "raw.txt");
+        //  File file = new File(Environment.getExternalStorageDirectory() + File.separator + "raw.txt");
 
 
         try {
 
             FileOutputStream fOut = openFileOutput("raw.txt", MODE_WORLD_READABLE);
-            
+
             String s = getResources().getString(R.string.raw_json);
 
             fOut.write(s.getBytes());
             fOut.close();
-            Toast.makeText(getBaseContext(),"file saved",Toast.LENGTH_SHORT).show();
-        }
-
-        catch (Exception e) {
+            Toast.makeText(getBaseContext(), "file saved", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
 
-
     }
 
     public String readFile() {
-        String s="";
+        String s = "";
         StringBuffer stringBuffer = new StringBuffer();
 
         // Attaching BufferedReader to the FileInputStream by the help of
         // InputStreamReader
         try {
-            FileInputStream fileIn=openFileInput("raw.txt");
-            InputStreamReader InputRead= new InputStreamReader(fileIn);
+            FileInputStream fileIn = openFileInput("raw.txt");
+            InputStreamReader InputRead = new InputStreamReader(fileIn);
 
-            char[] inputBuffer= new char[100000];
+            char[] inputBuffer = new char[100000];
 
             int charRead;
 
-            while ((charRead=InputRead.read(inputBuffer))>0) {
+            while ((charRead = InputRead.read(inputBuffer)) > 0) {
                 // char to string conversion
-                String readstring=String.copyValueOf(inputBuffer,0,charRead);
-                s +=readstring;
+                String readstring = String.copyValueOf(inputBuffer, 0, charRead);
+                s += readstring;
 
             }
             InputRead.close();
-            Toast.makeText(getBaseContext(), s,Toast.LENGTH_SHORT).show();
+            Toast.makeText(getBaseContext(), s, Toast.LENGTH_SHORT).show();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -427,11 +424,13 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             String s = data.getStringExtra("Key");
             if (resultCode == Activity.RESULT_OK) {
 
-                if (data.getStringExtra("Key").equalsIgnoreCase("fav")) {
+               /* if (data.getStringExtra("Key").equalsIgnoreCase("fav")) {
                     configureThumbnailList(favoriteItems, "videos");
                     currentMenu = FAVORITE_ITEMS;
                     toggleMenuButton(currentMenu);
-                } else if (data.getStringExtra("Key").equalsIgnoreCase("setting")) {
+                } */
+
+                 if (data.getStringExtra("Key").equalsIgnoreCase("setting")) {
 
 
                     includedSettingLayout_frame.setVisibility(View.VISIBLE);
@@ -572,9 +571,14 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                /* configureThumbnailList(favoriteItems, "videos");
                 currentMenu = FAVORITE_ITEMS;
                 toggleMenuButton(currentMenu);*/
-                Intent mainIntent = new Intent(MainActivity.this, ParentalChallengeScreen.class);
+              /*  Intent mainIntent = new Intent(MainActivity.this, ParentalChallengeScreen.class);
                 mainIntent.putExtra("Key", "fav");
-                startActivityForResult(mainIntent, 1);
+                startActivityForResult(mainIntent, 1);*/
+
+
+                configureThumbnailList(favoriteItems, "videos");
+                currentMenu = FAVORITE_ITEMS;
+                toggleMenuButton(currentMenu);
 
 
             }
