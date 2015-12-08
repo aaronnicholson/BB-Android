@@ -15,8 +15,8 @@ public class Constant {
     public static final String SUBJECT = "Hello from Baby's Brilliant";
 
 
-    public static final String base64EncodedPublicKey =
-            "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0DxaRSgNLoks1JlnvWKraaRaZLso5uSY8oGOOK4u99U8WKJSELcdAyqURjgv3gLmj+WqNGnnxSxx7ezqimt45kpgDGXS3NAlTh6HT6mhmpjxfv0rkeDNaPw7m0bn7gRG32VHQr0WbV01ylF3PzqhAgPJLQ/TA5jiRVngPzOcW1VQe0Iu1Gfp8XscPBmVEVRPVmadeV5RBKbAX/KcfNtHuKWter4ttpSJdj2EZaeXuQQ/NHPLIhcMhPnCd5pjrOuYyjwb8ok5XpqRg3oGZ7jHqiKBR7Qjyfva8uXnqkXjLYTO936NmDuaTSvrBzSAWrQHNr/kgx4NJM+v1X+4sA+KqwIDAQAB";
+    public static final String base64EncodedPublicKey ="MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxngIRgtXuJhiOh4U0GHJQmGyJQyaRUVWtOLQW6NOEOc5y3ysP0Wu5QhQL7ZtC2pffLgcmwu+ziC/FD/vM5ascAGAkPoFAb8fhakDXzqJrkFQEYHcMUjsq6MizlWsBEamlDLr2X9GVxOak20w0qFAFzfrAiPeXxXCktZqZnidBp5Q/2or5KzDGvFuGF7WAd6nKKddWRg/nYPCPVOriTRgvNBZwjR3tFPJPh108cKF5BL/CmzWJ7158SeD7uQ/Zb6XYQYiKnwEV0IxcjrcFeplELRn5FR7S8zW+83e/nLYpTxlAUldsWl+ps35pnlZYXfQaOyTFwkGgo4P+4r+iXLL2QIDAQAB";
+
 
 
    /* public static final String a = org.apache.commons.lang.StringUtils.join( new String[] {

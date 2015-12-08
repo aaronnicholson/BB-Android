@@ -37,9 +37,10 @@
 
 
             <ImageView
+                android:id="@+id/close_btn"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:background="@drawable/favorites" />
+                android:background="@drawable/close_button" />
 
 
         </LinearLayout>

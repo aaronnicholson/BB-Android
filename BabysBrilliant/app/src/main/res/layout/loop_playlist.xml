@@ -25,15 +25,19 @@
             android:orientation="horizontal"
             android:weightSum="1">
 
+
             <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:background="@drawable/favorites" />
+
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:background="@drawable/back_img" />
 
             <com.thecodebuilders.FontFamily.ProximaNovaSoftRegular
+                android:id="@+id/back_btn"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:layout_marginLeft="5dp"
                 android:layout_weight="0.25"
                 android:text="Settings"
                 android:textColor="#2776C3"
@@ -48,11 +52,6 @@
                 android:text="Loop Playlists"
                 android:textColor="#070709"
                 android:textSize="18sp" />
-
-
-
-
-
         </LinearLayout>
 
         <ScrollView
@@ -92,9 +91,9 @@
                         android:id="@+id/toggleButton1"
                         android:layout_width="50dp"
                         android:layout_height="30dp"
+                        android:layout_alignParentRight="true"
                         android:layout_centerHorizontal="true"
                         android:layout_centerVertical="true"
-                        android:layout_alignParentRight="true"
                         android:layout_marginRight="10dp"
                         android:background="@drawable/toggle_selector"
                         android:checked="false"
@@ -116,14 +115,14 @@
 
                     android:orientation="horizontal">
 
-                  <!--  <com.thecodebuilders.FontFamily.ProximaNovaSoftRegular
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_marginLeft="10dp"
-                        android:text="15 Minute Timer"
-                        android:textColor="#070709"
-                        android:textSize="18sp" />-->
+                    <!--  <com.thecodebuilders.FontFamily.ProximaNovaSoftRegular
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_centerVertical="true"
+                          android:layout_marginLeft="10dp"
+                          android:text="15 Minute Timer"
+                          android:textColor="#070709"
+                          android:textSize="18sp" />-->
 
 
                     <CheckedTextView
@@ -132,12 +131,11 @@
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_marginLeft="10dp"
-                        android:text="15 Minute Timer"
                         android:checkMark="?android:attr/listChoiceIndicatorMultiple"
                         android:checked="false"
+                        android:text="15 Minute Timer"
                         android:textColor="#070709"
                         android:textSize="18sp" />
-
 
 
                 </RelativeLayout>
@@ -168,9 +166,9 @@
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_marginLeft="10dp"
-                        android:text="30 Minute Timer"
                         android:checkMark="?android:attr/listChoiceIndicatorMultiple"
                         android:checked="false"
+                        android:text="30 Minute Timer"
                         android:textColor="#070709"
                         android:textSize="18sp" />
 
@@ -187,14 +185,14 @@
                     android:background="#FFFFFF"
                     android:orientation="horizontal">
 
-                  <!--  <com.thecodebuilders.FontFamily.ProximaNovaSoftRegular
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_marginLeft="10dp"
-                        android:text="45 Minute Timer"
-                        android:textColor="#070709"
-                        android:textSize="18sp" />-->
+                    <!--  <com.thecodebuilders.FontFamily.ProximaNovaSoftRegular
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_centerVertical="true"
+                          android:layout_marginLeft="10dp"
+                          android:text="45 Minute Timer"
+                          android:textColor="#070709"
+                          android:textSize="18sp" />-->
 
                     <CheckedTextView
                         android:id="@+id/checked3"
@@ -202,9 +200,9 @@
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_marginLeft="10dp"
-                        android:text="45 Minute Timer"
                         android:checkMark="?android:attr/listChoiceIndicatorMultiple"
                         android:checked="false"
+                        android:text="45 Minute Timer"
                         android:textColor="#070709"
                         android:textSize="18sp" />
 
@@ -236,9 +234,9 @@
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_marginLeft="10dp"
-                        android:text="60 Minute Timer"
                         android:checkMark="?android:attr/listChoiceIndicatorMultiple"
                         android:checked="false"
+                        android:text="60 Minute Timer"
                         android:textColor="#070709"
                         android:textSize="18sp" />
 
@@ -256,14 +254,14 @@
                     android:background="@drawable/lower_round"
                     android:orientation="horizontal">
 
-                 <!--   <com.thecodebuilders.FontFamily.ProximaNovaSoftRegular
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_marginLeft="10dp"
-                        android:text="90 Minute Timer"
-                        android:textColor="#070709"
-                        android:textSize="18sp" />-->
+                    <!--   <com.thecodebuilders.FontFamily.ProximaNovaSoftRegular
+                           android:layout_width="wrap_content"
+                           android:layout_height="wrap_content"
+                           android:layout_centerVertical="true"
+                           android:layout_marginLeft="10dp"
+                           android:text="90 Minute Timer"
+                           android:textColor="#070709"
+                           android:textSize="18sp" />-->
 
                     <CheckedTextView
                         android:id="@+id/checked5"
@@ -271,9 +269,9 @@
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_marginLeft="10dp"
-                        android:text="90 Minute Timer"
                         android:checkMark="?android:attr/listChoiceIndicatorMultiple"
                         android:checked="false"
+                        android:text="90 Minute Timer"
                         android:textColor="#070709"
                         android:textSize="18sp" />
 

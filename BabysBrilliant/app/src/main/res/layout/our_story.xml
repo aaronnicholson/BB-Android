@@ -26,15 +26,17 @@
             android:weightSum="1">
 
             <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:background="@drawable/favorites" />
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:background="@drawable/back_img" />
 
             <com.thecodebuilders.FontFamily.ProximaNovaSoftRegular
+                android:id="@+id/back_btn"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="0.25"
+                android:layout_marginLeft="5dp"
                 android:text="Settings"
                 android:textColor="#2776C3"
                 android:textSize="14sp" />

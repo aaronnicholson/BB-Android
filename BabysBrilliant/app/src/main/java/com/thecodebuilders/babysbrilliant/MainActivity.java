@@ -167,7 +167,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     static Runnable delayedHide = null;
     static Boolean doHideControls = false;
     SharedPreferences pref;
-
+ImageView close_btn;
     RelativeLayout email_password_update, contact_support, privacy_policy, log_out, loop_playlists,
             show_intro, our_story, social_media, purchase_history, check_new_content, download_purchase_content;
 
@@ -184,6 +184,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     String ITEM_SKU;
     JSONObject productJSON;
     InputStreamVolleyRequest request;
+    private TextView back_btn_loopPlaylist,back_btn_ourStory,back_btn_socialMedia,back_btn_downloadPurchasecontent,
+            back_btn_privacyPolicy,back_btn_purchaseHistory,back_btn_emilPasswdUpdate,back_btn_emilPasswdUpdate2;
 
 
     @Override
@@ -293,6 +295,14 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
 
     public void downlaodPurchaseContent() {
+
+        back_btn_downloadPurchasecontent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                includedDownloadPuchaseContentLayout.setVisibility(View.INVISIBLE);
+            }
+        });
 
         download_purchase_content.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -515,7 +525,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                     mHelper.launchPurchaseFlow(MainActivity.this, ITEM_SKU, 10001,
                             mPurchaseFinishedListener, "mypurchasetoken");
 
-                    purchasedItems.put(productJSON);
+                   // purchasedItems.put(productJSON);
                 } else {
 
 
@@ -537,7 +547,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     private void setUpListeners() {
 
 
-        includedSettingLayout_frame.setOnClickListener(new View.OnClickListener() {
+     /*   includedSettingLayout_frame.setOnClickListener(new View.OnClickListener() {
 
 
             @Override
@@ -555,7 +565,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                 includedDownloadPuchaseContentLayout.setVisibility(View.GONE);
 
             }
-        });
+        });*/
 
         homeButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -1293,7 +1303,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         includedPurchaseHistoryLayout = findViewById(R.id.purchase_history_lay);
         includedDownloadPuchaseContentLayout = findViewById(R.id.download_purchase_content_lay);
         includedCheckNewContentLayout = findViewById(R.id.check_new_content_lay);
-
+        close_btn = (ImageView) includedSettingLayout.findViewById(R.id.close_btn);
         email_password_update = (RelativeLayout) includedSettingLayout.findViewById(R.id.email_pass_update);
         contact_support = (RelativeLayout) includedSettingLayout.findViewById(R.id.contact_support);
         privacy_policy = (RelativeLayout) includedSettingLayout.findViewById(R.id.privacy_policy);
@@ -1316,7 +1326,16 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         fourty_five_min_timer_lay = (RelativeLayout) includedLoopPlaylistsLayout.findViewById(R.id.fourty_five_min_timer_lay);
         sixty_min_timer_lay = (RelativeLayout) includedLoopPlaylistsLayout.findViewById(R.id.sixty_min_timer_lay);
         ninty_min_timer_lay = (RelativeLayout) includedLoopPlaylistsLayout.findViewById(R.id.ninty_min_timer_lay);
+         back_btn_loopPlaylist = (TextView)includedLoopPlaylistsLayout.findViewById(R.id.back_btn);
+        back_btn_ourStory = (TextView)includedOurStoryLayout.findViewById(R.id.back_btn);
+        back_btn_socialMedia = (TextView)includedSocialMediaLayout.findViewById(R.id.back_btn);
+        back_btn_privacyPolicy = (TextView)includedPrivacyLayout.findViewById(R.id.back_btn);
+        back_btn_purchaseHistory = (TextView)includedPurchaseHistoryLayout.findViewById(R.id.back_btn);
+        back_btn_emilPasswdUpdate = (TextView)includedemailPasswordLayout.findViewById(R.id.back_btn);
+        back_btn_emilPasswdUpdate2 = (TextView)includedemailPasswordLayout2.findViewById(R.id.back_btn);
+        back_btn_downloadPurchasecontent = (TextView)includedDownloadPuchaseContentLayout.findViewById(R.id.back_btn);
 
+        fiftin_min_timer_lay = (RelativeLayout) includedLoopPlaylistsLayout.findViewById(R.id.fiftin_min_timer_lay);
         checked1 = (CheckedTextView) findViewById(R.id.checked1);
         checked2 = (CheckedTextView) findViewById(R.id.checked2);
         checked3 = (CheckedTextView) findViewById(R.id.checked3);
@@ -1328,42 +1347,27 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         videoFFButton.setTypeface(MainActivity.fontAwesome);
         videoRewButton.setTypeface(MainActivity.fontAwesome);
         sectionTitle.setTypeface(MainActivity.proximaBold);
-    }
 
-    public void socialMedia() {
-
-        social_media.setOnClickListener(new View.OnClickListener() {
+        close_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                includedSocialMediaLayout.setVisibility(View.VISIBLE);
-
-            }
-        });
-
-        includedSocialMediaLayout.findViewById(R.id.fb_social).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Intent privacy_policy = new Intent(MainActivity.this, ParentalChallengeScreen.class);
-                privacy_policy.putExtra("Key", "fb_social");
-                startActivityForResult(privacy_policy, 1);
-
-            }
-        });
-
-        includedSocialMediaLayout.findViewById(R.id.tw_social).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Intent privacy_policy = new Intent(MainActivity.this, ParentalChallengeScreen.class);
-                privacy_policy.putExtra("Key", "tw_social");
-                startActivityForResult(privacy_policy, 1);
+                includedSettingLayout_frame.setVisibility(View.INVISIBLE);
+                includedSettingLayout.setVisibility(View.INVISIBLE);
             }
         });
     }
+
+
 
     public void ourStory() {
+
+        back_btn_ourStory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                includedOurStoryLayout.setVisibility(View.INVISIBLE);
+            }
+        });
 
         our_story.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -1381,6 +1385,14 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     }
 
     public void privacyPolicy() {
+
+        back_btn_privacyPolicy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                includedPrivacyLayout.setVisibility(View.INVISIBLE);
+            }
+        });
 
 
         privacy_policy.setOnClickListener(new View.OnClickListener() {
@@ -1414,6 +1426,23 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
 
     public void emailPasswordUpdate() {
+
+        back_btn_emilPasswdUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                includedemailPasswordLayout.setVisibility(View.INVISIBLE);
+            }
+        });
+
+        back_btn_emilPasswdUpdate2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                includedemailPasswordLayout2.setVisibility(View.INVISIBLE);
+            }
+        });
+
 
 
         email_password_update.setOnClickListener(new View.OnClickListener() {
@@ -1475,6 +1504,47 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     }
 
+    public void socialMedia() {
+
+        back_btn_socialMedia.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                includedSocialMediaLayout.setVisibility(View.INVISIBLE);
+            }
+        });
+
+        social_media.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                includedSocialMediaLayout.setVisibility(View.VISIBLE);
+
+            }
+        });
+
+        includedSocialMediaLayout.findViewById(R.id.fb_social).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent privacy_policy = new Intent(MainActivity.this, ParentalChallengeScreen.class);
+                privacy_policy.putExtra("Key", "fb_social");
+                startActivityForResult(privacy_policy, 1);
+
+            }
+        });
+
+        includedSocialMediaLayout.findViewById(R.id.tw_social).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent privacy_policy = new Intent(MainActivity.this, ParentalChallengeScreen.class);
+                privacy_policy.putExtra("Key", "tw_social");
+                startActivityForResult(privacy_policy, 1);
+            }
+        });
+    }
+
 
     public void logOut() {
 
@@ -1494,6 +1564,13 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
 
     public void loopPlaylists() {
+        back_btn_loopPlaylist.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                includedLoopPlaylistsLayout.setVisibility(View.INVISIBLE);
+            }
+        });
 
         loop_playlists.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -1694,6 +1771,14 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
 
     public void purchaseHistory() {
+
+        back_btn_purchaseHistory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                includedPurchaseHistoryLayout.setVisibility(View.INVISIBLE);
+            }
+        });
 
         purchase_history.setOnClickListener(new View.OnClickListener() {
             @Override
