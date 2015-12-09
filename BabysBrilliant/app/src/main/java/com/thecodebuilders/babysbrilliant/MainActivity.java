@@ -697,13 +697,13 @@ ImageView close_btn;
                 videoView.pause();
                 videoView.stopPlayback();
                 videoView.suspend();
-//                if(mediaPlayer!=null) {
-//                    if(mediaPlayer.isPlaying())
-//                        mediaPlayer.stop();
-//                    mediaPlayer.reset();
-//                    mediaPlayer.release();
-//                    mediaPlayer=null;
-//                }
+                if(mediaPlayer!=null) {
+                    if(mediaPlayer.isPlaying())
+                       mediaPlayer.stop();
+                    mediaPlayer.reset();
+                    mediaPlayer.release();
+                    mediaPlayer=null;
+               }
                 videoToggleButton.setText(getString(R.string.video_pause));
                 videoLayout.setVisibility(View.INVISIBLE);
             }
@@ -723,7 +723,7 @@ ImageView close_btn;
             }
         });
 
-        videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+       /* videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mp) {
 
@@ -740,7 +740,7 @@ ImageView close_btn;
                 mediaPlayer = mp;
                 showControls();
             }
-        });
+        });*/
 
         videoLayout.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -1049,19 +1049,33 @@ ImageView close_btn;
 
     @SuppressLint("NewApi")
     public void playVideo(String videoURL) {
-        String url = mediaURL + videoURL;
+       String url = mediaURL + videoURL;
+       // String url = "http://techslides.com/demos/sample-videos/small.mp4";
         //TODO: temporary for testing
 //        downloadItem(url);
 
+        // Create a progressbar
+        pDialog = new ProgressDialog(MainActivity.this);
+        // Set progressbar title
+        pDialog.setTitle("Video Streaming");
+        // Set progressbar message
+        pDialog.setMessage("Buffering...");
+        pDialog.setIndeterminate(false);
+        pDialog.setCancelable(false);
+        // Show progressbar
+        pDialog.show();
 
-       /* videoToggleButton.setText(appContext.getString(R.string.video_pause));
-        videoLayout.setVisibility(View.VISIBLE);
-        videoView.setVideoPath(url);
-        videoView.requestFocus();
-        videoView.start();
+       // videoLayout.setVisibility(View.VISIBLE);
+        videoToggleButton.setText(appContext.getString(R.string.video_pause));
+       // videoLayout.setVisibility(View.VISIBLE);
+       // videoView.setVideoPath(url);
+       // videoView.requestFocus();
+       // videoView.start();
 
-        videoView.setAlpha(0); //hide prior to media being ready
+      // videoView.setAlpha(0); //hide prior to media being ready
         //TODO: show preloader*/
+
+
 
         try {
             // Start the MediaController
@@ -1072,24 +1086,69 @@ ImageView close_btn;
             Uri video = Uri.parse(url);
             videoView.setMediaController(mediacontroller);
             videoView.setVideoURI(video);
-            videoView.start();
-            videoView.setAlpha(0);
+
+
+           // videoView.setAlpha(0);
 
 
         } catch (Exception e) {
             Log.e("Error", e.getMessage());
             e.printStackTrace();
         }
+       /* videoView.requestFocus();
+        videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
 
-      /*  videoView.requestFocus();
+                //TODO: come up with more accurate solution to hide previous video image before playback starts
+                //show the video after a short delay to allow previous video image to clear out
+                new android.os.Handler().postDelayed(
+                        new Runnable() {
+                            @SuppressLint("NewApi")
+                            public void run() {
+
+                                pDialog.dismiss();
+                                videoLayout.setVisibility(View.VISIBLE);
+                                videoView.start();
+                                videoView.setAlpha(1);
+                            }
+                        },
+                        500);
+                mediaPlayer = mp;
+                showControls();
+            }
+        });*/
+
+        videoView.requestFocus();
         videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             // Close the progress bar and play the video
             public void onPrepared(MediaPlayer mp) {
-                // pDialog.dismiss();
+                videoLayout.setVisibility(View.VISIBLE);
+                pDialog.dismiss();
+
                 videoView.start();
-                videoView.setAlpha(0);
+                //  videoView.setAlpha(1);
+
+                 mediaPlayer = mp;
             }
-        });*/
+
+        });
+
+        videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                mediaPlayer.stop();
+                mediaPlayer.reset();
+                mediaPlayer.release();
+                mediaPlayer=null;
+                videoToggleButton.setText(getString(R.string.video_pause));
+                videoLayout.setVisibility(View.INVISIBLE);
+
+
+
+
+            }
+        });
 
         showControls();
     }

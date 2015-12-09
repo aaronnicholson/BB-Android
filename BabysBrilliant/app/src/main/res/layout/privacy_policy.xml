@@ -60,9 +60,10 @@
             android:layout_height="0dp"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
+            android:background="@drawable/round"
             android:layout_marginTop="8dp"
             android:layout_weight="0.85"
-            android:background="#FFFFFF">
+            >
 
 
             <LinearLayout
@@ -76,7 +77,6 @@
                     android:id="@+id/email_pass_update"
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
-
                     android:layout_marginRight="10dp"
                     android:layout_marginTop="8dp"
                     android:background="@drawable/upper_round"
@@ -85,7 +85,6 @@
                     <com.thecodebuilders.FontFamily.ProximaNovaSoftRegular
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-
                         android:layout_marginLeft="10dp"
                         android:text="Privacy Policy"
                         android:textColor="#070709"
