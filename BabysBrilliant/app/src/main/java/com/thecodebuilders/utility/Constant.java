@@ -10,9 +10,9 @@ public class Constant {
 
     public static final String RESET_PASSWORD = "http://new.babysbrilliant.com/wp-login.php?action=lostpassword";
 
-    public static final String EMAIL_ADDRESS = "support@babybrilliant.com";
+    public static final String EMAIL_ADDRESS = "support@babysbrilliant.com";
 
-    public static final String SUBJECT = "Hello from Baby's Brilliant";
+    public static final String SUBJECT = "Baby's Brilliant Support Request";
 
 
     public static final String base64EncodedPublicKey ="MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxngIRgtXuJhiOh4U0GHJQmGyJQyaRUVWtOLQW6NOEOc5y3ysP0Wu5QhQL7ZtC2pffLgcmwu+ziC/FD/vM5ascAGAkPoFAb8fhakDXzqJrkFQEYHcMUjsq6MizlWsBEamlDLr2X9GVxOak20w0qFAFzfrAiPeXxXCktZqZnidBp5Q/2or5KzDGvFuGF7WAd6nKKddWRg/nYPCPVOriTRgvNBZwjR3tFPJPh108cKF5BL/CmzWJ7158SeD7uQ/Zb6XYQYiKnwEV0IxcjrcFeplELRn5FR7S8zW+83e/nLYpTxlAUldsWl+ps35pnlZYXfQaOyTFwkGgo4P+4r+iXLL2QIDAQAB";

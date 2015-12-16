@@ -188,6 +188,8 @@ ImageView close_btn;
             back_btn_privacyPolicy,back_btn_purchaseHistory,back_btn_emilPasswdUpdate,back_btn_emilPasswdUpdate2;
 
 
+    private int flag =0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -1458,10 +1460,18 @@ ImageView close_btn;
             @Override
             public void onClick(View v) {
 
-
-                Intent privacy_policy = new Intent(MainActivity.this, ParentalChallengeScreen.class);
-                privacy_policy.putExtra("Key", "privacy_policy");
-                startActivityForResult(privacy_policy, 1);
+                if(flag==0) {
+                    Intent privacy_policy = new Intent(MainActivity.this, ParentalChallengeScreen.class);
+                    privacy_policy.putExtra("Key", "privacy_policy");
+                    startActivityForResult(privacy_policy, 1);
+                    flag=1;
+                }
+                else{
+                    includedPrivacyLayout.setVisibility(View.VISIBLE);
+                    WebView story_data = (WebView) includedPrivacyLayout.findViewById(R.id.privacy_policy_webview);
+                    story_data.getSettings().setJavaScriptEnabled(true);
+                    story_data.loadData(getString(R.string.privacy_policy), "text/html", "UTF-8");
+                }
 
 
             }
