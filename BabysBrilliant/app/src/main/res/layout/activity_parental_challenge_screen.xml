@@ -207,7 +207,7 @@
                     android:clickable="true"
                     android:onClick="Click"
                     android:textColor="#FDF8F5"
-                    android:textSize="22sp" />
+                    android:textSize="26sp" />
 
                 <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
                     android:id="@+id/two_digit"
@@ -219,7 +219,7 @@
                     android:clickable="true"
                     android:onClick="Click"
                     android:textColor="#FDF8F5"
-                    android:textSize="22sp" />
+                    android:textSize="26sp" />
 
                 <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
                     android:id="@+id/three_digit"
@@ -231,7 +231,7 @@
                     android:clickable="true"
                     android:onClick="Click"
                     android:textColor="#FDF8F5"
-                    android:textSize="22sp" />
+                    android:textSize="26sp" />
             </LinearLayout>
 
             <View
@@ -255,7 +255,7 @@
                     android:clickable="true"
                     android:onClick="Click"
                     android:textColor="#FDF8F5"
-                    android:textSize="22sp" />
+                    android:textSize="26sp" />
 
                 <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
                     android:id="@+id/five_digit"
@@ -267,7 +267,7 @@
                     android:clickable="true"
                     android:onClick="Click"
                     android:textColor="#FDF8F5"
-                    android:textSize="22sp" />
+                    android:textSize="26sp" />
 
                 <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
                     android:id="@+id/six_digit"
@@ -279,7 +279,7 @@
                     android:clickable="true"
                     android:onClick="Click"
                     android:textColor="#FDF8F5"
-                    android:textSize="22sp" />
+                    android:textSize="26sp" />
             </LinearLayout>
 
             <View
@@ -303,7 +303,7 @@
                     android:clickable="true"
                     android:onClick="Click"
                     android:textColor="#FDF8F5"
-                    android:textSize="22sp" />
+                    android:textSize="26sp" />
 
                 <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
                     android:id="@+id/eight_digit"
@@ -315,7 +315,7 @@
                     android:clickable="true"
                     android:onClick="Click"
                     android:textColor="#FDF8F5"
-                    android:textSize="22sp" />
+                    android:textSize="26sp" />
 
                 <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
                     android:id="@+id/nine_digit"
@@ -327,7 +327,7 @@
                     android:clickable="true"
                     android:onClick="Click"
                     android:textColor="#FDF8F5"
-                    android:textSize="22sp" />
+                    android:textSize="26sp" />
             </LinearLayout>
 
             <View
@@ -362,7 +362,7 @@
                     android:clickable="true"
                     android:onClick="Click"
                     android:textColor="#FDF8F5"
-                    android:textSize="22sp" />
+                    android:textSize="26sp" />
 
                 <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
                     android:id="@+id/erase_digit"

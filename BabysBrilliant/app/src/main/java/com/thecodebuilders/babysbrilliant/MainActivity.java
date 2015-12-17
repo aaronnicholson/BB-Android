@@ -5,6 +5,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -1768,8 +1769,24 @@ ImageView close_btn;
 
                                 } else {
 
-                                    // showDialog("","Changed Successfully");
+                                     showDialog("","Changed Successfully");
+
                                 }
+                            }
+
+                            else{
+                                if (SELECT_FLAG.equalsIgnoreCase("new_emailaddress")) {
+
+
+
+                                } else if (SELECT_FLAG.equalsIgnoreCase("new_password")) {
+
+
+                                } else {
+
+                                    showDialog("","Incorrect existing password");
+                                }
+
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -1836,6 +1853,14 @@ ImageView close_btn;
         customizeDialog.setTitle(Title);
         customizeDialog.setMessage(msg);
         customizeDialog.show();
+
+        customizeDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+
+                includedemailPasswordLayout2.setVisibility(View.INVISIBLE);
+            }
+        });
     }
 
 
