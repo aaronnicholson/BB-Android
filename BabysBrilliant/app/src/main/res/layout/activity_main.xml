@@ -239,7 +239,6 @@
             android:padding="10dp"
             android:shadowColor="#80000000"
             android:shadowDx="0"
-
             android:shadowDy="0"
             android:shadowRadius="30"
             android:text="@string/video_close"

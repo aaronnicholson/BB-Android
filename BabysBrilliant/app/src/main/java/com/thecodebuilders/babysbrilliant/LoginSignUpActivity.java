@@ -99,9 +99,13 @@ public class LoginSignUpActivity extends AppCompatActivity {
 
         if (requestCode == 1) {
             if (resultCode == Activity.RESULT_OK) {
-                reset_pass.setVisibility(View.GONE);
-                progressBar.setVisibility(View.VISIBLE);
-                getRemoteJSON(Constant.URL + "a=sup&n=" + email.getText().toString() + "&u=" + email.getText().toString() + "&p=" + passwd.getText(), email.getText().toString(), passwd.getText().toString(), "SignUp");
+
+                if (data.getStringExtra("Key").equalsIgnoreCase("Cancel")) {
+                } else {
+                    reset_pass.setVisibility(View.GONE);
+                    progressBar.setVisibility(View.VISIBLE);
+                    getRemoteJSON(Constant.URL + "a=sup&n=" + email.getText().toString() + "&u=" + email.getText().toString() + "&p=" + passwd.getText(), email.getText().toString(), passwd.getText().toString(), "SignUp");
+                }
             }
             if (resultCode == Activity.RESULT_CANCELED) {
                 //Write your code if there's no result
@@ -134,6 +138,11 @@ public class LoginSignUpActivity extends AppCompatActivity {
                             startActivity(mainIntent);
                             LoginSignUpActivity.this.finish();
                         }
+                    } else if (result.getString("res").equalsIgnoreCase("unsuccessful") &&
+                            result.getString("msg").equalsIgnoreCase("This email address is already registered. Please tap Log In.")) {
+
+                        showDialog("That account is already in use. Try logging in.");
+
                     } else {
                         showDialog("Something went wrong!");
                     }

@@ -1130,7 +1130,7 @@ ImageView close_btn;
                 pDialog.dismiss();
 
                 videoView.start();
-                //  videoView.setAlpha(1);
+                  videoView.setAlpha(1);
 
                  mediaPlayer = mp;
             }
