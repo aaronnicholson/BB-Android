@@ -26,15 +26,17 @@
             android:weightSum="1">
 
             <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:background="@drawable/favorites" />
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:background="@drawable/back_img" />
 
             <com.thecodebuilders.FontFamily.ProximaNovaSoftRegular
+                android:id="@+id/back_btn"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="0.25"
+                android:layout_marginLeft="5dp"
                 android:text="Settings"
                 android:clickable="true"
                 android:textColor="#2776C3"
@@ -53,6 +55,17 @@
 
         </LinearLayout>
 
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginLeft="10dp"
+            android:layout_weight="0.85"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
+            android:visibility="gone"
+            android:dividerHeight="1dp"
+            android:id="@+id/listView" />
+
         <com.thecodebuilders.FontFamily.ProximaNovaSoftRegular
             android:id="@+id/...Checking..."
             android:layout_width="200dp"
@@ -60,7 +73,7 @@
             android:layout_gravity="center"
             android:layout_marginTop="20dp"
             android:gravity="center"
-            android:text="New Content"
+            android:text="Content up-to-date"
             android:textColor="#070709"
             android:textSize="18sp" />
 

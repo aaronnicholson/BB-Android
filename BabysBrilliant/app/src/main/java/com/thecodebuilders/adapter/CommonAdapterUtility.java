@@ -91,7 +91,7 @@ public class CommonAdapterUtility {
 
                 @Override
                 public void onErrorResponse(VolleyError volleyError) {
-                    Log.e("", volleyError.getLocalizedMessage());
+                   // Log.e("", volleyError.getLocalizedMessage());
                     CommonAdapterUtility.showPlaceHolderImage(imageView);
                 }
             });

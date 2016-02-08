@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.PixelFormat;
 import android.graphics.Typeface;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -121,12 +122,12 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     public static Typeface proximaBold = Typeface.createFromAsset(appContext.getAssets(), appContext.getString(R.string.proxima_bold));
 
     public static JSONObject jsonData;
-    public static JSONArray movies;
-    public static JSONArray audioBooks;
-    public static JSONArray hearingImpaired;
-    public static JSONArray music;
-    public static JSONArray nightLights;
-    public static JSONArray soundBoards;
+    public static JSONArray movies, movies1;
+    public static JSONArray audioBooks, audioBooks1;
+    public static JSONArray hearingImpaired, hearingImpaired1;
+    public static JSONArray music, music1;
+    public static JSONArray nightLights, nightLights1;
+    public static JSONArray soundBoards, soundBoards1;
     public ArrayList<JSONArray> jsonSets = new ArrayList<>();
 
     public static String currentMenu = MOVIES;
@@ -168,7 +169,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     static Runnable delayedHide = null;
     static Boolean doHideControls = false;
     SharedPreferences pref;
-ImageView close_btn;
+    ImageView close_btn;
     RelativeLayout email_password_update, contact_support, privacy_policy, log_out, loop_playlists,
             show_intro, our_story, social_media, purchase_history, check_new_content, download_purchase_content;
 
@@ -185,11 +186,12 @@ ImageView close_btn;
     String ITEM_SKU;
     JSONObject productJSON;
     InputStreamVolleyRequest request;
-    private TextView back_btn_loopPlaylist,back_btn_ourStory,back_btn_socialMedia,back_btn_downloadPurchasecontent,
-            back_btn_privacyPolicy,back_btn_purchaseHistory,back_btn_emilPasswdUpdate,back_btn_emilPasswdUpdate2;
+    private TextView back_btn_loopPlaylist, back_btn_ourStory, back_btn_socialMedia, back_btn_downloadPurchasecontent,
+            back_btn_privacyPolicy, back_btn_purchaseHistory, back_btn_emilPasswdUpdate, back_btn_emilPasswdUpdate2,
+            back_btn_checkNewContent;
 
 
-    private int flag =0;
+    private int flag = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -239,6 +241,7 @@ ImageView close_btn;
         showIntro();
         purchaseHistory();
         downlaodPurchaseContent();
+        checkForNewContent();
 
 
     }
@@ -434,16 +437,16 @@ ImageView close_btn;
 
 
         if (requestCode == 1) {
-            String s = data.getStringExtra("Key");
-            if (resultCode == Activity.RESULT_OK) {
 
+            if (resultCode == Activity.RESULT_OK) {
+                String s = data.getStringExtra("Key");
                /* if (data.getStringExtra("Key").equalsIgnoreCase("fav")) {
                     configureThumbnailList(favoriteItems, "videos");
                     currentMenu = FAVORITE_ITEMS;
                     toggleMenuButton(currentMenu);
                 } */
 
-                 if (data.getStringExtra("Key").equalsIgnoreCase("setting")) {
+                if (data.getStringExtra("Key").equalsIgnoreCase("setting")) {
 
 
                     includedSettingLayout_frame.setVisibility(View.VISIBLE);
@@ -521,14 +524,14 @@ ImageView close_btn;
                 } else if (data.getStringExtra("Key").equalsIgnoreCase("Purchase")) {
 
                     try {
-                        ITEM_SKU = productJSON.getString("id");
+                        ITEM_SKU = productJSON.getString("google_play_id");
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                     mHelper.launchPurchaseFlow(MainActivity.this, ITEM_SKU, 10001,
                             mPurchaseFinishedListener, "mypurchasetoken");
 
-                   // purchasedItems.put(productJSON);
+                    purchasedItems.put(productJSON);
                 } else {
 
 
@@ -539,10 +542,18 @@ ImageView close_btn;
                 //Write your code if there's no result
             }
         } else {
-            if (!mHelper.handleActivityResult(requestCode,
-                    resultCode, data)) {
-                super.onActivityResult(requestCode, resultCode, data);
+          /*  if (!mHelper.handleActivityResult(requestCode,
+                    resultCode, data)) {*/
+
+
+            SELECT_FLAG = "purchase_video";
+            try {
+                AsynEditPassword(productJSON.getString("SKU"));
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
+            super.onActivityResult(requestCode, resultCode, data);
+            //  }
 
         }
     }//onActivityResult
@@ -700,13 +711,13 @@ ImageView close_btn;
                 videoView.pause();
                 videoView.stopPlayback();
                 videoView.suspend();
-                if(mediaPlayer!=null) {
-                    if(mediaPlayer.isPlaying())
-                       mediaPlayer.stop();
+                if (mediaPlayer != null) {
+                    if (mediaPlayer.isPlaying())
+                        mediaPlayer.stop();
                     mediaPlayer.reset();
                     mediaPlayer.release();
-                    mediaPlayer=null;
-               }
+                    mediaPlayer = null;
+                }
                 videoToggleButton.setText(getString(R.string.video_pause));
                 videoLayout.setVisibility(View.INVISIBLE);
             }
@@ -1050,10 +1061,40 @@ ImageView close_btn;
         }
     }
 
+    public void playingVideos(String videoURL) {
+         String url = mediaURL + videoURL;
+        final ProgressDialog progressDialog;
+        progressDialog = ProgressDialog.show(MainActivity.this, "", "Buffering video...", true);
+        progressDialog.setCancelable(false);
+       // String url = "https://s3-us-west-1.amazonaws.com/babysbrilliant-media/SoundboardCow2.mp4";
+
+        try {
+            getWindow().setFormat(PixelFormat.TRANSLUCENT);
+            MediaController mediaController = new MediaController(MainActivity.this);
+            mediaController.setAnchorView(videoView);
+
+            Uri video = Uri.parse(url);
+            videoView.setMediaController(mediaController);
+            videoView.setVideoURI(video);
+            videoView.requestFocus();
+            videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+
+                public void onPrepared(MediaPlayer mp) {
+                    progressDialog.dismiss();
+                    videoView.start();
+                }
+            });
+        } catch (Exception e) {
+            //progressDialog.dismiss();
+            System.out.println("Video Play Error :" + e.toString());
+            finish();
+        }
+    }
+
     @SuppressLint("NewApi")
     public void playVideo(String videoURL) {
-       String url = mediaURL + videoURL;
-       // String url = "http://techslides.com/demos/sample-videos/small.mp4";
+        String url = mediaURL + videoURL;
+        // String url = "http://techslides.com/demos/sample-videos/small.mp4";
         //TODO: temporary for testing
 //        downloadItem(url);
 
@@ -1068,16 +1109,15 @@ ImageView close_btn;
         // Show progressbar
         pDialog.show();
 
-       // videoLayout.setVisibility(View.VISIBLE);
+        // videoLayout.setVisibility(View.VISIBLE);
         videoToggleButton.setText(appContext.getString(R.string.video_pause));
-       // videoLayout.setVisibility(View.VISIBLE);
-       // videoView.setVideoPath(url);
-       // videoView.requestFocus();
-       // videoView.start();
+        // videoLayout.setVisibility(View.VISIBLE);
+        // videoView.setVideoPath(url);
+        // videoView.requestFocus();
+        // videoView.start();
 
-      // videoView.setAlpha(0); //hide prior to media being ready
-        //TODO: show preloader*/
-
+        // videoView.setAlpha(0); //hide prior to media being ready
+        //TODO: show preloader*//*
 
 
         try {
@@ -1091,14 +1131,14 @@ ImageView close_btn;
             videoView.setVideoURI(video);
 
 
-           // videoView.setAlpha(0);
+            // videoView.setAlpha(0);
 
 
         } catch (Exception e) {
             Log.e("Error", e.getMessage());
             e.printStackTrace();
         }
-       /* videoView.requestFocus();
+        //* videoView.requestFocus();
         videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mp) {
@@ -1120,7 +1160,7 @@ ImageView close_btn;
                 mediaPlayer = mp;
                 showControls();
             }
-        });*/
+        });
 
         videoView.requestFocus();
         videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -1130,9 +1170,9 @@ ImageView close_btn;
                 pDialog.dismiss();
 
                 videoView.start();
-                  videoView.setAlpha(1);
+                videoView.setAlpha(1);
 
-                 mediaPlayer = mp;
+                mediaPlayer = mp;
             }
 
         });
@@ -1143,11 +1183,9 @@ ImageView close_btn;
                 mediaPlayer.stop();
                 mediaPlayer.reset();
                 mediaPlayer.release();
-                mediaPlayer=null;
+                mediaPlayer = null;
                 videoToggleButton.setText(getString(R.string.video_pause));
                 videoLayout.setVisibility(View.INVISIBLE);
-
-
 
 
             }
@@ -1194,7 +1232,7 @@ ImageView close_btn;
     //retrieve the data model from the server
     public void getRemoteJSON(final String From, String url) {
         queue = VolleySingleton.getInstance().getRequestQueue();
-        if (From.equalsIgnoreCase("Purchase")) {
+        if (From.equalsIgnoreCase("Purchase") || From.equalsIgnoreCase("checkForNewContent")) {
             pDialog = new ProgressDialog(MainActivity.this);
             pDialog.setMessage("Loading...");
             pDialog.setCancelable(false);
@@ -1209,6 +1247,88 @@ ImageView close_btn;
                 try {
                     if (From.equalsIgnoreCase("Main")) {
                         processJSON(response);
+                    } else if (From.equalsIgnoreCase("checkForNewContent")) {
+
+                        assetsString = Uri.decode(response);
+                        jsonData = new JSONObject(assetsString);
+
+                        movies1 = jsonData.getJSONArray(MOVIES);
+                        audioBooks1 = jsonData.getJSONArray(AUDIO_BOOKS);
+                        hearingImpaired1 = jsonData.getJSONArray(HEARING_IMPAIRED);
+                        music1 = jsonData.getJSONArray(MUSIC);
+                        nightLights1 = jsonData.getJSONArray(NIGHT_LIGHTS);
+                        soundBoards1 = jsonData.getJSONArray(SOUND_BOARDS);
+                        int i1 = jsonData.length();
+                        ArrayList<HashMap<String, String>> arraylist = new ArrayList<HashMap<String, String>>();
+
+                        for (int i = 1; i <= jsonData.length(); i++) {
+                            if (movies1.length() == movies.length() && i == 1) {
+
+
+                            } else {
+
+                                if (audioBooks1.length() == audioBooks.length() && i == 2) {
+
+
+                                } else {
+
+                                    if (hearingImpaired1.length() == hearingImpaired.length() && i == 3) {
+
+
+                                    } else {
+
+                                        if (music1.length() == music.length() && i == 4) {
+
+
+                                        } else {
+
+                                            if (nightLights1.length() == nightLights.length() && i == 5) {
+
+
+                                            } else {
+
+                                                if (soundBoards1.length() == soundBoards.length() && i == 6) {
+
+                                                    pDialog.hide();
+
+
+                                                } else {
+
+                                                    pDialog.hide();
+
+
+                                                    JSONArray arr = new JSONArray(Uri.decode(response));
+                                                    int lengt = arr.length();
+                                                    for (int i11 = 0; i11 < arr.length(); i11++) {
+                                                        HashMap<String, String> hash = new HashMap<String, String>();
+                                                        JSONObject json = arr.getJSONObject(i);
+                                                        hash.put("title", json.getString("title"));
+                                                        hash.put("date", json.getString("date"));
+                                                        arraylist.add(hash);
+                                                    }
+
+                                                    ListView lv = (ListView) includedPurchaseHistoryLayout.findViewById(R.id.listView);
+                                                    PurchaseHistoryAdapter pHA = new PurchaseHistoryAdapter(MainActivity.this, arraylist);
+                                                    lv.setAdapter(pHA);
+
+
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+
+                            }
+                        }
+
+                        jsonSets.add(movies);
+                        jsonSets.add(audioBooks);
+                        jsonSets.add(hearingImpaired);
+                        jsonSets.add(music);
+                        jsonSets.add(nightLights);
+                        jsonSets.add(soundBoards);
+
                     } else if (From.equalsIgnoreCase("Purchase")) {
 
                         JSONArray downlaodItems1 = new JSONArray(Uri.decode(response));
@@ -1388,14 +1508,15 @@ ImageView close_btn;
         fourty_five_min_timer_lay = (RelativeLayout) includedLoopPlaylistsLayout.findViewById(R.id.fourty_five_min_timer_lay);
         sixty_min_timer_lay = (RelativeLayout) includedLoopPlaylistsLayout.findViewById(R.id.sixty_min_timer_lay);
         ninty_min_timer_lay = (RelativeLayout) includedLoopPlaylistsLayout.findViewById(R.id.ninty_min_timer_lay);
-         back_btn_loopPlaylist = (TextView)includedLoopPlaylistsLayout.findViewById(R.id.back_btn);
-        back_btn_ourStory = (TextView)includedOurStoryLayout.findViewById(R.id.back_btn);
-        back_btn_socialMedia = (TextView)includedSocialMediaLayout.findViewById(R.id.back_btn);
-        back_btn_privacyPolicy = (TextView)includedPrivacyLayout.findViewById(R.id.back_btn);
-        back_btn_purchaseHistory = (TextView)includedPurchaseHistoryLayout.findViewById(R.id.back_btn);
-        back_btn_emilPasswdUpdate = (TextView)includedemailPasswordLayout.findViewById(R.id.back_btn);
-        back_btn_emilPasswdUpdate2 = (TextView)includedemailPasswordLayout2.findViewById(R.id.back_btn);
-        back_btn_downloadPurchasecontent = (TextView)includedDownloadPuchaseContentLayout.findViewById(R.id.back_btn);
+        back_btn_loopPlaylist = (TextView) includedLoopPlaylistsLayout.findViewById(R.id.back_btn);
+        back_btn_ourStory = (TextView) includedOurStoryLayout.findViewById(R.id.back_btn);
+        back_btn_socialMedia = (TextView) includedSocialMediaLayout.findViewById(R.id.back_btn);
+        back_btn_privacyPolicy = (TextView) includedPrivacyLayout.findViewById(R.id.back_btn);
+        back_btn_purchaseHistory = (TextView) includedPurchaseHistoryLayout.findViewById(R.id.back_btn);
+        back_btn_emilPasswdUpdate = (TextView) includedemailPasswordLayout.findViewById(R.id.back_btn);
+        back_btn_emilPasswdUpdate2 = (TextView) includedemailPasswordLayout2.findViewById(R.id.back_btn);
+        back_btn_downloadPurchasecontent = (TextView) includedDownloadPuchaseContentLayout.findViewById(R.id.back_btn);
+        back_btn_checkNewContent = (TextView) includedCheckNewContentLayout.findViewById(R.id.back_btn);
 
         fiftin_min_timer_lay = (RelativeLayout) includedLoopPlaylistsLayout.findViewById(R.id.fiftin_min_timer_lay);
         checked1 = (CheckedTextView) findViewById(R.id.checked1);
@@ -1418,7 +1539,6 @@ ImageView close_btn;
             }
         });
     }
-
 
 
     public void ourStory() {
@@ -1461,13 +1581,12 @@ ImageView close_btn;
             @Override
             public void onClick(View v) {
 
-                if(flag==0) {
+                if (flag == 0) {
                     Intent privacy_policy = new Intent(MainActivity.this, ParentalChallengeScreen.class);
                     privacy_policy.putExtra("Key", "privacy_policy");
                     startActivityForResult(privacy_policy, 1);
-                    flag=1;
-                }
-                else{
+                    flag = 1;
+                } else {
                     includedPrivacyLayout.setVisibility(View.VISIBLE);
                     WebView story_data = (WebView) includedPrivacyLayout.findViewById(R.id.privacy_policy_webview);
                     story_data.getSettings().setJavaScriptEnabled(true);
@@ -1512,7 +1631,6 @@ ImageView close_btn;
                 includedemailPasswordLayout2.setVisibility(View.INVISIBLE);
             }
         });
-
 
 
         email_password_update.setOnClickListener(new View.OnClickListener() {
@@ -1767,24 +1885,27 @@ ImageView close_btn;
                                     editor.commit();
                                     showDialog("", "Changed Successfully");
 
+                                } else if (SELECT_FLAG.equalsIgnoreCase("purchase_video")) {
+
+                                    Toast.makeText(MainActivity.this, arg0, Toast.LENGTH_SHORT).show();
                                 } else {
 
-                                     showDialog("","Changed Successfully");
+                                    showDialog("", "Changed Successfully");
 
                                 }
-                            }
-
-                            else{
+                            } else {
                                 if (SELECT_FLAG.equalsIgnoreCase("new_emailaddress")) {
-
 
 
                                 } else if (SELECT_FLAG.equalsIgnoreCase("new_password")) {
 
 
+                                } else if (SELECT_FLAG.equalsIgnoreCase("purchase_video")) {
+
+
                                 } else {
 
-                                    showDialog("","Incorrect existing password");
+                                    showDialog("", "Incorrect existing password");
                                 }
 
                             }
@@ -1818,6 +1939,12 @@ ImageView close_btn;
                 } else if (SELECT_FLAG.equalsIgnoreCase("new_password")) {
                     params.put("a", "nP");
                     params.put("n", pref.getString("user_id", ""));
+                    params.put("u", pref.getString("user_name", ""));
+                    params.put("p", pref.getString("user_password", ""));
+                    params.put("v", value);
+
+                } else if (SELECT_FLAG.equalsIgnoreCase("purchase_video")) {
+                    params.put("a", "aV");
                     params.put("u", pref.getString("user_name", ""));
                     params.put("p", pref.getString("user_password", ""));
                     params.put("v", value);
@@ -1880,6 +2007,28 @@ ImageView close_btn;
 
                 includedPurchaseHistoryLayout.setVisibility(View.VISIBLE);
                 getRemoteJSON("Purchase", Constant.URL + "a=pH&u=" + pref.getString("user_id", ""));
+
+            }
+        });
+    }
+
+
+    public void checkForNewContent() {
+
+        back_btn_checkNewContent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                includedCheckNewContentLayout.setVisibility(View.INVISIBLE);
+            }
+        });
+
+        check_new_content.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                includedCheckNewContentLayout.setVisibility(View.VISIBLE);
+                getRemoteJSON("checkForNewContent", assetsURL);
 
             }
         });

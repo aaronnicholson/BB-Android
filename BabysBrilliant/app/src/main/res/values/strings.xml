@@ -25,7 +25,7 @@
     <string name="arrow_left">\uf060</string>
     <string name="delete">\uf00d</string>
     <string name="menu_dark_grey">#676767</string>
-    <string name="right_to_left_delete">&#x232b;</string>
+    <string name="right_to_left_delete">&#x232B;</string><!--&#x232b;-->
     <string name="font_awesome">fonts/FontAwesome.otf</string>
     <string name="title_playlists">playlists</string>
     <string name="title_favorites">favorites</string>

@@ -14,6 +14,7 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -258,7 +259,9 @@ public class PurchasedAdapter extends RecyclerView.Adapter<ElementViewHolder> {
 
     private void previewClicked(int position) {
         ListItem listItem = elements.get(position);
-        if (!listItem.getMediaFile().equals("")) mainActivity.playVideo(listItem.getMediaFile());
+        if (!listItem.getMediaFile().equals("")) {
+            //mainActivity.playVideo(listItem.getMediaFile());
+        }
     }
 
     private void favoritesClicked(int position, ElementViewHolder thisViewHolder) {
@@ -409,6 +412,11 @@ public class PurchasedAdapter extends RecyclerView.Adapter<ElementViewHolder> {
                 Log.d("KEY_ERROR", "UNABLE TO DOWNLOAD FILE");
             }
         }, null);
+
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                1000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         RequestQueue mRequestQueue = Volley.newRequestQueue(mainActivity,
                 new HurlStack());
         mRequestQueue.add(request);
@@ -435,7 +443,7 @@ public class PurchasedAdapter extends RecyclerView.Adapter<ElementViewHolder> {
                     playInlineVideo(listItem.getMediaFile(), viewHolder);
                 } else {
                     //play in the main player
-                    mainActivity.playVideo(listItem.getMediaFile());
+                   // mainActivity.playVideo(listItem.getMediaFile());
                 }
             }
         }

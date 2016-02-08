@@ -135,7 +135,7 @@ public class PlaylistItemAdapter extends RecyclerView.Adapter<ElementViewHolder>
     private void thumbnailClicked(int position, ElementViewHolder thisViewHolder) {
         ListItem listItem = elements.get(position);
 
-        mainActivity.playVideo(listItem.getMediaFile());
+      //  mainActivity.playVideo(listItem.getMediaFile());
 
     }
 
