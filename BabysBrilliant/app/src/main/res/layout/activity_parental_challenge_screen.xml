@@ -367,11 +367,11 @@
                 <com.thecodebuilders.FontFamily.FontAwesome
                     android:id="@+id/erase_digit"
                     android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:layout_height="26dp"
                     android:layout_gravity="center"
                     android:layout_marginLeft="28dp"
                     android:clickable="true"
-                    android:text="@string/right_to_left_delete"
+                    android:text="@string/delete"
                     android:onClick="Click"
                     android:textColor="#FDF8F5"
                     android:textSize="22sp" />
