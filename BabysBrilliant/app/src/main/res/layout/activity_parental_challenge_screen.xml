@@ -364,7 +364,7 @@
                     android:textColor="#FDF8F5"
                     android:textSize="26sp" />
 
-                <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
+                <com.thecodebuilders.FontFamily.FontAwesome
                     android:id="@+id/erase_digit"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
