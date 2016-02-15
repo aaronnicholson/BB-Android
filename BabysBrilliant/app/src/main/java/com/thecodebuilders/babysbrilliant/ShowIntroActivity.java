@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.thecodebuilders.application.ApplicationContextProvider;
+import com.viewpagerindicator.CirclePageIndicator;
 
 public class ShowIntroActivity extends AppCompatActivity {
 
@@ -34,7 +35,11 @@ public class ShowIntroActivity extends AppCompatActivity {
         myPagerAdapter = new MyPagerAdapter();
         viewPager.setAdapter(myPagerAdapter);
 
-        viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+
+        CirclePageIndicator titleIndicator = (CirclePageIndicator)findViewById(R.id.page_indicator);
+        titleIndicator.setViewPager(viewPager);
+
+        titleIndicator.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
@@ -78,7 +83,7 @@ public class ShowIntroActivity extends AppCompatActivity {
 
 
         int[] res = {
-                R.layout.intro_0, R.layout.intro_1
+                R.layout.intro_0, R.layout.intro_1, R.layout.intro_0
         };
 
         int NumberOfPages = res.length;

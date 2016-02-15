@@ -10,6 +10,13 @@
         android:layout_height="match_parent"
         android:background="@drawable/bg_gradient"/>
 
+    <com.viewpagerindicator.CirclePageIndicator
+        android:id="@+id/page_indicator"
+        android:layout_height="22dp"
+        android:layout_width="fill_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="10dp"/>
+
     <FrameLayout
         android:id="@+id/skipthetour_layout"
         android:layout_width="150dp"
