@@ -5,11 +5,14 @@ import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+
+import com.thecodebuilders.application.ApplicationContextProvider;
 
 public class ShowIntroActivity extends AppCompatActivity {
 
@@ -72,14 +75,13 @@ public class ShowIntroActivity extends AppCompatActivity {
 
     private class MyPagerAdapter extends PagerAdapter {
 
-        int NumberOfPages = 12;
+
 
         int[] res = {
-                R.drawable.intro1,
-                R.drawable.intro2, R.drawable.intro3, R.drawable.intro4, R.drawable.intro5, R.drawable.intro6,
-                R.drawable.intro6b, R.drawable.intro6c, R.drawable.intro7, R.drawable.intro8, R.drawable.intro9,
+                R.layout.intro_0, R.layout.intro_1
         };
 
+        int NumberOfPages = res.length;
 
         @Override
         public int getCount() {
@@ -106,7 +108,9 @@ public class ShowIntroActivity extends AppCompatActivity {
             // layout.setBackgroundColor(backgroundcolor[position]);
             layout.setLayoutParams(layoutParams);
 
-            layout.addView(imageView); //TODO: Change this to add the composed views
+            View currentPage = LayoutInflater.from(ApplicationContextProvider.getContext()).inflate(res[position], null);
+
+            layout.addView(currentPage); //TODO: Change this to add the composed views
 
             final int page = position;
           /*  layout.setOnClickListener(new View.OnClickListener() {
