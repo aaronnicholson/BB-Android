@@ -93,8 +93,6 @@ public class ShowIntroActivity extends AppCompatActivity {
 
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
-
-
             ImageView imageView = new ImageView(ShowIntroActivity.this);
             imageView.setImageResource(res[position]);
             LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(
@@ -108,7 +106,7 @@ public class ShowIntroActivity extends AppCompatActivity {
             // layout.setBackgroundColor(backgroundcolor[position]);
             layout.setLayoutParams(layoutParams);
 
-            layout.addView(imageView);
+            layout.addView(imageView); //TODO: Change this to add the composed views
 
             final int page = position;
           /*  layout.setOnClickListener(new View.OnClickListener() {
