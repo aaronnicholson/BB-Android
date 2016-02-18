@@ -1423,6 +1423,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         //TODO: add preloader
         configureThumbnailList(jsonData.getJSONArray(currentMenu), "section");
         toggleMenuButton(MOVIES);
+
+        show_intro.performClick(); //TODO: for testing
     }
 
     @Override
@@ -1540,147 +1542,6 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             }
         });
     }
-
-
-
-    public void AsynEditPassword(final String value) {
-
-
-        rq = Volley.newRequestQueue(MainActivity.this);
-        pDialog = new ProgressDialog(MainActivity.this);
-        pDialog.setMessage("Loading...");
-        pDialog.setCancelable(false);
-        pDialog.show();
-
-        final int a = 1;
-
-        strReq = new StringRequest(Request.Method.POST, "http://new.babysbrilliant.com/app/",
-                new Response.Listener<String>() {
-
-                    @Override
-                    public void onResponse(String arg0) {
-                        // TODO Auto-generated method stub
-                        pDialog.hide();
-                        try {
-                            JSONObject result = new JSONObject(arg0);
-                            SharedPreferences.Editor editor = pref.edit();
-                            if (result.getString("res").equalsIgnoreCase("successful")) {
-                                if (SELECT_FLAG.equalsIgnoreCase("new_emailaddress")) {
-
-                                    editor.putString("user_name", value);
-                                    editor.commit();
-                                    showDialog("", "Changed Successfully");
-
-                                } else if (SELECT_FLAG.equalsIgnoreCase("new_password")) {
-                                    editor.putString("user_password", value);
-                                    editor.commit();
-                                    showDialog("", "Changed Successfully");
-
-                                } else if (SELECT_FLAG.equalsIgnoreCase("purchase_video")) {
-
-                                    Toast.makeText(MainActivity.this, arg0, Toast.LENGTH_SHORT).show();
-                                } else {
-
-                                    showDialog("", "Changed Successfully");
-
-                                }
-                            } else {
-                                if (SELECT_FLAG.equalsIgnoreCase("new_emailaddress")) {
-
-
-                                } else if (SELECT_FLAG.equalsIgnoreCase("new_password")) {
-
-
-                                } else if (SELECT_FLAG.equalsIgnoreCase("purchase_video")) {
-
-
-                                } else {
-
-                                    showDialog("", "Incorrect existing password");
-                                }
-
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
-
-                    }
-
-                }, new Response.ErrorListener() {
-
-            @Override
-            public void onErrorResponse(VolleyError arg0) {
-                // TODO Auto-generated method stub
-                System.out.println("Error [" + arg0 + "]");
-            }
-
-        }) {
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                // TODO Auto-generated method stub
-                Map<String, String> params = new HashMap<String, String>();
-                if (SELECT_FLAG.equalsIgnoreCase("new_emailaddress")) {
-                    params.put("a", "nE");
-                    params.put("n", pref.getString("user_id", ""));
-                    params.put("u", pref.getString("user_name", ""));
-                    params.put("p", pref.getString("user_password", ""));
-                    params.put("v", value);
-                } else if (SELECT_FLAG.equalsIgnoreCase("new_password")) {
-                    params.put("a", "nP");
-                    params.put("n", pref.getString("user_id", ""));
-                    params.put("u", pref.getString("user_name", ""));
-                    params.put("p", pref.getString("user_password", ""));
-                    params.put("v", value);
-
-                } else if (SELECT_FLAG.equalsIgnoreCase("purchase_video")) {
-                    params.put("a", "aV");
-                    params.put("u", pref.getString("user_name", ""));
-                    params.put("p", pref.getString("user_password", ""));
-                    params.put("v", value);
-
-                } else {
-                    params.put("a", "lgn");
-                    params.put("u", pref.getString("user_name", ""));
-                    params.put("p", value);
-
-
-                }
-
-
-                return params;
-            }
-
-            // @Override
-            // public Map<String, String> getHeaders() throws AuthFailureError {
-            // Map<String, String> params = new HashMap<String, String>();
-            // // params.put("Content-Type",
-            // "application/x-www-form-urlencoded");
-            // return params;
-            // }
-
-        };
-
-        rq.add(strReq);
-    }
-
-    public void showDialog(String Title, String msg) {
-
-
-        customizeDialog.setTitle(Title);
-        customizeDialog.setMessage(msg);
-        customizeDialog.show();
-
-        customizeDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-
-                includedemailPasswordLayout2.setVisibility(View.INVISIBLE);
-            }
-        });
-    }
-
 
     public void setUpButtons() {
         //show intro
@@ -2020,4 +1881,145 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             }
         });
     }
+
+    public void AsynEditPassword(final String value) {
+
+
+        rq = Volley.newRequestQueue(MainActivity.this);
+        pDialog = new ProgressDialog(MainActivity.this);
+        pDialog.setMessage("Loading...");
+        pDialog.setCancelable(false);
+        pDialog.show();
+
+        final int a = 1;
+
+        strReq = new StringRequest(Request.Method.POST, "http://new.babysbrilliant.com/app/",
+                new Response.Listener<String>() {
+
+                    @Override
+                    public void onResponse(String arg0) {
+                        // TODO Auto-generated method stub
+                        pDialog.hide();
+                        try {
+                            JSONObject result = new JSONObject(arg0);
+                            SharedPreferences.Editor editor = pref.edit();
+                            if (result.getString("res").equalsIgnoreCase("successful")) {
+                                if (SELECT_FLAG.equalsIgnoreCase("new_emailaddress")) {
+
+                                    editor.putString("user_name", value);
+                                    editor.commit();
+                                    showDialog("", "Changed Successfully");
+
+                                } else if (SELECT_FLAG.equalsIgnoreCase("new_password")) {
+                                    editor.putString("user_password", value);
+                                    editor.commit();
+                                    showDialog("", "Changed Successfully");
+
+                                } else if (SELECT_FLAG.equalsIgnoreCase("purchase_video")) {
+
+                                    Toast.makeText(MainActivity.this, arg0, Toast.LENGTH_SHORT).show();
+                                } else {
+
+                                    showDialog("", "Changed Successfully");
+
+                                }
+                            } else {
+                                if (SELECT_FLAG.equalsIgnoreCase("new_emailaddress")) {
+
+
+                                } else if (SELECT_FLAG.equalsIgnoreCase("new_password")) {
+
+
+                                } else if (SELECT_FLAG.equalsIgnoreCase("purchase_video")) {
+
+
+                                } else {
+
+                                    showDialog("", "Incorrect existing password");
+                                }
+
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+
+                    }
+
+                }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError arg0) {
+                // TODO Auto-generated method stub
+                System.out.println("Error [" + arg0 + "]");
+            }
+
+        }) {
+
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                // TODO Auto-generated method stub
+                Map<String, String> params = new HashMap<String, String>();
+                if (SELECT_FLAG.equalsIgnoreCase("new_emailaddress")) {
+                    params.put("a", "nE");
+                    params.put("n", pref.getString("user_id", ""));
+                    params.put("u", pref.getString("user_name", ""));
+                    params.put("p", pref.getString("user_password", ""));
+                    params.put("v", value);
+                } else if (SELECT_FLAG.equalsIgnoreCase("new_password")) {
+                    params.put("a", "nP");
+                    params.put("n", pref.getString("user_id", ""));
+                    params.put("u", pref.getString("user_name", ""));
+                    params.put("p", pref.getString("user_password", ""));
+                    params.put("v", value);
+
+                } else if (SELECT_FLAG.equalsIgnoreCase("purchase_video")) {
+                    params.put("a", "aV");
+                    params.put("u", pref.getString("user_name", ""));
+                    params.put("p", pref.getString("user_password", ""));
+                    params.put("v", value);
+
+                } else {
+                    params.put("a", "lgn");
+                    params.put("u", pref.getString("user_name", ""));
+                    params.put("p", value);
+
+
+                }
+
+
+                return params;
+            }
+
+            // @Override
+            // public Map<String, String> getHeaders() throws AuthFailureError {
+            // Map<String, String> params = new HashMap<String, String>();
+            // // params.put("Content-Type",
+            // "application/x-www-form-urlencoded");
+            // return params;
+            // }
+
+        };
+
+        rq.add(strReq);
+    }
+
+    public void showDialog(String Title, String msg) {
+
+
+        customizeDialog.setTitle(Title);
+        customizeDialog.setMessage(msg);
+        customizeDialog.show();
+
+        customizeDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+
+                includedemailPasswordLayout2.setVisibility(View.INVISIBLE);
+            }
+        });
+    }
+
+
+
 }
