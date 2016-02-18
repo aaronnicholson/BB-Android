@@ -36,33 +36,23 @@ public class ShowIntroActivity extends AppCompatActivity {
         viewPager.setAdapter(myPagerAdapter);
 
 
-        CirclePageIndicator titleIndicator = (CirclePageIndicator)findViewById(R.id.page_indicator);
-        titleIndicator.setViewPager(viewPager);
+        CirclePageIndicator pageIndicator = (CirclePageIndicator)findViewById(R.id.page_indicator);
+        pageIndicator.setViewPager(viewPager);
 
-        titleIndicator.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        pageIndicator.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
-
-                if (position == 11) {
-
-                }
             }
 
             @Override
             public void onPageSelected(int position) {
 
-                if (position == 11) {
-
-                }
             }
 
             @Override
-            public void onPageScrollStateChanged(int state) {
+            public void onPageScrollStateChanged(int position) {
 
-                if (state == 11) {
-
-                }
             }
         });
 
@@ -118,16 +108,6 @@ public class ShowIntroActivity extends AppCompatActivity {
             layout.addView(currentPage); //TODO: Change this to add the composed views
 
             final int page = position;
-          /*  layout.setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-                    Toast.makeText(MainActivity.this,
-                            "Page " + page + " clicked",
-                            Toast.LENGTH_LONG).show();
-                }
-            });*/
-
 
             container.addView(layout);
             return layout;

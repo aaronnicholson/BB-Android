@@ -230,18 +230,19 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         setUpThumbnailList();
 
+        setUpButtons();
 
-        socialMedia();
-        ourStory();
-        privacyPolicy();
-        contactSupport();
-        emailPasswordUpdate();
-        logOut();
-        loopPlaylists();
-        showIntro();
-        purchaseHistory();
+//        socialMedia();
+//        ourStory();
+//        privacyPolicy();
+//        contactSupport();
+//        emailPasswordUpdate();
+//        logOut();
+//        loopPlaylists();
+//        showIntro();
+//        purchaseHistory();
         downlaodPurchaseContent();
-        checkForNewContent();
+//        checkForNewContent();
 
 
     }
@@ -1541,316 +1542,6 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     }
 
 
-    public void ourStory() {
-
-        back_btn_ourStory.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                includedOurStoryLayout.setVisibility(View.INVISIBLE);
-            }
-        });
-
-        our_story.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                includedOurStoryLayout.setVisibility(View.VISIBLE);
-
-                WebView story_data = (WebView) includedOurStoryLayout.findViewById(R.id.our_story_webview);
-                story_data.getSettings().setJavaScriptEnabled(true);
-                story_data.loadData(getString(R.string.our_story), "text/html", "UTF-8");
-
-            }
-        });
-
-    }
-
-    public void privacyPolicy() {
-
-        back_btn_privacyPolicy.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                includedPrivacyLayout.setVisibility(View.INVISIBLE);
-            }
-        });
-
-
-        privacy_policy.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                if (flag == 0) {
-                    Intent privacy_policy = new Intent(MainActivity.this, ParentalChallengeScreen.class);
-                    privacy_policy.putExtra("Key", "privacy_policy");
-                    startActivityForResult(privacy_policy, 1);
-                    flag = 1;
-                } else {
-                    includedPrivacyLayout.setVisibility(View.VISIBLE);
-                    WebView story_data = (WebView) includedPrivacyLayout.findViewById(R.id.privacy_policy_webview);
-                    story_data.getSettings().setJavaScriptEnabled(true);
-                    story_data.loadData(getString(R.string.privacy_policy), "text/html", "UTF-8");
-                }
-
-
-            }
-        });
-
-    }
-
-    public void contactSupport() {
-
-        contact_support.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Intent contact_support = new Intent(MainActivity.this, ParentalChallengeScreen.class);
-                contact_support.putExtra("Key", "contact_support");
-                startActivityForResult(contact_support, 1);
-
-            }
-        });
-    }
-
-
-    public void emailPasswordUpdate() {
-
-        back_btn_emilPasswdUpdate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                includedemailPasswordLayout.setVisibility(View.INVISIBLE);
-            }
-        });
-
-        back_btn_emilPasswdUpdate2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                includedemailPasswordLayout2.setVisibility(View.INVISIBLE);
-            }
-        });
-
-
-        email_password_update.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-
-                Intent contact_support = new Intent(MainActivity.this, ParentalChallengeScreen.class);
-                contact_support.putExtra("Key", "email_password_update");
-                startActivityForResult(contact_support, 1);
-
-            }
-        });
-
-        includedemailPasswordLayout.findViewById(R.id.confirm_existing_password).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-
-                SELECT_FLAG = "confirm_existing_password";
-                includedemailPasswordLayout2.setVisibility(View.VISIBLE);
-                et.setHint("Please type in your password...");
-            }
-        });
-
-        includedemailPasswordLayout.findViewById(R.id.new_password).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SELECT_FLAG = "new_password";
-
-                includedemailPasswordLayout2.setVisibility(View.VISIBLE);
-                et.setHint("Please type in your new password...");
-
-            }
-        });
-
-        includedemailPasswordLayout.findViewById(R.id.new_emailaddress).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                SELECT_FLAG = "new_emailaddress";
-                includedemailPasswordLayout2.setVisibility(View.VISIBLE);
-                et.setHint("Please type in your new email...");
-            }
-        });
-
-        includedemailPasswordLayout2.findViewById(R.id.done).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-
-                if (et.getText().length() == 0 || et.getText().toString().equalsIgnoreCase("")) {
-
-                } else {
-                    AsynEditPassword(et.getText().toString());
-                }
-            }
-        });
-
-    }
-
-    public void socialMedia() {
-
-        back_btn_socialMedia.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                includedSocialMediaLayout.setVisibility(View.INVISIBLE);
-            }
-        });
-
-        social_media.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                includedSocialMediaLayout.setVisibility(View.VISIBLE);
-
-            }
-        });
-
-        includedSocialMediaLayout.findViewById(R.id.fb_social).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Intent privacy_policy = new Intent(MainActivity.this, ParentalChallengeScreen.class);
-                privacy_policy.putExtra("Key", "fb_social");
-                startActivityForResult(privacy_policy, 1);
-
-            }
-        });
-
-        includedSocialMediaLayout.findViewById(R.id.tw_social).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Intent privacy_policy = new Intent(MainActivity.this, ParentalChallengeScreen.class);
-                privacy_policy.putExtra("Key", "tw_social");
-                startActivityForResult(privacy_policy, 1);
-            }
-        });
-    }
-
-
-    public void logOut() {
-
-        log_out.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Intent privacy_policy = new Intent(MainActivity.this, ParentalChallengeScreen.class);
-                privacy_policy.putExtra("Key", "log_out");
-                startActivityForResult(privacy_policy, 1);
-
-            }
-        });
-
-
-    }
-
-
-    public void loopPlaylists() {
-        back_btn_loopPlaylist.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                includedLoopPlaylistsLayout.setVisibility(View.INVISIBLE);
-            }
-        });
-
-        loop_playlists.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                includedLoopPlaylistsLayout.setVisibility(View.VISIBLE);
-            }
-        });
-
-
-        fiftin_min_timer_lay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!checked1.isChecked()) {
-                    checked1.setChecked(true);
-                    checked2.setChecked(false);
-                    checked3.setChecked(false);
-                    checked4.setChecked(false);
-                    checked5.setChecked(false);
-
-                }
-
-
-            }
-        });
-
-
-        thirty_min_timer_lay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!checked2.isChecked()) {
-                    checked2.setChecked(true);
-                    checked1.setChecked(false);
-                    checked3.setChecked(false);
-                    checked4.setChecked(false);
-                    checked5.setChecked(false);
-
-                }
-            }
-        });
-
-
-        fourty_five_min_timer_lay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!checked3.isChecked()) {
-                    checked3.setChecked(true);
-                    checked2.setChecked(false);
-                    checked1.setChecked(false);
-                    checked4.setChecked(false);
-                    checked5.setChecked(false);
-
-                }
-
-            }
-        });
-
-
-        sixty_min_timer_lay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!checked4.isChecked()) {
-                    checked4.setChecked(true);
-                    checked2.setChecked(false);
-                    checked3.setChecked(false);
-                    checked1.setChecked(false);
-                    checked5.setChecked(false);
-
-                }
-
-            }
-        });
-
-
-        ninty_min_timer_lay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!checked5.isChecked()) {
-                    checked5.setChecked(true);
-                    checked2.setChecked(false);
-                    checked3.setChecked(false);
-                    checked4.setChecked(false);
-                    checked1.setChecked(false);
-
-                }
-
-            }
-        });
-
-
-    }
-
 
     public void AsynEditPassword(final String value) {
 
@@ -1991,30 +1682,19 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     }
 
 
-    public void purchaseHistory() {
-
-        back_btn_purchaseHistory.setOnClickListener(new View.OnClickListener() {
+    public void setUpButtons() {
+        //show intro
+        show_intro.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                includedPurchaseHistoryLayout.setVisibility(View.INVISIBLE);
+                startActivity(new Intent(MainActivity.this, ShowIntroActivity.class).putExtra("Key", "SignUp"));
+
+
             }
         });
 
-        purchase_history.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                includedPurchaseHistoryLayout.setVisibility(View.VISIBLE);
-                getRemoteJSON("Purchase", Constant.URL + "a=pH&u=" + pref.getString("user_id", ""));
-
-            }
-        });
-    }
-
-
-    public void checkForNewContent() {
-
+        //check for new content
         back_btn_checkNewContent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -2032,19 +1712,312 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
             }
         });
-    }
 
-    public void showIntro() {
-
-        show_intro.setOnClickListener(new View.OnClickListener() {
+        //purchase history
+        back_btn_purchaseHistory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                startActivity(new Intent(MainActivity.this, ShowIntroActivity.class).putExtra("Key", "SignUp"));
+                includedPurchaseHistoryLayout.setVisibility(View.INVISIBLE);
+            }
+        });
+
+        purchase_history.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                includedPurchaseHistoryLayout.setVisibility(View.VISIBLE);
+                getRemoteJSON("Purchase", Constant.URL + "a=pH&u=" + pref.getString("user_id", ""));
+
+            }
+        });
+
+
+        //loop playlist
+        back_btn_loopPlaylist.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                includedLoopPlaylistsLayout.setVisibility(View.INVISIBLE);
+            }
+        });
+
+        loop_playlists.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                includedLoopPlaylistsLayout.setVisibility(View.VISIBLE);
+            }
+        });
+
+
+        fiftin_min_timer_lay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!checked1.isChecked()) {
+                    checked1.setChecked(true);
+                    checked2.setChecked(false);
+                    checked3.setChecked(false);
+                    checked4.setChecked(false);
+                    checked5.setChecked(false);
+
+                }
 
 
             }
         });
-    }
 
+
+        thirty_min_timer_lay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!checked2.isChecked()) {
+                    checked2.setChecked(true);
+                    checked1.setChecked(false);
+                    checked3.setChecked(false);
+                    checked4.setChecked(false);
+                    checked5.setChecked(false);
+
+                }
+            }
+        });
+
+
+        fourty_five_min_timer_lay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!checked3.isChecked()) {
+                    checked3.setChecked(true);
+                    checked2.setChecked(false);
+                    checked1.setChecked(false);
+                    checked4.setChecked(false);
+                    checked5.setChecked(false);
+
+                }
+
+            }
+        });
+
+
+        sixty_min_timer_lay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!checked4.isChecked()) {
+                    checked4.setChecked(true);
+                    checked2.setChecked(false);
+                    checked3.setChecked(false);
+                    checked1.setChecked(false);
+                    checked5.setChecked(false);
+
+                }
+
+            }
+        });
+
+
+        ninty_min_timer_lay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!checked5.isChecked()) {
+                    checked5.setChecked(true);
+                    checked2.setChecked(false);
+                    checked3.setChecked(false);
+                    checked4.setChecked(false);
+                    checked1.setChecked(false);
+
+                }
+
+            }
+        });
+
+        //log out
+        log_out.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent privacy_policy = new Intent(MainActivity.this, ParentalChallengeScreen.class);
+                privacy_policy.putExtra("Key", "log_out");
+                startActivityForResult(privacy_policy, 1);
+
+            }
+        });
+
+        back_btn_socialMedia.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                includedSocialMediaLayout.setVisibility(View.INVISIBLE);
+            }
+        });
+
+        //social media
+        social_media.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                includedSocialMediaLayout.setVisibility(View.VISIBLE);
+
+            }
+        });
+
+        includedSocialMediaLayout.findViewById(R.id.fb_social).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent privacy_policy = new Intent(MainActivity.this, ParentalChallengeScreen.class);
+                privacy_policy.putExtra("Key", "fb_social");
+                startActivityForResult(privacy_policy, 1);
+
+            }
+        });
+
+        includedSocialMediaLayout.findViewById(R.id.tw_social).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent privacy_policy = new Intent(MainActivity.this, ParentalChallengeScreen.class);
+                privacy_policy.putExtra("Key", "tw_social");
+                startActivityForResult(privacy_policy, 1);
+            }
+        });
+
+        //email password update
+        back_btn_emilPasswdUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                includedemailPasswordLayout.setVisibility(View.INVISIBLE);
+            }
+        });
+
+        back_btn_emilPasswdUpdate2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                includedemailPasswordLayout2.setVisibility(View.INVISIBLE);
+            }
+        });
+
+
+        email_password_update.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                Intent contact_support = new Intent(MainActivity.this, ParentalChallengeScreen.class);
+                contact_support.putExtra("Key", "email_password_update");
+                startActivityForResult(contact_support, 1);
+
+            }
+        });
+
+        includedemailPasswordLayout.findViewById(R.id.confirm_existing_password).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                SELECT_FLAG = "confirm_existing_password";
+                includedemailPasswordLayout2.setVisibility(View.VISIBLE);
+                et.setHint("Please type in your password...");
+            }
+        });
+
+        includedemailPasswordLayout.findViewById(R.id.new_password).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SELECT_FLAG = "new_password";
+
+                includedemailPasswordLayout2.setVisibility(View.VISIBLE);
+                et.setHint("Please type in your new password...");
+
+            }
+        });
+
+        includedemailPasswordLayout.findViewById(R.id.new_emailaddress).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                SELECT_FLAG = "new_emailaddress";
+                includedemailPasswordLayout2.setVisibility(View.VISIBLE);
+                et.setHint("Please type in your new email...");
+            }
+        });
+
+        includedemailPasswordLayout2.findViewById(R.id.done).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                if (et.getText().length() == 0 || et.getText().toString().equalsIgnoreCase("")) {
+
+                } else {
+                    AsynEditPassword(et.getText().toString());
+                }
+            }
+        });
+
+        //contact support
+        contact_support.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent contact_support = new Intent(MainActivity.this, ParentalChallengeScreen.class);
+                contact_support.putExtra("Key", "contact_support");
+                startActivityForResult(contact_support, 1);
+
+            }
+        });
+
+        //privacy policy
+        back_btn_privacyPolicy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                includedPrivacyLayout.setVisibility(View.INVISIBLE);
+            }
+        });
+
+
+        privacy_policy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (flag == 0) {
+                    Intent privacy_policy = new Intent(MainActivity.this, ParentalChallengeScreen.class);
+                    privacy_policy.putExtra("Key", "privacy_policy");
+                    startActivityForResult(privacy_policy, 1);
+                    flag = 1;
+                } else {
+                    includedPrivacyLayout.setVisibility(View.VISIBLE);
+                    WebView story_data = (WebView) includedPrivacyLayout.findViewById(R.id.privacy_policy_webview);
+                    story_data.getSettings().setJavaScriptEnabled(true);
+                    story_data.loadData(getString(R.string.privacy_policy), "text/html", "UTF-8");
+                }
+
+
+            }
+        });
+
+        //our story
+        back_btn_ourStory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                includedOurStoryLayout.setVisibility(View.INVISIBLE);
+            }
+        });
+
+        our_story.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                includedOurStoryLayout.setVisibility(View.VISIBLE);
+
+                WebView story_data = (WebView) includedOurStoryLayout.findViewById(R.id.our_story_webview);
+                story_data.getSettings().setJavaScriptEnabled(true);
+                story_data.loadData(getString(R.string.our_story), "text/html", "UTF-8");
+
+            }
+        });
+    }
 }

@@ -20,7 +20,7 @@
     <integer name="default_circle_indicator_orientation">0</integer>
     <dimen name="default_circle_indicator_radius">5dp</dimen>
     <bool name="default_circle_indicator_snap">true</bool>
-    <dimen name="default_circle_indicator_stroke_width">2dp</dimen>
+    <dimen name="default_circle_indicator_stroke_width">0dp</dimen>
     <color name="default_circle_indicator_fill_color">#303030</color>
     <color name="default_circle_indicator_stroke_color">#303030</color>
 
