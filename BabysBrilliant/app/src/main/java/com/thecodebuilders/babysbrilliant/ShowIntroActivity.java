@@ -70,10 +70,20 @@ public class ShowIntroActivity extends AppCompatActivity {
 
     private class MyPagerAdapter extends PagerAdapter {
 
-
-
         int[] res = {
-                R.layout.intro_0, R.layout.intro_1, R.layout.intro_0
+                R.layout.intro_0,
+                R.layout.intro_1,
+                R.layout.intro_2,
+                R.layout.intro_3,
+                R.layout.intro_4,
+                R.layout.intro_5,
+                R.layout.intro_6,
+                R.layout.intro_7,
+                R.layout.intro_8,
+                R.layout.intro_9,
+                R.layout.intro_10,
+                R.layout.intro_11
+
         };
 
         int NumberOfPages = res.length;

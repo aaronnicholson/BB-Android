@@ -7,12 +7,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="Welcome to Baby's Brilliant"
+        android:text="INTRO 9"
         android:onClick="Click"
         android:textColor="#ff0000"
         android:textSize="18sp"
         android:visibility="visible" />
-
 
 
 </LinearLayout>

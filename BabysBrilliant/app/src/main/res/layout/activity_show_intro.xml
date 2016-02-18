@@ -12,10 +12,10 @@
 
     <com.viewpagerindicator.CirclePageIndicator
         android:id="@+id/page_indicator"
-        android:layout_height="22dp"
+        android:layout_height="wrap_content"
         android:layout_width="fill_parent"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="10dp"/>
+        android:layout_marginBottom="4dp"/>
 
     <FrameLayout
         android:id="@+id/skipthetour_layout"
