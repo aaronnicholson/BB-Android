@@ -1,6 +1,7 @@
 package com.thecodebuilders.babysbrilliant;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -21,6 +22,8 @@ public class ShowIntroActivity extends AppCompatActivity {
     ViewPager viewPager;
     MyPagerAdapter myPagerAdapter;
     View skipthetour;
+    ImageView intro_playlists,intro_favorites,intro_movies,intro_music,intro_nightlights,intro_audiobooks,intro_soundboards,intro_hearingimpaired, intro_settings;
+
     String Key;
 
     @Override
@@ -32,10 +35,21 @@ public class ShowIntroActivity extends AppCompatActivity {
         getSupportActionBar().hide();
         viewPager = (ViewPager) findViewById(R.id.myviewpager);
         skipthetour = (View) findViewById(R.id.skipthetour);
+        intro_playlists = (ImageView) findViewById(R.id.intro_playlists);
+        intro_favorites = (ImageView) findViewById(R.id.intro_favorites);
+        intro_movies = (ImageView) findViewById(R.id.intro_movies);
+        intro_music = (ImageView) findViewById(R.id.intro_music);
+        intro_nightlights = (ImageView) findViewById(R.id.intro_nightlights);
+        intro_audiobooks = (ImageView) findViewById(R.id.intro_audiobooks);
+        intro_soundboards = (ImageView) findViewById(R.id.intro_soundboards);
+        intro_hearingimpaired = (ImageView) findViewById(R.id.intro_hearingimpaired);
+        intro_settings = (ImageView) findViewById(R.id.intro_settings);
+
+
         myPagerAdapter = new MyPagerAdapter();
         viewPager.setAdapter(myPagerAdapter);
 
-        //TODO: dynamically size intro_menu_scroll_view to fit screen wid
+        //TODO: dynamically size intro_menu_scroll_view to fit screen width?
 
 
         CirclePageIndicator pageIndicator = (CirclePageIndicator)findViewById(R.id.page_indicator);
@@ -44,6 +58,102 @@ public class ShowIntroActivity extends AppCompatActivity {
         pageIndicator.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                //default menu items to hidden
+                intro_playlists.setVisibility(View.INVISIBLE);
+                intro_favorites.setVisibility(View.INVISIBLE);
+                intro_movies.setVisibility(View.INVISIBLE);
+                intro_music.setVisibility(View.INVISIBLE);
+                intro_nightlights.setVisibility(View.INVISIBLE);
+                intro_audiobooks.setVisibility(View.INVISIBLE);
+                intro_soundboards.setVisibility(View.INVISIBLE);
+                intro_hearingimpaired.setVisibility(View.INVISIBLE);
+                intro_settings.setVisibility(View.INVISIBLE);
+
+                intro_playlists.clearColorFilter();
+                intro_favorites.clearColorFilter();
+                intro_movies.clearColorFilter();
+                intro_music.clearColorFilter();
+                intro_nightlights.clearColorFilter();
+                intro_audiobooks.clearColorFilter();
+                intro_soundboards.clearColorFilter();
+                intro_hearingimpaired.clearColorFilter();
+                intro_settings.clearColorFilter();
+
+
+                if(position==2 || position ==3) {
+                    intro_playlists.setVisibility(View.VISIBLE);
+                    intro_playlists.setColorFilter(Color.RED);
+                }
+
+                if(position==4) {
+                    intro_playlists.setVisibility(View.VISIBLE);
+                    intro_favorites.setVisibility(View.VISIBLE);
+                    intro_favorites.setColorFilter(Color.RED);
+
+                }
+
+                if(position==5) {
+                    intro_playlists.setVisibility(View.VISIBLE);
+                    intro_favorites.setVisibility(View.VISIBLE);
+                    intro_music.setVisibility(View.VISIBLE);
+                    intro_movies.setVisibility(View.VISIBLE);
+                    intro_nightlights.setVisibility(View.VISIBLE);
+                    intro_audiobooks.setVisibility(View.VISIBLE);
+
+                    intro_music.setColorFilter(Color.RED);
+                    intro_movies.setColorFilter(Color.RED);
+                    intro_nightlights.setColorFilter(Color.RED);
+                    intro_audiobooks.setColorFilter(Color.RED);
+
+                }
+                if(position==6 || position==7) {
+                    intro_playlists.setVisibility(View.VISIBLE);
+                    intro_favorites.setVisibility(View.VISIBLE);
+                    intro_music.setVisibility(View.VISIBLE);
+                    intro_movies.setVisibility(View.VISIBLE);
+                    intro_nightlights.setVisibility(View.VISIBLE);
+                    intro_audiobooks.setVisibility(View.VISIBLE);
+
+
+                }
+                if(position==8) {
+                        intro_playlists.setVisibility(View.VISIBLE);
+                        intro_favorites.setVisibility(View.VISIBLE);
+                        intro_music.setVisibility(View.VISIBLE);
+                        intro_movies.setVisibility(View.VISIBLE);
+                        intro_nightlights.setVisibility(View.VISIBLE);
+                        intro_audiobooks.setVisibility(View.VISIBLE);
+                        intro_soundboards.setVisibility(View.VISIBLE);
+
+                        intro_soundboards.setColorFilter(Color.RED);
+
+
+                }
+                if(position==9) {
+                        intro_playlists.setVisibility(View.VISIBLE);
+                        intro_favorites.setVisibility(View.VISIBLE);
+                        intro_music.setVisibility(View.VISIBLE);
+                        intro_movies.setVisibility(View.VISIBLE);
+                        intro_nightlights.setVisibility(View.VISIBLE);
+                        intro_audiobooks.setVisibility(View.VISIBLE);
+                        intro_soundboards.setVisibility(View.VISIBLE);
+                        intro_hearingimpaired.setVisibility(View.VISIBLE);
+
+                        intro_hearingimpaired.setColorFilter(Color.RED);
+                }
+                if(position==10) {
+                        intro_playlists.setVisibility(View.VISIBLE);
+                        intro_favorites.setVisibility(View.VISIBLE);
+                        intro_music.setVisibility(View.VISIBLE);
+                        intro_movies.setVisibility(View.VISIBLE);
+                        intro_nightlights.setVisibility(View.VISIBLE);
+                        intro_audiobooks.setVisibility(View.VISIBLE);
+                        intro_soundboards.setVisibility(View.VISIBLE);
+                        intro_hearingimpaired.setVisibility(View.VISIBLE);
+                        intro_settings.setVisibility(View.VISIBLE);
+
+                        intro_settings.setColorFilter(Color.RED);
+                }
 
             }
 
