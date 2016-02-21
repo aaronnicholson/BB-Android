@@ -7,11 +7,34 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="INTRO 1"
+        android:text="the Baby's Brilliant logo"
         android:onClick="Click"
         android:textColor="#ff0000"
+        android:textSize="22sp"
+        android:visibility="visible"
+        android:layout_marginTop="100dp"/>
+
+    <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Tap on the logo any time to see your purchased items."
+        android:onClick="Click"
+        android:textColor="#000000"
         android:textSize="18sp"
-        android:visibility="visible" />
+        android:visibility="visible"
+        android:layout_marginTop="30dp"/>
+
+    <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="You'll start with three free items."
+        android:onClick="Click"
+        android:textColor="#000000"
+        android:textSize="18sp"
+        android:visibility="visible"
+        android:layout_marginTop="10dp"/>
 
 
 </LinearLayout>

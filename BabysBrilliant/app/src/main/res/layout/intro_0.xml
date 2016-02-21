@@ -10,8 +10,20 @@
         android:text="Welcome to Baby's Brilliant"
         android:onClick="Click"
         android:textColor="#ff0000"
+        android:textSize="22sp"
+        android:visibility="visible"
+        android:layout_marginTop="100dp"/>
+
+    <com.thecodebuilders.FontFamily.ProximaNovaSoftBold
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Please swipe from right to left to get a tour of the app."
+        android:onClick="Click"
+        android:textColor="#000000"
         android:textSize="18sp"
-        android:visibility="visible" />
+        android:visibility="visible"
+        android:layout_marginTop="30dp"/>
 
 
 
