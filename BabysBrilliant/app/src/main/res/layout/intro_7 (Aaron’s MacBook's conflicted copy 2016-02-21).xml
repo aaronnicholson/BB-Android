@@ -3,6 +3,7 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <ImageView
         android:layout_width="340dp"
         android:layout_marginTop="30dp"
@@ -30,7 +31,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="left"
-            android:text="Tap this menu item to see your playlists."
+            android:text="The Add to Playlist screen will appear.\r\nTap a playlist to add to that playlist.\r\nTap Create New Playlist to add a new playlist."
             android:onClick="Click"
             android:textColor="#000000"
             android:textSize="18sp"
@@ -39,4 +40,5 @@
 
 
     </LinearLayout>
+
 </LinearLayout>

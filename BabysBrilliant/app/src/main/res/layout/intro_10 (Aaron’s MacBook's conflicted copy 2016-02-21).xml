@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
-    android:layout_width="match_parent"
+    android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <ImageView
         android:layout_width="340dp"
         android:layout_marginTop="30dp"
@@ -19,7 +19,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="left"
-            android:text="playlists"
+            android:text="settings"
             android:onClick="Click"
             android:textColor="#ff0000"
             android:textSize="22sp"
@@ -30,7 +30,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="left"
-            android:text="Tap this menu item to see your playlists."
+            android:text="Access settings, such as playlist looping, by tapping the gear."
             android:onClick="Click"
             android:textColor="#000000"
             android:textSize="18sp"
@@ -39,4 +39,6 @@
 
 
     </LinearLayout>
+
+
 </LinearLayout>

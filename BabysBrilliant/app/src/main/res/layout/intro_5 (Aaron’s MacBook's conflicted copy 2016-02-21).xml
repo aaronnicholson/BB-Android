@@ -3,12 +3,13 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <ImageView
         android:layout_width="340dp"
         android:layout_marginTop="30dp"
         android:layout_marginLeft="10dp"
         android:layout_height="wrap_content"
-        android:src="@drawable/doggiesplaylist" />
+        android:src="@drawable/intro_favorites_example" />
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
@@ -19,7 +20,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="left"
-            android:text="playlists"
+            android:text="categories"
             android:onClick="Click"
             android:textColor="#ff0000"
             android:textSize="22sp"
@@ -30,7 +31,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="left"
-            android:text="Tap this menu item to see your playlists."
+            android:text="The movies, music, nightlights, and books sections each contain different types of content."
             android:onClick="Click"
             android:textColor="#000000"
             android:textSize="18sp"
@@ -39,4 +40,6 @@
 
 
     </LinearLayout>
+
+
 </LinearLayout>

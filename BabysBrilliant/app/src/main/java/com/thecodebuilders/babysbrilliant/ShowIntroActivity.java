@@ -20,7 +20,7 @@ public class ShowIntroActivity extends AppCompatActivity {
 
     ViewPager viewPager;
     MyPagerAdapter myPagerAdapter;
-    FrameLayout skipthetour_framelayout;
+    View skipthetour;
     String Key;
 
     @Override
@@ -31,9 +31,11 @@ public class ShowIntroActivity extends AppCompatActivity {
         Key = returnIntent.getStringExtra("Key");
         getSupportActionBar().hide();
         viewPager = (ViewPager) findViewById(R.id.myviewpager);
-        skipthetour_framelayout = (FrameLayout) findViewById(R.id.skipthetour_layout);
+        skipthetour = (View) findViewById(R.id.skipthetour);
         myPagerAdapter = new MyPagerAdapter();
         viewPager.setAdapter(myPagerAdapter);
+
+        //TODO: dynamically size intro_menu_scroll_view to fit screen wid
 
 
         CirclePageIndicator pageIndicator = (CirclePageIndicator)findViewById(R.id.page_indicator);
@@ -56,7 +58,7 @@ public class ShowIntroActivity extends AppCompatActivity {
             }
         });
 
-        skipthetour_framelayout.setOnClickListener(new View.OnClickListener() {
+        skipthetour.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 

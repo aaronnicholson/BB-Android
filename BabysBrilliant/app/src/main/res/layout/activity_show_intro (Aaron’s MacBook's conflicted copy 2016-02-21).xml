@@ -37,7 +37,7 @@
         android:layout_marginBottom="4dp"/>
 
     <RelativeLayout
-        android:id="@+id/menu_group"
+        android:id="@+id/intro_menu_group"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp">
@@ -150,6 +150,17 @@
                     android:src="@drawable/hearingimpaired" />
             </LinearLayout>
         </HorizontalScrollView>
+        <ImageView
+            android:id="@+id/intro_settings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerInParent="true"
+            android:layout_marginRight="@dimen/small_margin"
+            android:adjustViewBounds="true"
+            android:maxWidth="20dp"
+            android:src="@drawable/settings" />
+
         </RelativeLayout>
 
 
