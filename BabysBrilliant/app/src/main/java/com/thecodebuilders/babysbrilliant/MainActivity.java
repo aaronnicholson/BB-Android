@@ -1424,7 +1424,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         configureThumbnailList(jsonData.getJSONArray(currentMenu), "section");
         toggleMenuButton(MOVIES);
 
-        show_intro.performClick(); //TODO: for testing
+        //show_intro.performClick(); //TODO: for testing
     }
 
     @Override
