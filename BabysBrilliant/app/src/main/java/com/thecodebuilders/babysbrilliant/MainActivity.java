@@ -709,16 +709,17 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         videoCloseButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                Log.d(LOGVAR, "VIDEO CLOSE PRESS");
                 videoView.pause();
                 videoView.stopPlayback();
                 videoView.suspend();
-                if (mediaPlayer != null) {
-                    if (mediaPlayer.isPlaying())
-                        mediaPlayer.stop();
-                    mediaPlayer.reset();
-                    mediaPlayer.release();
-                    mediaPlayer = null;
-                }
+//                if (mediaPlayer != null) {
+//                    if (mediaPlayer.isPlaying())
+//                        mediaPlayer.stop();
+//                    mediaPlayer.reset();
+//                    mediaPlayer.release();
+//                    mediaPlayer = null;
+//                }
                 videoToggleButton.setText(getString(R.string.video_pause));
                 videoLayout.setVisibility(View.INVISIBLE);
             }
@@ -786,8 +787,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             case PLAYLISTS:
                 playListButton.setColorFilter(menuBlue);
                 //TODO: further refine what is shown here
-                videoFFButton.setVisibility(View.VISIBLE);
-                videoRewButton.setVisibility(View.VISIBLE);
+                //videoFFButton.setVisibility(View.VISIBLE);
+                //videoRewButton.setVisibility(View.VISIBLE);
                 setSectionTitle(getString(R.string.title_playlists));
                 return;
             case FAVORITE_ITEMS:
@@ -1123,12 +1124,12 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         try {
             // Start the MediaController
-            MediaController mediacontroller = new MediaController(
-                    MainActivity.this);
-            mediacontroller.setAnchorView(videoView);
+            //MediaController mediacontroller = new MediaController(
+            //        MainActivity.this);
+            //mediacontroller.setAnchorView(videoView);
             // Get the URL from String VideoURL
             Uri video = Uri.parse(url);
-            videoView.setMediaController(mediacontroller);
+            //videoView.setMediaController(mediacontroller);
             videoView.setVideoURI(video);
 
 
@@ -1196,8 +1197,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     }
 
     private static void showControls() {
-        videoFFButton.setVisibility(View.VISIBLE);
-        videoRewButton.setVisibility(View.VISIBLE);
+        //videoFFButton.setVisibility(View.VISIBLE);
+        //videoRewButton.setVisibility(View.VISIBLE);
         videoToggleButton.setVisibility(View.VISIBLE);
         videoCloseButton.setVisibility(View.VISIBLE);
 
