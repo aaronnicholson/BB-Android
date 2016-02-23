@@ -41,6 +41,8 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
         this.mainActivity = mainActivity;
         parseListItems(assetsList.size());
 
+        Log.d(LOGVAR, "VIDEO assets: " + assetsList);
+
     }
 
     //This gets the data ready for the adapter to use in order to set up the view for each list item.
