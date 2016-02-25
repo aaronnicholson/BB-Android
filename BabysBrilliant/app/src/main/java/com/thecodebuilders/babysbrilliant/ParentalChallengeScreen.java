@@ -70,6 +70,8 @@ public class ParentalChallengeScreen extends AppCompatActivity {
         generateRandomDigit();
         // setListener();
 
+//        successCompletion(); //TODO: for testing only
+
     }
 
     public void generateRandomDigit() {
@@ -186,11 +188,7 @@ public class ParentalChallengeScreen extends AppCompatActivity {
                 if (randomNumber.equalsIgnoreCase(num_digit_first.getText() + "" + num_digit_second.getText() + num_digit_third.getText() + num_digit_fourth.getText())) {
 
 
-                    Intent returnIntent = getIntent();
-                    returnIntent.putExtra("Key", returnIntent.getStringExtra("Key"));
-
-                    setResult(Activity.RESULT_OK, returnIntent);
-                    finish();
+                    successCompletion();
                 }
 
             } else {
@@ -199,6 +197,14 @@ public class ParentalChallengeScreen extends AppCompatActivity {
 
         }
 
+    }
+
+    private void successCompletion() {
+        Intent returnIntent = getIntent();
+        returnIntent.putExtra("Key", returnIntent.getStringExtra("Key"));
+
+        setResult(Activity.RESULT_OK, returnIntent);
+        finish();
     }
 
 

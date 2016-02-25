@@ -59,7 +59,7 @@ public class LoginSignUpActivity extends AppCompatActivity {
             LoginSignUpActivity.this.finish();*/
 
             if (email.length() == 0) {
-                showDialog("Enter Email id");
+                showDialog("Enter Email Address");
             } else if (passwd.length() == 0) {
                 showDialog("Enter Password");
             } else {
@@ -77,8 +77,6 @@ public class LoginSignUpActivity extends AppCompatActivity {
             } else {
                 Intent mainIntent = new Intent(LoginSignUpActivity.this, ParentalChallengeScreen.class);
                 startActivityForResult(mainIntent, 1);
-
-
             }
         } else {
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.RESET_PASSWORD));
@@ -96,21 +94,23 @@ public class LoginSignUpActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
+        Log.d(LOGVAR, requestCode+"; "+resultCode+"; "+Activity.RESULT_OK+"; "+data.getStringExtra("Key"));
         if (requestCode == 1) {
             if (resultCode == Activity.RESULT_OK) {
 
-                if (data.getStringExtra("Key").equalsIgnoreCase("Cancel")) {
-                } else {
+                if (data.getStringExtra("Key")!=null && data.getStringExtra("Key").equalsIgnoreCase("Cancel")) {
+                    //do nothing
+                }
+                else {
                     reset_pass.setVisibility(View.GONE);
                     progressBar.setVisibility(View.VISIBLE);
                     getRemoteJSON(Constant.URL + "a=sup&n=" + email.getText().toString() + "&u=" + email.getText().toString() + "&p=" + passwd.getText(), email.getText().toString(), passwd.getText().toString(), "SignUp");
                 }
             }
             if (resultCode == Activity.RESULT_CANCELED) {
-                //Write your code if there's no result
+                //do nothing
             }
-        }
+       }
     }//onActivityResult
 
     public void getRemoteJSON(String assetsURL, final String username, final String password, final String type) {
