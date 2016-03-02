@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     public static ArrayList<JSONObject> favoriteItems = new ArrayList<>();
     //TODO: fetch and populated pre-purchased items from user db
     public static JSONArray purchasedItems = new JSONArray();
-    public static JSONArray downlaodItems = new JSONArray();
+    public static JSONArray downloadItems = new JSONArray();
     public static ArrayList<Playlist> playlists = new ArrayList<>();
     public int activePlaylist = 0;
     public JSONObject pendingPlaylistItem;
@@ -241,7 +241,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 //        loopPlaylists();
 //        showIntro();
 //        purchaseHistory();
-        downlaodPurchaseContent();
+        downloadPurchaseContent();
 //        checkForNewContent();
 
 
@@ -301,7 +301,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     }
 
 
-    public void downlaodPurchaseContent() {
+    public void downloadPurchaseContent() {
 
         back_btn_downloadPurchasecontent.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -316,7 +316,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             public void onClick(View v) {
 
                 includedDownloadPuchaseContentLayout.setVisibility(View.VISIBLE);
-                if (downlaodItems.length() == 0 && purchasedItems.length() == 0) {
+                if (downloadItems.length() == 0 && purchasedItems.length() == 0) {
 
                     Toast.makeText(getApplicationContext(), "dfsf", Toast.LENGTH_SHORT).show();
                 } else {
@@ -324,7 +324,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                     ArrayList<HashMap<String, String>> arraylist = new ArrayList<HashMap<String, String>>();
 
 
-                    for (int i = 0; i < downlaodItems.length(); i++) {
+                    for (int i = 0; i < downloadItems.length(); i++) {
                         HashMap<String, String> hash = new HashMap<String, String>();
                         JSONObject download_json = null;
                         JSONObject puchased_json1 = null;
@@ -332,10 +332,10 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
                         try {
                             JSONArray a = purchasedItems;
-                            JSONArray b = downlaodItems;
+                            JSONArray b = downloadItems;
                             puchased_json1 = purchasedItems.getJSONObject(i);
 
-                            download_json = downlaodItems.getJSONObject(i);
+                            download_json = downloadItems.getJSONObject(i);
                             if (puchased_json1.getString("title").equalsIgnoreCase(download_json.getString("title"))) {
                                 hash.put("title", download_json.getString("title"));
                                 arraylist.add(hash);
@@ -1335,7 +1335,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
                         JSONArray downlaodItems1 = new JSONArray(Uri.decode(response));
                         JSONArray purchasedItems1 = new JSONArray(Uri.decode(response));
-                        downlaodItems = downlaodItems1;
+                        downloadItems = downlaodItems1;
                         purchasedItems = purchasedItems1;
                         pDialog.hide();
                         purchaseJson(response);
