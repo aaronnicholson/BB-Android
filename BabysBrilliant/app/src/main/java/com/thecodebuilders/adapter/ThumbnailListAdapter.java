@@ -537,7 +537,6 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
 
     }
 
-
     private void updateThumbnailList(int position) {
         mainActivity.configureThumbnailList(products.get(position), "videos");
     }

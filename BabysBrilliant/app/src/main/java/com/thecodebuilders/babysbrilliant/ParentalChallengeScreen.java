@@ -70,7 +70,7 @@ public class ParentalChallengeScreen extends AppCompatActivity {
         generateRandomDigit();
         // setListener();
 
-//        successCompletion(); //TODO: for testing only
+        successCompletion(); //TODO: for testing only to bypassing having to enter the password
 
     }
 

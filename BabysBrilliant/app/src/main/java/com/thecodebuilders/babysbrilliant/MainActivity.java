@@ -46,8 +46,10 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HurlStack;
+import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.thecodebuilders.adapter.CommonAdapterUtility;
 import com.thecodebuilders.adapter.DownloadPurchaseContentAdapter;
 import com.thecodebuilders.adapter.PlaylistAdapter;
 import com.thecodebuilders.adapter.PlaylistItemAdapter;
@@ -87,6 +89,7 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements PlaylistChooser.PlaylistChooserListener {
     public final static Context appContext = ApplicationContextProvider.getContext();
+
 
     public final static String PURCHASED_ITEMS = "purchasedItems";
     public final static String PLAYLISTS = "playlists";
@@ -192,6 +195,10 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
 
     private int flag = 0;
+
+    private static VolleySingleton volleySingleton = VolleySingleton.getInstance();
+    private static ImageLoader imageLoader = volleySingleton.getImageLoader();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -360,83 +367,127 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     }
 
-    public void downloadVideo(final String videoName) {
+    public static void downloadVideo(final String videoName) {
+
         String mUrl;
-        mUrl = "https://s3-us-west-1.amazonaws.com/babysbrilliant-media/" + videoName;
+        mUrl = appContext.getResources().getString(R.string.media_url) + videoName;
+        Log.d(LOGVAR, mUrl);
 
-        request = new InputStreamVolleyRequest(Request.Method.GET, mUrl, new Response.Listener<byte[]>() {
+        if (mUrl != null) {
+            imageLoader.get(mUrl, new ImageLoader.ImageListener() {
+                @Override
+                public void onResponse(ImageLoader.ImageContainer imageContainer, boolean stillLoading) {
+                    if (stillLoading) {
+//                        CommonAdapterUtility.showPlaceHolderImage(imageView);
+                        Log.d(LOGVAR, "VIDEO STILL LOADING");
+                    } else {
+                        Log.d(LOGVAR, "VIDEO DONE LOADING");
 
-            @Override
-            public void onResponse(byte[] response) {
+                        //show and save the bitmap
+//                        Bitmap loadedBitmap = imageContainer.getBitmap();
+//                        Bitmap savedBitmap = Bitmap.createBitmap(loadedBitmap);
+//                        imageView.setImageBitmap(loadedBitmap);
+//                        CommonAdapterUtility.saveThumbToLocalFile(fileName, savedBitmap);
 
-                HashMap<String, Object> map = new HashMap<String, Object>();
-                try {
-                    if (response != null) {
-
-                        File myDirectory = new File(
-                                Environment.getExternalStorageDirectory(), "BABYBRILLIANT");
-
-                        if (!myDirectory.exists()) {
-                            myDirectory.mkdirs();
-                        }
-
-                        //Read file name from headers
-
-
-                        try {
-                            long lenghtOfFile = response.length;
-
-                            //covert reponse to input stream
-                            InputStream input = new ByteArrayInputStream(response);
-
-                            File file = new File(myDirectory, videoName + ".mp4");
-                            //map.put("resume_path", file.toString());
-                            OutputStream output = new FileOutputStream(file);
-                            byte data[] = new byte[1024];
-
-                            long total = 0;
-
-                            int count;
-                            while ((count = input.read(data)) != -1) {
-                                total += count;
-                                output.write(data, 0, count);
-
-                            }
-
-                            output.flush();
-
-                            output.close();
-                            input.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-
-                        }
                     }
-                } catch (Exception e) {
-                    // TODO Auto-generated catch block
-                    Log.d("KEY_ERROR", "UNABLE TO DOWNLOAD FILE");
-                    e.printStackTrace();
+
                 }
 
-            }
-        }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError volleyError) {
+                    Log.d(LOGVAR, "VIDEO LOADING ERROR");
 
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-
-                Log.d("KEY_ERROR", "UNABLE TO DOWNLOAD FILE");
-            }
-        }, null);
-        RequestQueue mRequestQueue = Volley.newRequestQueue(getApplicationContext(),
-                new HurlStack());
-        mRequestQueue.add(request);
+                    // Log.e("", volleyError.getLocalizedMessage());
+//                    CommonAdapterUtility.showPlaceHolderImage(imageView);
+                }
+            });
+        }
     }
 
+//    public void downloadVideo(final String videoName) {
+//        String mUrl;
+//        mUrl = "https://s3-us-west-1.amazonaws.com/babysbrilliant-media/" + videoName;
+//
+//        Log.d(LOGVAR, mUrl);
+
+//        request = new InputStreamVolleyRequest(Request.Method.GET, mUrl, new Response.Listener<byte[]>() {
+//
+//            @Override
+//            public void onResponse(byte[] response) {
+//                Log.d(LOGVAR, "DOWNLOAD GOT RESPONSE");
+//
+////                HashMap<String, Object> map = new HashMap<String, Object>();
+////                try {
+////                    if (response != null) {
+////
+////                        File myDirectory = new File(
+////                                Environment.getExternalStorageDirectory(), "BABYBRILLIANT");
+////
+////                        Log.d(LOGVAR, "Dir exists?: " + myDirectory.exists());
+//////                        if (!myDirectory.exists()) {
+////                        if (!myDirectory.mkdirs()) {
+////                            Log.d(LOGVAR, "dir not made");
+////                        } else { Log.d(LOGVAR, "dir made"); }
+//
+//                        //Read file name from headers
+//
+//
+////                        try {
+////                            long lengthOfFile = response.length;
+////
+////                            //covert reponse to input stream
+////                            InputStream input = new ByteArrayInputStream(response);
+////
+////                            File file = new File(myDirectory, videoName + ".mp4");
+////                            //map.put("resume_path", file.toString());
+////                            OutputStream output = new FileOutputStream(file);
+////                            byte data[] = new byte[1024];
+////
+////                            long total = 0;
+////
+////                            int count;
+////                            while ((count = input.read(data)) != -1) {
+////                                total += count;
+////                                output.write(data, 0, count);
+////
+////                            }
+////
+////                            output.flush();
+////
+////                            output.close();
+////                            input.close();
+////                        } catch (IOException e) {
+////                            e.printStackTrace();
+////
+////                        }
+//                    }
+////                } catch (Exception e) {
+////                    // TODO Auto-generated catch block
+////                    Log.d("KEY_ERROR", "UNABLE TO DOWNLOAD FILE");
+////                    e.printStackTrace();
+////                }
+//
+////            }
+//        }, new Response.ErrorListener() {
+//
+//            @Override
+//            public void onErrorResponse(VolleyError volleyError) {
+//
+//                Log.d(LOGVAR, "UNABLE TO DOWNLOAD FILE");
+//            }
+//        }, null);
+//        RequestQueue mRequestQueue = Volley.newRequestQueue(getApplicationContext(),
+//                new HurlStack());
+//        mRequestQueue.add(request);
+
+
+//        queue.add(request);
+//    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-
+        Log.d(LOGVAR, "ONACTIVITYRESULT CALLED");
         if (requestCode == 1) {
 
             if (resultCode == Activity.RESULT_OK) {
@@ -1098,7 +1149,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         String url = mediaURL + videoURL;
         // String url = "http://techslides.com/demos/sample-videos/small.mp4";
         //TODO: temporary for testing
-//        downloadItem(url);
+        //downloadItem(url);
 
         // Create a progressbar
         pDialog = new ProgressDialog(MainActivity.this);
@@ -1300,7 +1351,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
 
                                                     JSONArray arr = new JSONArray(Uri.decode(response));
-                                                    int lengt = arr.length();
+
                                                     for (int i11 = 0; i11 < arr.length(); i11++) {
                                                         HashMap<String, String> hash = new HashMap<String, String>();
                                                         JSONObject json = arr.getJSONObject(i);
@@ -1319,8 +1370,6 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                                         }
                                     }
                                 }
-
-
                             }
                         }
 
@@ -1333,12 +1382,12 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
                     } else if (From.equalsIgnoreCase("Purchase")) {
 
-                        JSONArray downlaodItems1 = new JSONArray(Uri.decode(response));
+                        JSONArray downloadItems1 = new JSONArray(Uri.decode(response));
                         JSONArray purchasedItems1 = new JSONArray(Uri.decode(response));
-                        downloadItems = downlaodItems1;
+                        downloadItems = downloadItems1;
                         purchasedItems = purchasedItems1;
                         pDialog.hide();
-                        purchaseJson(response);
+                        purchaseJSON(response);
                     }
 
 
@@ -1364,7 +1413,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         queue.add(stringRequest);
     }
 
-    public void purchaseJson(String response) throws JSONException {
+    public void purchaseJSON(String response) throws JSONException {
 
         // JSONObject jsonData = new JSONObject(Uri.decode(response));
         ArrayList<HashMap<String, String>> arraylist = new ArrayList<HashMap<String, String>>();
@@ -1885,7 +1934,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     public void AsynEditPassword(final String value) {
 
-
+        //TODO: put this on the standard "queue" RequestQueue
         rq = Volley.newRequestQueue(MainActivity.this);
         pDialog = new ProgressDialog(MainActivity.this);
         pDialog.setMessage("Loading...");

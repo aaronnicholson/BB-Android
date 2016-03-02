@@ -26,6 +26,7 @@ import java.util.ArrayList;
  * Created by aaronnicholson on 8/17/15.
  */
 public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
+
     private final String LOGVAR = "VideosAdapter";
     private ArrayList<ListItem> elements;
     private final Context appContext = ApplicationContextProvider.getContext();
@@ -33,6 +34,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
     MainActivity mainActivity;
     private VolleySingleton volleySingleton;
     private ImageLoader imageLoader;
+    public String mediaURL = appContext.getString(R.string.media_url);
 
     public VideosAdapter(ArrayList listData, MainActivity mainActivity) {
         volleySingleton = VolleySingleton.getInstance();
@@ -220,12 +222,20 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
     }
 
     private void thumbnailClicked(int position, ElementViewHolder thisViewHolder) {
+
+
         ListItem listItem = elements.get(position);
 
         if (listItem.isPurchasable() && listItem.isPurchased()) {
+            String videoURL = listItem.getMediaFile();
+//            String url = mediaURL + videoURL;
+//            Log.d(LOGVAR, url);
             //play in the main player
-            mainActivity.playVideo(listItem.getMediaFile());
+            //mainActivity.playVideo(listItem.getMediaFile());
             //if it has not been purchased already
+
+            //TODO: Check to see if it is already downloaded first
+            mainActivity.downloadVideo(listItem.getMediaFile());
         } else {
             //TODO: do actual purchase round trip here
             listItem.setIsPurchased(true);
