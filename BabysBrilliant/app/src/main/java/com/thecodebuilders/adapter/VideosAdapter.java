@@ -231,11 +231,11 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
 //            String url = mediaURL + videoURL;
 //            Log.d(LOGVAR, url);
             //play in the main player
-            //mainActivity.playVideo(listItem.getMediaFile());
+            mainActivity.playVideo(listItem.getMediaFile());
             //if it has not been purchased already
 
             //TODO: Check to see if it is already downloaded first
-            mainActivity.downloadVideo(listItem.getMediaFile());
+//            mainActivity.downloadVideo(listItem.getMediaFile());
         } else {
             //TODO: do actual purchase round trip here
             listItem.setIsPurchased(true);
