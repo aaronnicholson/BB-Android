@@ -3,6 +3,7 @@ package com.thecodebuilders.babysbrilliant;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.DownloadManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -26,6 +27,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.MimeTypeMap;
+import android.webkit.URLUtil;
 import android.webkit.WebView;
 import android.widget.CheckedTextView;
 import android.widget.EditText;
@@ -373,35 +376,15 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         mUrl = appContext.getResources().getString(R.string.media_url) + videoName;
         Log.d(LOGVAR, mUrl);
 
-        if (mUrl != null) {
-            imageLoader.get(mUrl, new ImageLoader.ImageListener() {
-                @Override
-                public void onResponse(ImageLoader.ImageContainer imageContainer, boolean stillLoading) {
-                    if (stillLoading) {
-//                        CommonAdapterUtility.showPlaceHolderImage(imageView);
-                        Log.d(LOGVAR, "VIDEO STILL LOADING");
-                    } else {
-                        Log.d(LOGVAR, "VIDEO DONE LOADING");
+        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(mUrl));
+        request.setTitle("File Download");
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        String nameOfFile = URLUtil.guessFileName(mUrl, null, MimeTypeMap.getFileExtensionFromUrl(mUrl));
 
-                        //show and save the bitmap
-//                        Bitmap loadedBitmap = imageContainer.getBitmap();
-//                        Bitmap savedBitmap = Bitmap.createBitmap(loadedBitmap);
-//                        imageView.setImageBitmap(loadedBitmap);
-//                        CommonAdapterUtility.saveThumbToLocalFile(fileName, savedBitmap);
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, nameOfFile); //TODO: Change to private
 
-                    }
-
-                }
-
-                @Override
-                public void onErrorResponse(VolleyError volleyError) {
-                    Log.d(LOGVAR, "VIDEO LOADING ERROR");
-
-                    // Log.e("", volleyError.getLocalizedMessage());
-//                    CommonAdapterUtility.showPlaceHolderImage(imageView);
-                }
-            });
-        }
+        DownloadManager manager = (DownloadManager) appContext.getSystemService(appContext.DOWNLOAD_SERVICE);
+        manager.enqueue(request);
     }
 
 //    public void downloadVideo(final String videoName) {
