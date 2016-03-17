@@ -208,6 +208,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         //http://new.babysbrilliant.com/app/?a=pDBstandard
         assetsURL = Constant.URL + "a=pDBstandard";
         customizeDialog = new CustomizeDialog(MainActivity.this);
@@ -268,6 +269,13 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             FileOutputStream fOut = openFileOutput("raw.txt", MODE_WORLD_READABLE);
 
             String s = getResources().getString(R.string.raw_json);
+
+
+
+
+
+
+
 
             fOut.write(s.getBytes());
             fOut.close();

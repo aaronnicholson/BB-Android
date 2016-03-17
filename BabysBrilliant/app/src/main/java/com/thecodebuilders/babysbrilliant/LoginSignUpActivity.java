@@ -87,7 +87,7 @@ public class LoginSignUpActivity extends AppCompatActivity {
     public void showDialog(String msg) {
         CustomizeDialog customizeDialog = new CustomizeDialog(LoginSignUpActivity.this);
 
-        customizeDialog.setTitle("Alert");
+        customizeDialog.setTitle("Login Failure!");
         customizeDialog.setMessage(msg);
         customizeDialog.show();
     }
@@ -138,10 +138,10 @@ public class LoginSignUpActivity extends AppCompatActivity {
                             startActivity(mainIntent);
                             LoginSignUpActivity.this.finish();
                         }
-                    } else if (result.getString("res").equalsIgnoreCase("unsuccessful") &&
+                    } else if (result.getString("res").equalsIgnoreCase("unsuccessful") ||
                             result.getString("msg").equalsIgnoreCase("This email address is already registered. Please tap Log In.")) {
-
-                        showDialog("That account is already in use. Try logging in.");
+// The password is incorrect
+                        showDialog("Incorrect Password");
 
                     } else {
                         showDialog("Something went wrong!");
