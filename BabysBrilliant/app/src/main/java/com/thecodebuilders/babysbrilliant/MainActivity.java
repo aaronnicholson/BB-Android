@@ -5,9 +5,11 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
@@ -202,6 +204,11 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     private static VolleySingleton volleySingleton = VolleySingleton.getInstance();
     private static ImageLoader imageLoader = volleySingleton.getImageLoader();
 
+    private BroadcastReceiver onDownloadFinishReceiver;
+    private BroadcastReceiver onNotificationClickReceiver;
+    private boolean broadcastReceiverRegistered;
+
+    private static long downloadID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -214,6 +221,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         customizeDialog = new CustomizeDialog(MainActivity.this);
         pref = getApplicationContext().getSharedPreferences("BabyBrilliantPref", MODE_PRIVATE);
 
+        registerBroadcastReceivers();
 
         //do not show the action bar
         ActionBar actionBar = getSupportActionBar();
@@ -382,17 +390,43 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         String mUrl;
         mUrl = appContext.getResources().getString(R.string.media_url) + videoName;
-        Log.d(LOGVAR, mUrl);
 
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(mUrl));
         request.setTitle("File Download");
         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
         String nameOfFile = URLUtil.guessFileName(mUrl, null, MimeTypeMap.getFileExtensionFromUrl(mUrl));
 
-        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, nameOfFile); //TODO: Change to private
+        request.setDestinationInExternalFilesDir(appContext, Environment.DIRECTORY_DOWNLOADS, nameOfFile); //TODO: Change to private
 
-        DownloadManager manager = (DownloadManager) appContext.getSystemService(appContext.DOWNLOAD_SERVICE);
-        manager.enqueue(request);
+        DownloadManager downloadManager = (DownloadManager) appContext.getSystemService(appContext.DOWNLOAD_SERVICE);
+        downloadID = downloadManager.enqueue(request);
+
+    }
+
+    private void registerBroadcastReceivers() {
+
+        broadcastReceiverRegistered = true;
+
+        registerReceiver(onDownloadFinishReceiver = new BroadcastReceiver() {
+
+            @Override
+            public void onReceive(Context context, Intent i) {
+                Log.d(LOGVAR, "DOWNLOAD FINISHED intent received");
+                DownloadManager downloadManager = (DownloadManager) appContext.getSystemService(appContext.DOWNLOAD_SERVICE);
+                Log.d(LOGVAR, "URI:" + downloadManager.getUriForDownloadedFile(downloadID));
+
+            }
+        }, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+
+
+        registerReceiver(onNotificationClickReceiver = new BroadcastReceiver() {
+
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.d(LOGVAR, "NOTIFICATION CLICKED intent received");
+            }
+        }, new IntentFilter(DownloadManager.ACTION_NOTIFICATION_CLICKED));
+
     }
 
 //    public void downloadVideo(final String videoName) {
