@@ -396,7 +396,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
         String nameOfFile = URLUtil.guessFileName(mUrl, null, MimeTypeMap.getFileExtensionFromUrl(mUrl));
 
-        request.setDestinationInExternalFilesDir(appContext, Environment.DIRECTORY_DOWNLOADS, nameOfFile); //TODO: Change to private
+        request.setDestinationInExternalFilesDir(appContext, Environment.DIRECTORY_DOWNLOADS, nameOfFile);
 
         DownloadManager downloadManager = (DownloadManager) appContext.getSystemService(appContext.DOWNLOAD_SERVICE);
         downloadID = downloadManager.enqueue(request);

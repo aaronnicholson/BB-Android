@@ -2,6 +2,7 @@ package com.thecodebuilders.adapter;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Environment;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,6 +20,7 @@ import com.thecodebuilders.network.VolleySingleton;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
 
 
@@ -231,12 +233,26 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
 //            String url = mediaURL + videoURL;
 //            Log.d(LOGVAR, url);
             //play in the main player
-            mainActivity.playVideo(listItem.getMediaFile());
-//            mainActivity.downloadVideo(listItem.getMediaFile());
-            //if it has not been purchased already
+//            mainActivity.playVideo(listItem.getMediaFile());
 
-            //TODO: Check to see if it is already downloaded first
-//            mainActivity.downloadVideo(listItem.getMediaFile());
+            //if the file is in local storage, play it
+
+//            String fileLocation = Environment.getExternalStorageDirectory() + "/" + appContext.getApplicationInfo().dataDir + "/files/" + Environment.DIRECTORY_DOWNLOADS + "/" + listItem.getMediaFile();
+            String fileLocation = appContext.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) +  "/" + listItem.getMediaFile();
+            File file = new File(fileLocation);
+            Log.d(LOGVAR, "FILE location: " + fileLocation);
+//            Log.d(LOGVAR, "data dir:" + appContext.getApplicationInfo().dataDir);
+
+            if(file.exists()) {
+                Log.d(LOGVAR, "FILE EXISTS");
+                mainActivity.playVideo(fileLocation);
+            //otherwise, go get it
+            } else {
+                Log.d(LOGVAR, "FILE DOES NOT EXIST");
+                //TODO: Stop multiple downloads of the same file
+                mainActivity.downloadVideo(listItem.getMediaFile());
+            }
+
         } else {
             //TODO: do actual purchase round trip here
             listItem.setIsPurchased(true);
