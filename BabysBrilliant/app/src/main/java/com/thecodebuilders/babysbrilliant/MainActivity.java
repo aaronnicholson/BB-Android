@@ -1171,11 +1171,6 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     @SuppressLint("NewApi")
     public void playVideo(String videoURL) {
-        String url = mediaURL + videoURL;
-        // String url = "http://techslides.com/demos/sample-videos/small.mp4";
-        //TODO: temporary for testing
-        //downloadItem(url);
-
         // Create a progressbar
         pDialog = new ProgressDialog(MainActivity.this);
         // Set progressbar title
@@ -1204,7 +1199,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             //        MainActivity.this);
             //mediacontroller.setAnchorView(videoView);
             // Get the URL from String VideoURL
-            Uri video = Uri.parse(url);
+            Uri video = Uri.parse(videoURL);
             //videoView.setMediaController(mediacontroller);
             videoView.setVideoURI(video);
 
@@ -1258,10 +1253,12 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
-                mediaPlayer.stop();
-                mediaPlayer.reset();
-                mediaPlayer.release();
-                mediaPlayer = null;
+                if(mediaPlayer!=null) {
+                    mediaPlayer.stop();
+                    mediaPlayer.reset();
+                    mediaPlayer.release();
+                    mediaPlayer = null;
+                }
                 videoToggleButton.setText(getString(R.string.video_pause));
                 videoLayout.setVisibility(View.INVISIBLE);
 

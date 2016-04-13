@@ -224,21 +224,11 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
     }
 
     private void thumbnailClicked(int position, ElementViewHolder thisViewHolder) {
-
-
         ListItem listItem = elements.get(position);
 
         if (listItem.isPurchasable() && listItem.isPurchased()) {
             String videoURL = listItem.getMediaFile();
-//            String url = mediaURL + videoURL;
-//            Log.d(LOGVAR, url);
-            //play in the main player
-//            mainActivity.playVideo(listItem.getMediaFile());
-
-            //if the file is in local storage, play it
-
-//            String fileLocation = Environment.getExternalStorageDirectory() + "/" + appContext.getApplicationInfo().dataDir + "/files/" + Environment.DIRECTORY_DOWNLOADS + "/" + listItem.getMediaFile();
-            String fileLocation = appContext.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) +  "/" + listItem.getMediaFile();
+            String fileLocation = appContext.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) +  "/" + videoURL;
             File file = new File(fileLocation);
             Log.d(LOGVAR, "FILE location: " + fileLocation);
 //            Log.d(LOGVAR, "data dir:" + appContext.getApplicationInfo().dataDir);
