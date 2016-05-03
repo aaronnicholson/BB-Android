@@ -11,6 +11,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.Typeface;
@@ -20,6 +21,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.ParcelFileDescriptor;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -83,6 +85,7 @@ import org.json.JSONObject;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -210,6 +213,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     private static long downloadID;
 
+    private static boolean isDownloading = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -232,9 +237,9 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             @Override
             public void onIabSetupFinished(IabResult result) {
                 if (!result.isSuccess())
-                    Log.d("", "In-app Billing setup fail" + result);
+                    Log.d(LOGVAR, "In-app Billing setup fail" + result);
                 else
-                    Log.d("", "In-app Billing is set up OK");
+                    Log.d(LOGVAR, "In-app Billing is set up OK");
             }
         });
         createRawFile();
@@ -387,19 +392,60 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     }
 
     public static void downloadVideo(final String videoName) {
-
         String mUrl;
         mUrl = appContext.getResources().getString(R.string.media_url) + videoName;
+        //mUrl = "http://goo.gl/Mfyya";
 
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(mUrl));
-        request.setTitle("File Download");
-        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+     //   request.setTitle("File Download");
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN);
+        request.setVisibleInDownloadsUi(false);
         String nameOfFile = URLUtil.guessFileName(mUrl, null, MimeTypeMap.getFileExtensionFromUrl(mUrl));
 
         request.setDestinationInExternalFilesDir(appContext, Environment.DIRECTORY_DOWNLOADS, nameOfFile);
 
         DownloadManager downloadManager = (DownloadManager) appContext.getSystemService(appContext.DOWNLOAD_SERVICE);
         downloadID = downloadManager.enqueue(request);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(1000);
+                    while (isDownloading) {
+                        DownloadManager downloadManager = (DownloadManager) appContext.getSystemService(appContext.DOWNLOAD_SERVICE);
+                        DownloadManager.Query query = new DownloadManager.Query();
+                        query.setFilterById(downloadID);
+                        Cursor cursor = downloadManager.query(query);
+
+                        if (cursor.moveToFirst()) {
+                            int columnIndex = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS);
+                            int status = cursor.getInt(columnIndex);
+                            int columnReason = cursor.getColumnIndex(DownloadManager.COLUMN_REASON);
+                            int reason = cursor.getInt(columnReason);
+                            Log.d(LOGVAR, "..." + status);
+                            int bytes_downloaded = cursor.getInt(cursor
+                                    .getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
+                            int bytes_total = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
+                            final int dl_progress = (int) ((bytes_downloaded * 100l) / bytes_total);
+                            Log.d(LOGVAR, "Download:" + dl_progress);
+
+                            if(status == DownloadManager.STATUS_SUCCESSFUL){
+                                isDownloading = false;
+                            }
+                            else if(status == DownloadManager.STATUS_PENDING){
+                                isDownloading = true;
+                            }
+
+                        }
+                    }
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
 
     }
 
@@ -414,7 +460,6 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                 Log.d(LOGVAR, "DOWNLOAD FINISHED intent received");
                 DownloadManager downloadManager = (DownloadManager) appContext.getSystemService(appContext.DOWNLOAD_SERVICE);
                 Log.d(LOGVAR, "URI:" + downloadManager.getUriForDownloadedFile(downloadID));
-
             }
         }, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
 
@@ -605,9 +650,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    mHelper.launchPurchaseFlow(MainActivity.this, ITEM_SKU, 10001,
+                    mHelper.launchPurchaseFlow(MainActivity.this, Constant.TEST_ITEM_SKU, 10001,
                             mPurchaseFinishedListener, "mypurchasetoken");
-
                     purchasedItems.put(productJSON);
                 } else {
 
@@ -622,14 +666,17 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
           /*  if (!mHelper.handleActivityResult(requestCode,
                     resultCode, data)) {*/
 
-
-            SELECT_FLAG = "purchase_video";
+            if (!mHelper.handleActivityResult(requestCode,
+                    resultCode, data)) {
+                super.onActivityResult(requestCode, resultCode, data);
+            }
+           /* SELECT_FLAG = "purchase_video";
             try {
                 AsynEditPassword(productJSON.getString("SKU"));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            super.onActivityResult(requestCode, resultCode, data);
+            super.onActivityResult(requestCode, resultCode, data);*/
             //  }
 
         }
@@ -1016,7 +1063,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             if (result.isFailure()) {
                 // Handle error
                 return;
-            } else if (purchase.getSku().equals(ITEM_SKU)) {
+            } else if (purchase.getSku().equals(Constant.TEST_ITEM_SKU)) {
+                Log.d(LOGVAR,"Purchase:"+purchase.getSku());
                 consumeItem();
                 // buyButton.setEnabled(false);
             }
@@ -1036,7 +1084,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             if (result.isFailure()) {
                 // Handle failure
             } else {
-                mHelper.consumeAsync(inventory.getPurchase(ITEM_SKU),
+                mHelper.consumeAsync(inventory.getPurchase(Constant.TEST_ITEM_SKU),
                         mConsumeFinishedListener);
             }
         }
@@ -1318,7 +1366,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-
+                Log.d(LOGVAR, "Response:"+response);
                 try {
                     if (From.equalsIgnoreCase("Main")) {
                         processJSON(response);
@@ -1482,7 +1530,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         try {
             //TODO: pull this out of strings and into a flat file.
 
-
+            Log.d(LOGVAR,"Call ProcessJSON");
             // processJSON(getString(R.string.our_story));
             processJSON(readFile());
 

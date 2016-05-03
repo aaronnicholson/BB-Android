@@ -19,6 +19,10 @@ public class Constant {
 
 
 
+    public static final String TEST_ITEM_SKU = "android.test.purchased";
+
+
+
    /* public static final String a = org.apache.commons.lang.StringUtils.join( new String[] {
             "This string is long",
             "really long...",

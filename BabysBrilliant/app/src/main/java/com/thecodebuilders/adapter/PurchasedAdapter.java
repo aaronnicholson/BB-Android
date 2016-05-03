@@ -185,7 +185,7 @@ public class PurchasedAdapter extends RecyclerView.Adapter<ElementViewHolder> {
             public void onClick(View v) {
 
                 ListItem listItem = elements.get(position);
-
+                Log.e(LOGVAR,"Download:"+listItem.getMediaFile());
                 if (!listItem.getMediaFile().equals("")) {
                     downloadVideo(listItem.getMediaFile());
 

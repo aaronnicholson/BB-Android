@@ -1,6 +1,8 @@
 package com.thecodebuilders.adapter;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Environment;
 import android.support.v7.widget.RecyclerView;
@@ -73,7 +75,6 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
                 JSONObject itemJSON = assetsList.get(i);
 
                 name = itemJSON.getString("title");
-
                 for (int purchasedIndex = 0; purchasedIndex < mainActivity.purchasedItems.length(); purchasedIndex++) {
                     //if it has no SKU, skip it
                     if (!itemJSON.isNull("SKU")) {
@@ -118,7 +119,8 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
 
                 mediaFile = itemJSON.getString("file");
 
-                ListItem listItem = new ListItem(itemJSON, name, playInline, imageResource, mediaFile, price, category, isSection, isPurchased, isPlaylistItem, isPlaylist, isFavorite, appContext);
+                ListItem listItem = new ListItem(itemJSON, name, playInline, imageResource, mediaFile, price, category, isSection,
+                        isPurchased, isPlaylistItem, isPlaylist, isFavorite, appContext);
 
                 elements.add(listItem);//TODO: make image dynamic
             } catch (Throwable t) {
@@ -148,6 +150,13 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
             @Override
             public void onClick(View view) {
                 playlistClicked(position, thisViewHolder);
+            }
+        });
+        viewHolder.downloadIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ListItem listItem = elements.get(position);
+                mainActivity.downloadVideo(listItem.getMediaFile());
             }
         });
 
@@ -240,7 +249,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
             } else {
                 Log.d(LOGVAR, "FILE DOES NOT EXIST");
                 //TODO: Stop multiple downloads of the same file
-                mainActivity.downloadVideo(listItem.getMediaFile());
+                alertForDownload(listItem.getMediaFile());
             }
 
         } else {
@@ -270,6 +279,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
         //TODO: hide these on soundboards?
         viewHolder.favoritesIcon.setVisibility(View.VISIBLE);
         viewHolder.playlistIcon.setVisibility(View.VISIBLE);
+        viewHolder.downloadIcon.setVisibility(View.VISIBLE);
         //Log.d(LOGVAR, "set to visible");
     }
 
@@ -308,6 +318,22 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
     @Override
     public int getItemCount() {
         return elements.size();
+    }
+
+
+    private void alertForDownload(final String videoName){
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(mainActivity);
+        alertDialog.setTitle(mainActivity.getResources().getString(R.string.alert_download_title));
+        alertDialog.setMessage(mainActivity.getResources().getString(R.string.alert_download_summary));
+        alertDialog.setPositiveButton(mainActivity.getResources().getString(R.string.download), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                mainActivity.downloadVideo(videoName);
+            }
+        });
+        alertDialog.setNegativeButton(mainActivity.getResources().getString(R.string.cancel), null);
+        AlertDialog builder = alertDialog.create();
+        builder.show();
     }
 
 }
