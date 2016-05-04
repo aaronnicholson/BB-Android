@@ -31,6 +31,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.webkit.MimeTypeMap;
 import android.webkit.URLUtil;
 import android.webkit.WebView;
@@ -58,6 +60,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.thecodebuilders.adapter.CommonAdapterUtility;
 import com.thecodebuilders.adapter.DownloadPurchaseContentAdapter;
+import com.thecodebuilders.adapter.ElementViewHolder;
 import com.thecodebuilders.adapter.PlaylistAdapter;
 import com.thecodebuilders.adapter.PlaylistItemAdapter;
 import com.thecodebuilders.adapter.PurchaseHistoryAdapter;
@@ -76,6 +79,7 @@ import com.thecodebuilders.network.InputStreamVolleyRequest;
 import com.thecodebuilders.network.VolleySingleton;
 import com.thecodebuilders.utility.Constant;
 import com.thecodebuilders.utility.CustomizeDialog;
+import com.thecodebuilders.utility.PreferenceStorage;
 import com.thecodebuilders.utility.Utils;
 
 import org.json.JSONArray;
@@ -95,7 +99,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity implements PlaylistChooser.PlaylistChooserListener {
+public class MainActivity extends AppCompatActivity implements PlaylistChooser.PlaylistChooserListener, Animation.AnimationListener {
     public final static Context appContext = ApplicationContextProvider.getContext();
 
 
@@ -213,7 +217,9 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     private static long downloadID;
 
-    private static boolean isDownloading = true;
+    private boolean isDownloading = true;
+
+    private Animation animationBlink;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -242,6 +248,9 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                     Log.d(LOGVAR, "In-app Billing is set up OK");
             }
         });
+
+        animationBlink = AnimationUtils.loadAnimation(MainActivity.this, R.anim.blink);
+        animationBlink.setAnimationListener(this);
         createRawFile();
         setMenuWidth();
 
@@ -282,13 +291,6 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             FileOutputStream fOut = openFileOutput("raw.txt", MODE_WORLD_READABLE);
 
             String s = getResources().getString(R.string.raw_json);
-
-
-
-
-
-
-
 
             fOut.write(s.getBytes());
             fOut.close();
@@ -391,7 +393,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     }
 
-    public static void downloadVideo(final String videoName) {
+    public  void downloadVideo(final String videoName, final ElementViewHolder viewHolder) {
         String mUrl;
         mUrl = appContext.getResources().getString(R.string.media_url) + videoName;
         //mUrl = "http://goo.gl/Mfyya";
@@ -406,11 +408,33 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         DownloadManager downloadManager = (DownloadManager) appContext.getSystemService(appContext.DOWNLOAD_SERVICE);
         downloadID = downloadManager.enqueue(request);
+        viewHolder.progressBar.setVisibility(View.VISIBLE);
+        viewHolder.thumbnailImage.setClickable(false);
+        viewHolder.downloadIcon.setVisibility(View.GONE);
+       // viewHolder.downloadProgressShow.startAnimation(animationBlink);
 
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try {
+                boolean downloading = true;
+                DownloadManager downloadManager = (DownloadManager) getSystemService(appContext.DOWNLOAD_SERVICE);
+                while (downloading) {
+                    DownloadManager.Query q = new DownloadManager.Query();
+                    q.setFilterById(downloadID);
+                    Cursor cursor = downloadManager.query(q);
+                    cursor.moveToFirst();
+                    final int bytesDownloaded = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
+                    int bytesTotal = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
+                    final int dl_progress = (int) ((bytesDownloaded * 100l) / bytesTotal);
+                    Log.d(LOGVAR, "Download:" + dl_progress + ":" + bytesDownloaded + " Total Length:" + bytesTotal);
+                    PreferenceStorage.saveFileLength(MainActivity.this, videoName, bytesTotal);
+                    if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_SUCCESSFUL) {
+                        downloading = false;
+                        viewHolder.progressBar.setVisibility(View.GONE);
+                        viewHolder.thumbnailImage.setClickable(true);
+                    }
+
+                /*try {
                     Thread.sleep(1000);
                     while (isDownloading) {
                         DownloadManager downloadManager = (DownloadManager) appContext.getSystemService(appContext.DOWNLOAD_SERVICE);
@@ -428,9 +452,10 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                                     .getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
                             int bytes_total = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
                             final int dl_progress = (int) ((bytes_downloaded * 100l) / bytes_total);
-                            Log.d(LOGVAR, "Download:" + dl_progress);
-
+                            Log.d(LOGVAR, "Download:" + dl_progress +":"+bytes_downloaded+" Total Length:"+bytes_total);
+                            PreferenceStorage.saveFileLength(MainActivity.this, videoName, bytes_total);
                             if(status == DownloadManager.STATUS_SUCCESSFUL){
+                                viewHolder.downloadProgressShow.setVisibility(View.GONE);
                                 isDownloading = false;
                             }
                             else if(status == DownloadManager.STATUS_PENDING){
@@ -442,6 +467,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                 }
                 catch (Exception e){
                     e.printStackTrace();
+                }*/
                 }
             }
         }).start();
@@ -453,7 +479,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         broadcastReceiverRegistered = true;
 
-        registerReceiver(onDownloadFinishReceiver = new BroadcastReceiver() {
+        /*registerReceiver(onDownloadFinishReceiver = new BroadcastReceiver() {
 
             @Override
             public void onReceive(Context context, Intent i) {
@@ -461,16 +487,16 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                 DownloadManager downloadManager = (DownloadManager) appContext.getSystemService(appContext.DOWNLOAD_SERVICE);
                 Log.d(LOGVAR, "URI:" + downloadManager.getUriForDownloadedFile(downloadID));
             }
-        }, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+        }, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));*/
 
 
-        registerReceiver(onNotificationClickReceiver = new BroadcastReceiver() {
+        /*registerReceiver(onNotificationClickReceiver = new BroadcastReceiver() {
 
             @Override
             public void onReceive(Context context, Intent intent) {
                 Log.d(LOGVAR, "NOTIFICATION CLICKED intent received");
             }
-        }, new IntentFilter(DownloadManager.ACTION_NOTIFICATION_CLICKED));
+        }, new IntentFilter(DownloadManager.ACTION_NOTIFICATION_CLICKED));*/
 
     }
 
@@ -2141,5 +2167,18 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     }
 
 
+    @Override
+    public void onAnimationEnd(Animation animation) {
 
+    }
+
+    @Override
+    public void onAnimationStart(Animation animation) {
+
+    }
+
+    @Override
+    public void onAnimationRepeat(Animation animation) {
+
+    }
 }

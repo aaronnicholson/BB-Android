@@ -18,6 +18,7 @@ import com.thecodebuilders.babysbrilliant.MainActivity;
 import com.thecodebuilders.babysbrilliant.R;
 import com.thecodebuilders.model.Playlist;
 import com.thecodebuilders.network.VolleySingleton;
+import com.thecodebuilders.utility.PreferenceStorage;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -130,7 +131,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
 
     }
 
-    private void configureListItemListeners(ElementViewHolder viewHolder, final int position) {
+    private void configureListItemListeners(final ElementViewHolder viewHolder, final int position) {
         final ElementViewHolder thisViewHolder = viewHolder;
         viewHolder.thumbnailImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -156,7 +157,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
             @Override
             public void onClick(View v) {
                 ListItem listItem = elements.get(position);
-                mainActivity.downloadVideo(listItem.getMediaFile());
+                mainActivity.downloadVideo(listItem.getMediaFile(), viewHolder);
             }
         });
 
@@ -169,6 +170,8 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
 
         viewHolder.favoritesIcon.setVisibility(View.INVISIBLE);
         viewHolder.playlistIcon.setVisibility(View.INVISIBLE);
+        viewHolder.downloadIcon.setVisibility(View.INVISIBLE);
+        viewHolder.progressBar.setVisibility(View.INVISIBLE);
         viewHolder.priceText.setVisibility(View.VISIBLE);
 
         //set text
@@ -240,16 +243,16 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
             String fileLocation = appContext.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) +  "/" + videoURL;
             File file = new File(fileLocation);
             Log.d(LOGVAR, "FILE location: " + fileLocation);
-//            Log.d(LOGVAR, "data dir:" + appContext.getApplicationInfo().dataDir);
-
-            if(file.exists()) {
+            int fileLength = PreferenceStorage.returnFileLength(mainActivity, listItem.getMediaFile());
+            Log.d(LOGVAR,"FileLength:"+fileLength+" == "+file.length());
+            if(file.exists() && (file.length() == fileLength)) {
                 Log.d(LOGVAR, "FILE EXISTS");
                 mainActivity.playVideo(fileLocation);
             //otherwise, go get it
             } else {
                 Log.d(LOGVAR, "FILE DOES NOT EXIST");
                 //TODO: Stop multiple downloads of the same file
-                alertForDownload(listItem.getMediaFile());
+                alertForDownload(listItem.getMediaFile(), thisViewHolder);
             }
 
         } else {
@@ -321,14 +324,14 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
     }
 
 
-    private void alertForDownload(final String videoName){
+    private void alertForDownload(final String videoName, final ElementViewHolder viewHolder){
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(mainActivity);
         alertDialog.setTitle(mainActivity.getResources().getString(R.string.alert_download_title));
         alertDialog.setMessage(mainActivity.getResources().getString(R.string.alert_download_summary));
         alertDialog.setPositiveButton(mainActivity.getResources().getString(R.string.download), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                mainActivity.downloadVideo(videoName);
+                mainActivity.downloadVideo(videoName, viewHolder);
             }
         });
         alertDialog.setNegativeButton(mainActivity.getResources().getString(R.string.cancel), null);

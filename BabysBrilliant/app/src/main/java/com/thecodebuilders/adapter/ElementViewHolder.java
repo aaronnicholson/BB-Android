@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.TextureView;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -27,6 +28,7 @@ public class ElementViewHolder extends RecyclerView.ViewHolder {
     public final ImageView editPlaylistIcon;
     public final TextureView videoView;
     public final RelativeLayout listItemContainer;
+    public final ProgressBar progressBar;
 
     public ElementViewHolder(View itemView) {
         super(itemView);
@@ -46,6 +48,8 @@ public class ElementViewHolder extends RecyclerView.ViewHolder {
         listItemContainer = (RelativeLayout) itemView.findViewById(R.id.list_item_container);
         //Added by Rahul
         downloadIcon = (ImageView) itemView.findViewById(R.id.download_icon);
+
+        progressBar = (ProgressBar) itemView.findViewById(R.id.progressBar);
     }
 
 }

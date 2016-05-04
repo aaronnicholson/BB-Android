@@ -124,7 +124,7 @@
             android:layout_margin="7dp"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            >
+            android:id="@+id/linearLayout">
             <TextView
                 android:id="@+id/bump_left"
                 android:layout_width="wrap_content"
@@ -202,8 +202,19 @@
             android:visibility="invisible"/>
 
 
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:visibility="gone"
+            />
+
 
     </RelativeLayout>
+
+
 
     <VideoView
         android:id="@+id/videoView1"
