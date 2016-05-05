@@ -141,7 +141,7 @@ public class LoginSignUpActivity extends AppCompatActivity {
                     } else if (result.getString("res").equalsIgnoreCase("unsuccessful") ||
                             result.getString("msg").equalsIgnoreCase("This email address is already registered. Please tap Log In.")) {
 // The password is incorrect
-                        showDialog("Incorrect Password");
+                        showDialog("The login is incorrect");
 
                     } else {
                         showDialog("Something went wrong!");

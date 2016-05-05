@@ -297,10 +297,10 @@ public class PurchasedAdapter extends RecyclerView.Adapter<ElementViewHolder> {
                 playOrOpen(position, listItem, thisViewHolder);
                 //if it has not been purchased already
             } else {
-                listItem.setIsPurchased(true);
-                setLookToPurchased(thisViewHolder);
+               // listItem.setIsPurchased(true);
+               // setLookToPurchased(thisViewHolder);
                 try {
-                    mainActivity.addToPurchased(listItem.getRawJSON());
+                    mainActivity.addToPurchased(listItem.getRawJSON(), listItem, thisViewHolder);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

@@ -19,6 +19,7 @@ import com.thecodebuilders.babysbrilliant.R;
 import com.thecodebuilders.model.Playlist;
 import com.thecodebuilders.network.VolleySingleton;
 import com.thecodebuilders.utility.PreferenceStorage;
+import com.thecodebuilders.utility.Utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -211,6 +212,8 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
         } else {
             setLookToNotPlaylistItem(viewHolder);
         }
+        if(listItem.isPurchased())
+            setFileDownloadedListItem(viewHolder, listItem);
 
         CommonAdapterUtility.setThumbnailImage(listItem,viewHolder.thumbnailImage);
 
@@ -240,12 +243,8 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
 
         if (listItem.isPurchasable() && listItem.isPurchased()) {
             String videoURL = listItem.getMediaFile();
-            String fileLocation = appContext.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) +  "/" + videoURL;
-            File file = new File(fileLocation);
-            Log.d(LOGVAR, "FILE location: " + fileLocation);
-            int fileLength = PreferenceStorage.returnFileLength(mainActivity, listItem.getMediaFile());
-            Log.d(LOGVAR,"FileLength:"+fileLength+" == "+file.length());
-            if(file.exists() && (file.length() == fileLength)) {
+            String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) +  "/" + videoURL;
+            if(Utils.checkFileExist(mainActivity, fileLocation, videoURL)) {
                 Log.d(LOGVAR, "FILE EXISTS");
                 mainActivity.playVideo(fileLocation);
             //otherwise, go get it
@@ -257,10 +256,10 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
 
         } else {
             //TODO: do actual purchase round trip here
-            listItem.setIsPurchased(true);
-            setLookToPurchased(thisViewHolder);
+           // listItem.setIsPurchased(true);
+          //  setLookToPurchased(thisViewHolder);
             try {
-                mainActivity.addToPurchased(listItem.getRawJSON());
+                mainActivity.addToPurchased(listItem.getRawJSON(), listItem, thisViewHolder);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -290,6 +289,14 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
 //        viewHolder.priceText.setVisibility(View.INVISIBLE);
         viewHolder.playlistIcon.setColorFilter(Color.YELLOW);
     }
+    private void setFileDownloadedListItem(ElementViewHolder viewHolder, ListItem listItem) {
+        String videoURL = listItem.getMediaFile();
+        String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) +  "/" + videoURL;
+        if(Utils.checkFileExist(mainActivity, fileLocation, videoURL))
+             viewHolder.downloadIcon.setVisibility(View.GONE);
+        else
+            viewHolder.downloadIcon.setVisibility(View.VISIBLE);
+    }
 
     private void setLookToNotPlaylistItem(ElementViewHolder viewHolder) {
 //        viewHolder.priceText.setVisibility(View.INVISIBLE);
@@ -302,7 +309,6 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
 
         View rowView = LayoutInflater.from(viewGroup.getContext())
                 .inflate(R.layout.list_item_layout, viewGroup, false);
-
         return new ElementViewHolder(rowView);
     }
 
@@ -311,7 +317,6 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
     public void onBindViewHolder(ElementViewHolder viewHolder, final int position) {
 
         final ListItem rowData = elements.get(position);
-
         configureListItemLook(viewHolder, rowData);
 
         configureListItemListeners(viewHolder, position);

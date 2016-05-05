@@ -2,7 +2,13 @@ package com.thecodebuilders.utility;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.os.Environment;
 import android.util.DisplayMetrics;
+import android.util.Log;
+
+import com.thecodebuilders.babysbrilliant.ListItem;
+
+import java.io.File;
 
 /**
  * Created by aaronnicholson on 8/27/15.
@@ -34,6 +40,25 @@ public class Utils {
         DisplayMetrics metrics = resources.getDisplayMetrics();
         float dp = px / (metrics.densityDpi / 160f);
         return dp;
+    }
+
+    /**
+     * This method check the downloaded file is present in the device and also check
+     * its fully downloaded or not
+     * @param context context to call the file location method
+     * @param fileLocation file location of specific media file
+     * @param videoUrl video name of specific media
+     * @return  return true if file is present.
+     */
+    public static boolean checkFileExist(Context context, String fileLocation, String videoUrl){
+        File file = new File(fileLocation);
+        Log.d("File", "FILE location: " + fileLocation);
+        int fileLength = PreferenceStorage.returnFileLength(context, videoUrl);
+        Log.d("File","FileLength:"+fileLength+" == "+file.length());
+        if(file.exists() && (file.length() == fileLength))
+            return true;
+        else
+            return false;
     }
 
 

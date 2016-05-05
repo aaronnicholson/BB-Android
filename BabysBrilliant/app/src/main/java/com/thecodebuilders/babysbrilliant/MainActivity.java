@@ -215,11 +215,9 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     private BroadcastReceiver onNotificationClickReceiver;
     private boolean broadcastReceiverRegistered;
 
-    private static long downloadID;
-
-    private boolean isDownloading = true;
-
     private Animation animationBlink;
+    private ListItem listItem;
+    private ElementViewHolder viewHolder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -407,7 +405,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         request.setDestinationInExternalFilesDir(appContext, Environment.DIRECTORY_DOWNLOADS, nameOfFile);
 
         DownloadManager downloadManager = (DownloadManager) appContext.getSystemService(appContext.DOWNLOAD_SERVICE);
-        downloadID = downloadManager.enqueue(request);
+        final long downloadID = downloadManager.enqueue(request);
         viewHolder.progressBar.setVisibility(View.VISIBLE);
         viewHolder.thumbnailImage.setClickable(false);
         viewHolder.downloadIcon.setVisibility(View.GONE);
@@ -433,41 +431,10 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                         viewHolder.progressBar.setVisibility(View.GONE);
                         viewHolder.thumbnailImage.setClickable(true);
                     }
-
-                /*try {
-                    Thread.sleep(1000);
-                    while (isDownloading) {
-                        DownloadManager downloadManager = (DownloadManager) appContext.getSystemService(appContext.DOWNLOAD_SERVICE);
-                        DownloadManager.Query query = new DownloadManager.Query();
-                        query.setFilterById(downloadID);
-                        Cursor cursor = downloadManager.query(query);
-
-                        if (cursor.moveToFirst()) {
-                            int columnIndex = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS);
-                            int status = cursor.getInt(columnIndex);
-                            int columnReason = cursor.getColumnIndex(DownloadManager.COLUMN_REASON);
-                            int reason = cursor.getInt(columnReason);
-                            Log.d(LOGVAR, "..." + status);
-                            int bytes_downloaded = cursor.getInt(cursor
-                                    .getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
-                            int bytes_total = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
-                            final int dl_progress = (int) ((bytes_downloaded * 100l) / bytes_total);
-                            Log.d(LOGVAR, "Download:" + dl_progress +":"+bytes_downloaded+" Total Length:"+bytes_total);
-                            PreferenceStorage.saveFileLength(MainActivity.this, videoName, bytes_total);
-                            if(status == DownloadManager.STATUS_SUCCESSFUL){
-                                viewHolder.downloadProgressShow.setVisibility(View.GONE);
-                                isDownloading = false;
-                            }
-                            else if(status == DownloadManager.STATUS_PENDING){
-                                isDownloading = true;
-                            }
-
-                        }
+                    else if(cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_RUNNING){
+                        viewHolder.progressBar.setVisibility(View.VISIBLE);
                     }
-                }
-                catch (Exception e){
-                    e.printStackTrace();
-                }*/
+
                 }
             }
         }).start();
@@ -1070,11 +1037,13 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     }
 
-    public void addToPurchased(JSONObject productJSON) throws JSONException {
+    public void addToPurchased(JSONObject productJSON, ListItem listItem, ElementViewHolder viewHolder) throws JSONException {
         //TODO: run through actual app store purchase routine
         //TODO: check for duplicate purchase
         //TODO: save to user database
         this.productJSON = productJSON;
+        this.listItem = listItem;
+        this.viewHolder = viewHolder;
         Intent purchase = new Intent(MainActivity.this, ParentalChallengeScreen.class);
         purchase.putExtra("Key", "Purchase");
         startActivityForResult(purchase, 1);
@@ -1088,15 +1057,31 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                                           Purchase purchase) {
             if (result.isFailure()) {
                 // Handle error
+                Log.d(LOGVAR, "Purcahse Failed");
                 return;
             } else if (purchase.getSku().equals(Constant.TEST_ITEM_SKU)) {
-                Log.d(LOGVAR,"Purchase:"+purchase.getSku());
+                Log.d(LOGVAR, "Purchase:" + purchase.getSku());
+                purchaseDone();
                 consumeItem();
-                // buyButton.setEnabled(false);
             }
 
         }
     };
+
+    private void purchaseDone(){
+        listItem.setIsPurchased(true);
+        viewHolder.priceText.setVisibility(View.INVISIBLE);
+        viewHolder.favoritesIcon.setVisibility(View.VISIBLE);
+        viewHolder.playlistIcon.setVisibility(View.VISIBLE);
+        String videoURL = listItem.getMediaFile();
+        String fileLocation = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) +  "/" + videoURL;
+        if(Utils.checkFileExist(this, fileLocation, videoURL))
+            viewHolder.downloadIcon.setVisibility(View.GONE);
+        else
+            viewHolder.downloadIcon.setVisibility(View.VISIBLE);
+        Log.d(LOGVAR, "ProductJson:"+productJSON);
+
+    }
 
     public void consumeItem() {
         mHelper.queryInventoryAsync(mReceivedInventoryListener);
