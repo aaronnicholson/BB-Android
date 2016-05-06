@@ -1,15 +1,20 @@
 package com.thecodebuilders.adapter;
 
 import android.app.AlertDialog;
+import android.app.DownloadManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.database.Cursor;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Environment;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.MimeTypeMap;
+import android.webkit.URLUtil;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.thecodebuilders.application.ApplicationContextProvider;
@@ -48,7 +53,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
         assetsList = listData;
         this.mainActivity = mainActivity;
         parseListItems(assetsList.size());
-
+        //checkDownloadingProgress(assetsList.size());
         Log.d(LOGVAR, "VIDEO assets: " + assetsList);
 
     }
@@ -122,7 +127,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
                 mediaFile = itemJSON.getString("file");
 
                 ListItem listItem = new ListItem(itemJSON, name, playInline, imageResource, mediaFile, price, category, isSection,
-                        isPurchased, isPlaylistItem, isPlaylist, isFavorite, appContext);
+                        isPurchased, isPlaylistItem, isPlaylist, isFavorite, appContext, false, MainActivity.DOWNLOAD_ID);
 
                 elements.add(listItem);//TODO: make image dynamic
             } catch (Throwable t) {
@@ -137,7 +142,9 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
         viewHolder.thumbnailImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                thumbnailClicked(position, thisViewHolder);
+                if(!elements.get(position).getIsDownloading()) {
+                    thumbnailClicked(position, thisViewHolder);
+                }
             }
         });
 
@@ -158,7 +165,10 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
             @Override
             public void onClick(View v) {
                 ListItem listItem = elements.get(position);
-                mainActivity.downloadVideo(listItem.getMediaFile(), viewHolder);
+                mainActivity.downloadVideo(viewHolder, listItem);
+                viewHolder.progressBar.setVisibility(View.VISIBLE);
+                viewHolder.thumbnailImage.setClickable(false);
+                viewHolder.downloadIcon.setVisibility(View.GONE);
             }
         });
 
@@ -215,9 +225,12 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
         if(listItem.isPurchased())
             setFileDownloadedListItem(viewHolder, listItem);
 
-        CommonAdapterUtility.setThumbnailImage(listItem,viewHolder.thumbnailImage);
+        setFileDownloadingListItem(viewHolder, listItem);
+
+        CommonAdapterUtility.setThumbnailImage(listItem, viewHolder.thumbnailImage);
 
         viewHolder.itemView.setTag(listItem);
+        viewHolder.progressBar.setTag(listItem);
     }
 
     private void favoritesClicked(int position, ElementViewHolder thisViewHolder) {
@@ -251,7 +264,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
             } else {
                 Log.d(LOGVAR, "FILE DOES NOT EXIST");
                 //TODO: Stop multiple downloads of the same file
-                alertForDownload(listItem.getMediaFile(), thisViewHolder);
+                alertForDownload(thisViewHolder, listItem);
             }
 
         } else {
@@ -298,6 +311,20 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
             viewHolder.downloadIcon.setVisibility(View.VISIBLE);
     }
 
+    private void setFileDownloadingListItem(ElementViewHolder viewHolder, ListItem listItem) {
+        if(listItem.getIsDownloading()) {
+            viewHolder.progressBar.setVisibility(View.VISIBLE);
+            viewHolder.thumbnailImage.setClickable(false);
+            viewHolder.downloadIcon.setVisibility(View.GONE);
+
+        }
+        else {
+            viewHolder.progressBar.setVisibility(View.GONE);
+            viewHolder.thumbnailImage.setClickable(true);
+        }
+
+    }
+
     private void setLookToNotPlaylistItem(ElementViewHolder viewHolder) {
 //        viewHolder.priceText.setVisibility(View.INVISIBLE);
         viewHolder.playlistIcon.setColorFilter(Color.WHITE);
@@ -329,19 +356,24 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
     }
 
 
-    private void alertForDownload(final String videoName, final ElementViewHolder viewHolder){
+    private void alertForDownload(final ElementViewHolder viewHolder, final ListItem listItem){
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(mainActivity);
         alertDialog.setTitle(mainActivity.getResources().getString(R.string.alert_download_title));
         alertDialog.setMessage(mainActivity.getResources().getString(R.string.alert_download_summary));
         alertDialog.setPositiveButton(mainActivity.getResources().getString(R.string.download), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                mainActivity.downloadVideo(videoName, viewHolder);
+                viewHolder.progressBar.setVisibility(View.VISIBLE);
+                viewHolder.thumbnailImage.setClickable(false);
+                viewHolder.downloadIcon.setVisibility(View.GONE);
+                mainActivity.downloadVideo(viewHolder, listItem);
             }
         });
         alertDialog.setNegativeButton(mainActivity.getResources().getString(R.string.cancel), null);
         AlertDialog builder = alertDialog.create();
         builder.show();
     }
+
+
 
 }

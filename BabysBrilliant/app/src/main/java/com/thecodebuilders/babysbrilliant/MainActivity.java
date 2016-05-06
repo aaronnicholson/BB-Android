@@ -112,6 +112,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     public static final String AUDIO_BOOKS = "audiobooks";
     public static final String SOUND_BOARDS = "soundboard";
     public static final String HEARING_IMPAIRED = "hearing impaired";
+    public static final Long DOWNLOAD_ID = -1L;
     String SELECT_FLAG;
 
     private static String LOGVAR = "MainActivity";
@@ -391,9 +392,9 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     }
 
-    public  void downloadVideo(final String videoName, final ElementViewHolder viewHolder) {
+    public  void downloadVideo(final ElementViewHolder viewHolder, final ListItem listItem) {
         String mUrl;
-        mUrl = appContext.getResources().getString(R.string.media_url) + videoName;
+        mUrl = appContext.getResources().getString(R.string.media_url) + listItem.getMediaFile();
         //mUrl = "http://goo.gl/Mfyya";
 
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(mUrl));
@@ -406,9 +407,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         DownloadManager downloadManager = (DownloadManager) appContext.getSystemService(appContext.DOWNLOAD_SERVICE);
         final long downloadID = downloadManager.enqueue(request);
-        viewHolder.progressBar.setVisibility(View.VISIBLE);
-        viewHolder.thumbnailImage.setClickable(false);
-        viewHolder.downloadIcon.setVisibility(View.GONE);
+        listItem.setDownloadId(downloadID);
+        listItem.setIsDownloading(true);
        // viewHolder.downloadProgressShow.startAnimation(animationBlink);
 
         new Thread(new Runnable() {
@@ -424,15 +424,20 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                     final int bytesDownloaded = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
                     int bytesTotal = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
                     final int dl_progress = (int) ((bytesDownloaded * 100l) / bytesTotal);
-                    Log.d(LOGVAR, "Download:" + dl_progress + ":" + bytesDownloaded + " Total Length:" + bytesTotal);
-                    PreferenceStorage.saveFileLength(MainActivity.this, videoName, bytesTotal);
+                    Log.d(LOGVAR, "Download:" + dl_progress + ":" + bytesDownloaded + " Total Length:" + bytesTotal +":"+downloadID);
+                    PreferenceStorage.saveFileLength(MainActivity.this, listItem.getMediaFile(), bytesTotal);
                     if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_SUCCESSFUL) {
                         downloading = false;
-                        viewHolder.progressBar.setVisibility(View.GONE);
-                        viewHolder.thumbnailImage.setClickable(true);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                viewHolder.thumbnailImage.setClickable(true);
+                            }
+                        });
+                        listItem.setIsDownloading(false);
                     }
                     else if(cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_RUNNING){
-                        viewHolder.progressBar.setVisibility(View.VISIBLE);
+                        listItem.setIsDownloading(true);
                     }
 
                 }
@@ -1061,6 +1066,13 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                 return;
             } else if (purchase.getSku().equals(Constant.TEST_ITEM_SKU)) {
                 Log.d(LOGVAR, "Purchase:" + purchase.getSku());
+               /* SELECT_FLAG = "purchase_video";
+                try {
+                    AsynEditPassword(productJSON.getString("SKU"));
+                }
+                catch (JSONException e){
+                    e.printStackTrace();
+                }*/
                 purchaseDone();
                 consumeItem();
             }
@@ -2033,6 +2045,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                         pDialog.hide();
                         try {
                             JSONObject result = new JSONObject(arg0);
+                            Log.d(LOGVAR, "result:"+result);
                             SharedPreferences.Editor editor = pref.edit();
                             if (result.getString("res").equalsIgnoreCase("successful")) {
                                 if (SELECT_FLAG.equalsIgnoreCase("new_emailaddress")) {
@@ -2117,7 +2130,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
 
                 }
-
+                Log.d(LOGVAR, "Params:"+value+" :"+params.toString());
 
                 return params;
             }

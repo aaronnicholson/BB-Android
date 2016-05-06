@@ -26,8 +26,12 @@ public class ListItem extends View {
     private Boolean playInline;
     private Boolean isPurchasable = false;
     private JSONObject rawJSON;
+    private Boolean isDownloading;
+    private Long downloadId;
 
-    public ListItem(JSONObject rawJSON, String title, Boolean playInline, String imageResource, String mediaFile, String price, String category, Boolean isSection, Boolean isPurchased, Boolean isPlaylistItem, Boolean isPlaylist, Boolean isFavorite, Context context) {
+    public ListItem(JSONObject rawJSON, String title, Boolean playInline, String imageResource, String mediaFile, String price, String category,
+                    Boolean isSection, Boolean isPurchased, Boolean isPlaylistItem, Boolean isPlaylist,
+                    Boolean isFavorite, Context context, Boolean isDownloading, Long downloadId ) {
         super(context);
         this.rawJSON = rawJSON;
         this.title = title;
@@ -41,6 +45,8 @@ public class ListItem extends View {
         this.isFavorite = isFavorite;
         this.isPlaylistItem = isPlaylistItem;
         this.isPlaylist = isPlaylist;
+        this.isDownloading = isDownloading;
+        this.downloadId = downloadId;
 
         setIsPurchasable();
 
@@ -104,6 +110,22 @@ public class ListItem extends View {
 
     public Boolean isPurchasable() {
         return isPurchasable;
+    }
+
+    public Boolean getIsDownloading() {
+        return isDownloading;
+    }
+
+    public void setIsDownloading(Boolean isDownloading) {
+        this.isDownloading = isDownloading;
+    }
+
+    public Long getDownloadId() {
+        return downloadId;
+    }
+
+    public void setDownloadId(Long downloadId) {
+        this.downloadId = downloadId;
     }
 
     private void setIsPurchasable() {

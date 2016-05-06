@@ -76,7 +76,8 @@ public class PlaylistItemAdapter extends RecyclerView.Adapter<ElementViewHolder>
                     mediaFile = itemJSON.getString("preview");
                 }
 
-                ListItem listItem = new ListItem(itemJSON, name, playInline, imageResource, mediaFile, price, category, isSection, isPurchased, isPlaylistItem, isPlaylist, isFavorite, appContext);
+                ListItem listItem = new ListItem(itemJSON, name, playInline, imageResource, mediaFile, price, category, isSection, isPurchased,
+                        isPlaylistItem, isPlaylist, isFavorite, appContext, false, MainActivity.DOWNLOAD_ID);
 
                 elements.add(listItem);//TODO: make image dynamic
             } catch (Throwable t) {

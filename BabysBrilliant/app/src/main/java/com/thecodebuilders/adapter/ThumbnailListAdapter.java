@@ -163,7 +163,8 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
 //                    isPlaylist = true;
 //                }
 
-                ListItem listItem = new ListItem(rawJSON, name, playInline, imageResource, mediaFile, price, category, isSubcategory, isPurchased, isPlaylistItem, isPlaylist, isFavorite, appContext);
+                ListItem listItem = new ListItem(rawJSON, name, playInline, imageResource, mediaFile, price, category, isSubcategory,
+                        isPurchased, isPlaylistItem, isPlaylist, isFavorite, appContext, false, MainActivity.DOWNLOAD_ID);
 
                 elements.add(listItem);//TODO: make image dynamic
             } catch (Throwable t) {
