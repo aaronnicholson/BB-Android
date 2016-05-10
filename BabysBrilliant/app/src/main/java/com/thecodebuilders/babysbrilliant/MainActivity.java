@@ -97,6 +97,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements PlaylistChooser.PlaylistChooserListener, Animation.AnimationListener {
@@ -207,6 +208,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             back_btn_checkNewContent;
 
 
+
     private int flag = 0;
 
     private static VolleySingleton volleySingleton = VolleySingleton.getInstance();
@@ -219,6 +221,9 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     private Animation animationBlink;
     private ListItem listItem;
     private ElementViewHolder viewHolder;
+
+    private VideosAdapter videoAdapter;
+    private PurchasedAdapter purchasedAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -395,7 +400,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     public  void downloadVideo(final ElementViewHolder viewHolder, final ListItem listItem) {
         String mUrl;
         mUrl = appContext.getResources().getString(R.string.media_url) + listItem.getMediaFile();
-        //mUrl = "http://goo.gl/Mfyya";
+       // mUrl = "http://goo.gl/Mfyya";
 
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(mUrl));
      //   request.setTitle("File Download");
@@ -424,7 +429,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                     final int bytesDownloaded = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
                     int bytesTotal = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
                     final int dl_progress = (int) ((bytesDownloaded * 100l) / bytesTotal);
-                    Log.d(LOGVAR, "Download:" + dl_progress + ":" + bytesDownloaded + " Total Length:" + bytesTotal +":"+downloadID);
+                    Log.d(LOGVAR, "Download:" + dl_progress + ":" + bytesDownloaded + " Total Length:" + bytesTotal +":"+
+                            cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)));
                     PreferenceStorage.saveFileLength(MainActivity.this, listItem.getMediaFile(), bytesTotal);
                     if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_SUCCESSFUL) {
                         downloading = false;
@@ -432,6 +438,11 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                             @Override
                             public void run() {
                                 viewHolder.thumbnailImage.setClickable(true);
+                                if(videoAdapter != null)
+                                    videoAdapter.notifyDataSetChanged();
+                                else if(purchasedAdapter != null)
+                                    purchasedAdapter.notifyDataSetChanged();
+
                             }
                         });
                         listItem.setIsDownloading(false);
@@ -999,6 +1010,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     //overloaded version for passing ArrayLists directly
     public void configureThumbnailList(ArrayList listData, String adapterType) {
+
         // set the thumbnail list adapter so it will display the items
         // TODO: I could change what kind of adapter is used depending on the type of list we want,
         // such as a list of movies vs. a list of playlists.
@@ -1016,8 +1028,9 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             SectionAdapter adapter = new SectionAdapter(listData, this);
             thumbnailList.setAdapter(adapter);
         } else if (adapterType == "videos") {
-            VideosAdapter adapter = new VideosAdapter(listData, this);
-            thumbnailList.setAdapter(adapter);
+            videoAdapter = new VideosAdapter(listData, this);
+            thumbnailList.setAdapter(videoAdapter);
+
         } else if (adapterType == "playlists") {
             PlaylistAdapter adapter = new PlaylistAdapter(listData, this);
             thumbnailList.setAdapter(adapter);
@@ -1025,8 +1038,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             PlaylistItemAdapter adapter = new PlaylistItemAdapter(listData, this);
             thumbnailList.setAdapter(adapter);
         } else if (adapterType == "purchased") {
-            PurchasedAdapter adapter = new PurchasedAdapter(listData, this);
-            thumbnailList.setAdapter(adapter);
+            purchasedAdapter = new PurchasedAdapter(listData, this);
+            thumbnailList.setAdapter(purchasedAdapter);
         }
        /* else if (adapterType == "favorites") {
             FavoritesAdapter adapter = new FavoritesAdapter(listData, this);
@@ -1066,13 +1079,13 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                 return;
             } else if (purchase.getSku().equals(Constant.TEST_ITEM_SKU)) {
                 Log.d(LOGVAR, "Purchase:" + purchase.getSku());
-               /* SELECT_FLAG = "purchase_video";
+                SELECT_FLAG = "purchase_video";
                 try {
                     AsynEditPassword(productJSON.getString("SKU"));
                 }
                 catch (JSONException e){
                     e.printStackTrace();
-                }*/
+                }
                 purchaseDone();
                 consumeItem();
             }
@@ -1282,6 +1295,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             Log.e("Error", e.getMessage());
             e.printStackTrace();
         }
+
         //* videoView.requestFocus();
         videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
@@ -1301,6 +1315,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                             }
                         },
                         500);
+
                 mediaPlayer = mp;
                 showControls();
             }

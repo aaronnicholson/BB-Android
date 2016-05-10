@@ -46,6 +46,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
     private VolleySingleton volleySingleton;
     private ImageLoader imageLoader;
     public String mediaURL = appContext.getString(R.string.media_url);
+    public static String priceValue = "0.00";
 
     public VideosAdapter(ArrayList listData, MainActivity mainActivity) {
         volleySingleton = VolleySingleton.getInstance();
@@ -82,6 +83,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
                 JSONObject itemJSON = assetsList.get(i);
 
                 name = itemJSON.getString("title");
+                price = "$"+itemJSON.getString("price");
                 for (int purchasedIndex = 0; purchasedIndex < mainActivity.purchasedItems.length(); purchasedIndex++) {
                     //if it has no SKU, skip it
                     if (!itemJSON.isNull("SKU")) {
@@ -131,6 +133,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
 
                 elements.add(listItem);//TODO: make image dynamic
             } catch (Throwable t) {
+                t.printStackTrace();
                 //Log.e(LOGVAR, "JSON Error " + t.getMessage() + assetsList);
             }
         }
@@ -206,8 +209,8 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
         viewHolder.titleText.setTextSize(13);
 
 
-        //if it has been purchased already
-        if (listItem.isPurchased()) {
+        //if it has been purchased already or free
+        if (listItem.isPurchased() || listItem.getPrice().equalsIgnoreCase(priceValue)) {
             setLookToPurchased(viewHolder);
         }
 
@@ -254,7 +257,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
     private void thumbnailClicked(int position, ElementViewHolder thisViewHolder) {
         ListItem listItem = elements.get(position);
 
-        if (listItem.isPurchasable() && listItem.isPurchased()) {
+        if ((listItem.isPurchasable() && listItem.isPurchased()) || listItem.getPrice().equalsIgnoreCase(priceValue)) {
             String videoURL = listItem.getMediaFile();
             String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) +  "/" + videoURL;
             if(Utils.checkFileExist(mainActivity, fileLocation, videoURL)) {
@@ -312,6 +315,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
     }
 
     private void setFileDownloadingListItem(ElementViewHolder viewHolder, ListItem listItem) {
+        Log.d(LOGVAR,"setFileDownloadingListItem"+listItem.getIsDownloading()+":"+listItem.getMediaFile());
         if(listItem.getIsDownloading()) {
             viewHolder.progressBar.setVisibility(View.VISIBLE);
             viewHolder.thumbnailImage.setClickable(false);
