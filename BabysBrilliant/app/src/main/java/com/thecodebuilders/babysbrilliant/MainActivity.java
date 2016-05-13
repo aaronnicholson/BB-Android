@@ -36,6 +36,7 @@ import android.view.animation.AnimationUtils;
 import android.webkit.MimeTypeMap;
 import android.webkit.URLUtil;
 import android.webkit.WebView;
+import android.widget.AdapterView;
 import android.widget.CheckedTextView;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -152,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     public static String mediaURL = appContext.getString(R.string.media_url);
     private MediaPlayer mediaPlayer;
 
-    public static ArrayList<JSONObject> favoriteItems = new ArrayList<>();
+    public static ArrayList<JSONObject>  favoriteItems = new ArrayList<JSONObject>();
     //TODO: fetch and populated pre-purchased items from user db
     public static JSONArray purchasedItems = new JSONArray();
     public static JSONArray downloadItems = new JSONArray();
@@ -166,8 +167,6 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     private static TextView videoCloseButton;
     private static TextView videoFFButton;
     private static TextView videoRewButton;
-
-    private String fromClick;
 
     ImageView homeButton;
     ImageView playListButton;
@@ -202,7 +201,6 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     IabHelper mHelper;
     String ITEM_SKU;
     JSONObject productJSON;
-    InputStreamVolleyRequest request;
     private TextView back_btn_loopPlaylist, back_btn_ourStory, back_btn_socialMedia, back_btn_downloadPurchasecontent,
             back_btn_privacyPolicy, back_btn_purchaseHistory, back_btn_emilPasswdUpdate, back_btn_emilPasswdUpdate2,
             back_btn_checkNewContent;
@@ -210,14 +208,6 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
 
     private int flag = 0;
-
-    private static VolleySingleton volleySingleton = VolleySingleton.getInstance();
-    private static ImageLoader imageLoader = volleySingleton.getImageLoader();
-
-    private BroadcastReceiver onDownloadFinishReceiver;
-    private BroadcastReceiver onNotificationClickReceiver;
-    private boolean broadcastReceiverRegistered;
-
     private Animation animationBlink;
     private ListItem listItem;
     private ElementViewHolder viewHolder;
@@ -235,12 +225,10 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         assetsURL = Constant.URL + "a=pDBstandard";
         customizeDialog = new CustomizeDialog(MainActivity.this);
         pref = getApplicationContext().getSharedPreferences("BabyBrilliantPref", MODE_PRIVATE);
-
-        registerBroadcastReceivers();
-
         //do not show the action bar
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
+
 
         mHelper = new IabHelper(getApplicationContext(), Constant.base64EncodedPublicKey);
         mHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
@@ -280,6 +268,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 //        purchaseHistory();
         downloadPurchaseContent();
 //        checkForNewContent();
+
 
 
     }
@@ -353,44 +342,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             public void onClick(View v) {
 
                 includedDownloadPuchaseContentLayout.setVisibility(View.VISIBLE);
-                if (downloadItems.length() == 0 && purchasedItems.length() == 0) {
-
-                    Toast.makeText(getApplicationContext(), "dfsf", Toast.LENGTH_SHORT).show();
-                } else {
-
-                    ArrayList<HashMap<String, String>> arraylist = new ArrayList<HashMap<String, String>>();
-
-
-                    for (int i = 0; i < downloadItems.length(); i++) {
-                        HashMap<String, String> hash = new HashMap<String, String>();
-                        JSONObject download_json = null;
-                        JSONObject puchased_json1 = null;
-
-
-                        try {
-                            JSONArray a = purchasedItems;
-                            JSONArray b = downloadItems;
-                            puchased_json1 = purchasedItems.getJSONObject(i);
-
-                            download_json = downloadItems.getJSONObject(i);
-                            if (puchased_json1.getString("title").equalsIgnoreCase(download_json.getString("title"))) {
-                                hash.put("title", download_json.getString("title"));
-                                arraylist.add(hash);
-                            }
-
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
-                    }
-
-                    ListView lv = (ListView) includedDownloadPuchaseContentLayout.findViewById(R.id.listView);
-                    DownloadPurchaseContentAdapter pHA = new DownloadPurchaseContentAdapter(MainActivity.this, arraylist);
-                    lv.setAdapter(pHA);
-
-
-                }
+                getRemoteJSON("PurchaseContent", Constant.URL + "a=pV&u=" + pref.getString("user_id", ""));
 
             }
         });
@@ -458,110 +410,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     }
 
-    private void registerBroadcastReceivers() {
 
-        broadcastReceiverRegistered = true;
-
-        /*registerReceiver(onDownloadFinishReceiver = new BroadcastReceiver() {
-
-            @Override
-            public void onReceive(Context context, Intent i) {
-                Log.d(LOGVAR, "DOWNLOAD FINISHED intent received");
-                DownloadManager downloadManager = (DownloadManager) appContext.getSystemService(appContext.DOWNLOAD_SERVICE);
-                Log.d(LOGVAR, "URI:" + downloadManager.getUriForDownloadedFile(downloadID));
-            }
-        }, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));*/
-
-
-        /*registerReceiver(onNotificationClickReceiver = new BroadcastReceiver() {
-
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                Log.d(LOGVAR, "NOTIFICATION CLICKED intent received");
-            }
-        }, new IntentFilter(DownloadManager.ACTION_NOTIFICATION_CLICKED));*/
-
-    }
-
-//    public void downloadVideo(final String videoName) {
-//        String mUrl;
-//        mUrl = "https://s3-us-west-1.amazonaws.com/babysbrilliant-media/" + videoName;
-//
-//        Log.d(LOGVAR, mUrl);
-
-//        request = new InputStreamVolleyRequest(Request.Method.GET, mUrl, new Response.Listener<byte[]>() {
-//
-//            @Override
-//            public void onResponse(byte[] response) {
-//                Log.d(LOGVAR, "DOWNLOAD GOT RESPONSE");
-//
-////                HashMap<String, Object> map = new HashMap<String, Object>();
-////                try {
-////                    if (response != null) {
-////
-////                        File myDirectory = new File(
-////                                Environment.getExternalStorageDirectory(), "BABYBRILLIANT");
-////
-////                        Log.d(LOGVAR, "Dir exists?: " + myDirectory.exists());
-//////                        if (!myDirectory.exists()) {
-////                        if (!myDirectory.mkdirs()) {
-////                            Log.d(LOGVAR, "dir not made");
-////                        } else { Log.d(LOGVAR, "dir made"); }
-//
-//                        //Read file name from headers
-//
-//
-////                        try {
-////                            long lengthOfFile = response.length;
-////
-////                            //covert reponse to input stream
-////                            InputStream input = new ByteArrayInputStream(response);
-////
-////                            File file = new File(myDirectory, videoName + ".mp4");
-////                            //map.put("resume_path", file.toString());
-////                            OutputStream output = new FileOutputStream(file);
-////                            byte data[] = new byte[1024];
-////
-////                            long total = 0;
-////
-////                            int count;
-////                            while ((count = input.read(data)) != -1) {
-////                                total += count;
-////                                output.write(data, 0, count);
-////
-////                            }
-////
-////                            output.flush();
-////
-////                            output.close();
-////                            input.close();
-////                        } catch (IOException e) {
-////                            e.printStackTrace();
-////
-////                        }
-//                    }
-////                } catch (Exception e) {
-////                    // TODO Auto-generated catch block
-////                    Log.d("KEY_ERROR", "UNABLE TO DOWNLOAD FILE");
-////                    e.printStackTrace();
-////                }
-//
-////            }
-//        }, new Response.ErrorListener() {
-//
-//            @Override
-//            public void onErrorResponse(VolleyError volleyError) {
-//
-//                Log.d(LOGVAR, "UNABLE TO DOWNLOAD FILE");
-//            }
-//        }, null);
-//        RequestQueue mRequestQueue = Volley.newRequestQueue(getApplicationContext(),
-//                new HurlStack());
-//        mRequestQueue.add(request);
-
-
-//        queue.add(request);
-//    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -659,7 +508,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    mHelper.launchPurchaseFlow(MainActivity.this, Constant.TEST_ITEM_SKU, 10001,
+                    Log.e(LOGVAR,"ITEM_SKU:"+ITEM_SKU);
+                    mHelper.launchPurchaseFlow(MainActivity.this, ITEM_SKU, 10001,
                             mPurchaseFinishedListener, "mypurchasetoken");
                     purchasedItems.put(productJSON);
                 } else {
@@ -689,30 +539,10 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             //  }
 
         }
-    }//onActivityResult
+    }
 
     private void setUpListeners() {
 
-
-     /*   includedSettingLayout_frame.setOnClickListener(new View.OnClickListener() {
-
-
-            @Override
-            public void onClick(View v) {
-
-
-                includedSettingLayout_frame.setVisibility(View.GONE);
-                includedemailPasswordLayout.setVisibility(View.GONE);
-                includedPrivacyLayout.setVisibility(View.GONE);
-                includedSocialMediaLayout.setVisibility(View.GONE);
-                includedemailPasswordLayout2.setVisibility(View.GONE);
-                includedOurStoryLayout.setVisibility(View.GONE);
-                includedLoopPlaylistsLayout.setVisibility(View.GONE);
-                includedPurchaseHistoryLayout.setVisibility(View.GONE);
-                includedDownloadPuchaseContentLayout.setVisibility(View.GONE);
-
-            }
-        });*/
 
         homeButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -1077,7 +907,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                 // Handle error
                 Log.d(LOGVAR, "Purcahse Failed");
                 return;
-            } else if (purchase.getSku().equals(Constant.TEST_ITEM_SKU)) {
+            } else if (purchase.getSku().equals(ITEM_SKU)) {
                 Log.d(LOGVAR, "Purchase:" + purchase.getSku());
                 SELECT_FLAG = "purchase_video";
                 try {
@@ -1120,7 +950,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             if (result.isFailure()) {
                 // Handle failure
             } else {
-                mHelper.consumeAsync(inventory.getPurchase(Constant.TEST_ITEM_SKU),
+                mHelper.consumeAsync(inventory.getPurchase(ITEM_SKU),
                         mConsumeFinishedListener);
             }
         }
@@ -1148,7 +978,10 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     public static void addToFavorites(JSONObject productJSON) {
         //TODO: save to user database
+        Log.d(LOGVAR, "..." + productJSON);
         favoriteItems.add(productJSON);
+
+
     }
 
     public void removeFromFavorites(JSONObject rawJSON) {
@@ -1160,6 +993,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                 if (!rawJSON.isNull("SKU") || favoriteItems.get(favoriteIndex).isNull("SKU")) {
                     if (rawJSON.getString("SKU").equals(favoriteItems.get(favoriteIndex).getString("SKU"))) {
                         favoriteItems.remove(favoriteIndex);
+                        PreferenceStorage.removeFavourites(appContext, rawJSON.getString("SKU"));
                     }
                 }
             }
@@ -1393,7 +1227,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     //retrieve the data model from the server
     public void getRemoteJSON(final String From, String url) {
         queue = VolleySingleton.getInstance().getRequestQueue();
-        if (From.equalsIgnoreCase("Purchase") || From.equalsIgnoreCase("checkForNewContent")) {
+        if (From.equalsIgnoreCase("Purchase") || From.equalsIgnoreCase("checkForNewContent")
+                || From.equalsIgnoreCase("PurchaseContent")) {
             pDialog = new ProgressDialog(MainActivity.this);
             pDialog.setMessage("Loading...");
             pDialog.setCancelable(false);
@@ -1496,6 +1331,47 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                         purchasedItems = purchasedItems1;
                         pDialog.hide();
                         purchaseJSON(response);
+                    } else if(From.equalsIgnoreCase("PurchaseContent")) {
+                        pDialog.dismiss();
+                        JSONObject purchasedJson = null;
+                        Log.d(LOGVAR, "PurchaseContent"+ Uri.decode(response));
+                        JSONArray purchasedItems = new JSONArray(Uri.decode(response));
+                        if (/*downloadItems.length() == 0 &&*/ purchasedItems.length() == 0) {
+
+                            Toast.makeText(getApplicationContext(), "No Purchased Item", Toast.LENGTH_SHORT).show();
+                        } else {
+
+                            final ArrayList<HashMap<String, String>> arrayList = new ArrayList<HashMap<String, String>>();
+
+
+                            for (int i = 0; i < purchasedItems.length(); i++) {
+                                HashMap<String, String> hash = new HashMap<String, String>();
+
+
+                                try {
+                                 //   JSONArray a = purchasedItems;
+                                    //JSONArray b = downloadItems;
+                                   // purchasedJson = purchasedItems.getJSONObject(i);
+
+                                    purchasedJson = purchasedItems.getJSONObject(i);
+                                    if (purchasedJson.getString("title").equalsIgnoreCase(purchasedJson.getString("title"))) {
+                                        hash.put("title", purchasedJson.getString("title"));
+                                        arrayList.add(hash);
+                                    }
+
+
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
+                            }
+
+                            ListView lv = (ListView) includedDownloadPuchaseContentLayout.findViewById(R.id.listView);
+                            DownloadPurchaseContentAdapter downloadPurchaseContentAdapter = new DownloadPurchaseContentAdapter(MainActivity.this, arrayList);
+                            lv.setAdapter(downloadPurchaseContentAdapter);
+
+
+                        }
                     }
 
 

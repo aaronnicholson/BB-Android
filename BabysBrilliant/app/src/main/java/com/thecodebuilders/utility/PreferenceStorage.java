@@ -22,4 +22,24 @@ public class PreferenceStorage {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         return  preferences.getInt(key, 0);
     }
+
+    public static void  saveFavourites (Context context, String key, String value){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(key, value);
+        editor.commit();
+    }
+
+
+    public static String returnFavourites(Context context, String key){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return  preferences.getString(key, "");
+    }
+    public static void  removeFavourites (Context context, String key){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.remove(key);
+        editor.commit();
+    }
+
 }
