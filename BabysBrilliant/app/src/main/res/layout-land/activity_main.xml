@@ -160,6 +160,7 @@
         android:textAllCaps="true"
         android:textColor="@color/gray"
         android:textSize="14sp" />
+
     <TextView
         android:id="@+id/item_empty_placeholder"
         android:layout_width="wrap_content"
@@ -168,6 +169,7 @@
         android:textColor="@color/black"
         android:layout_centerInParent="true"
         android:text="@string/empty_category_msg"
+        android:paddingTop="20dp"
         android:visibility="gone"
         android:textSize="22sp" />
 

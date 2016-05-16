@@ -57,4 +57,7 @@
     <string name="alert_download_summary">Would you like to download it now?</string>
     <string name="cancel">Cancel</string>
     <string name="download">Download</string>
+    <string name="empty_category_msg">No Item Found</string>
+
+
 </resources>

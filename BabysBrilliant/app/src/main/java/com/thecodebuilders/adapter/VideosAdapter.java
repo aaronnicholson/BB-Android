@@ -210,6 +210,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
 
 
         //if it has been purchased already or free
+        Log.e(LOGVAR,"Adapter:"+listItem.isPurchased()+":"+listItem.getPrice());
         if (listItem.isPurchased() || listItem.getPrice().equalsIgnoreCase(priceValue)) {
             setLookToPurchased(viewHolder);
         }

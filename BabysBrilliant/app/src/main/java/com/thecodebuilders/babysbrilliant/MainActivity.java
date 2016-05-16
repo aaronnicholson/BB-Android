@@ -179,6 +179,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     ImageView hearingImpairedButton;
     ImageView settings;
 
+
     static TextView sectionTitle;
 
     static Handler controlsHandler = new Handler();
@@ -204,6 +205,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     private TextView back_btn_loopPlaylist, back_btn_ourStory, back_btn_socialMedia, back_btn_downloadPurchasecontent,
             back_btn_privacyPolicy, back_btn_purchaseHistory, back_btn_emilPasswdUpdate, back_btn_emilPasswdUpdate2,
             back_btn_checkNewContent;
+    private TextView emptyCategory;
 
 
 
@@ -508,10 +510,9 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    Log.e(LOGVAR,"ITEM_SKU:"+ITEM_SKU);
+                    Log.e(LOGVAR, "ITEM_SKU:" + ITEM_SKU);
                     mHelper.launchPurchaseFlow(MainActivity.this, ITEM_SKU, 10001,
                             mPurchaseFinishedListener, "mypurchasetoken");
-                    purchasedItems.put(productJSON);
                 } else {
 
 
@@ -546,6 +547,10 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         homeButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                if(purchasedItems.length() == 0)
+                    emptyCategory.setVisibility(View.VISIBLE);
+                else
+                    emptyCategory.setVisibility(View.GONE);
                 configureThumbnailList(purchasedItems, "purchased");
                 currentMenu = PURCHASED_ITEMS;
                 toggleMenuButton(currentMenu);
@@ -562,7 +567,10 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                 mainIntent.putExtra("Key", "fav");
                 startActivityForResult(mainIntent, 1);*/
 
-
+                if(favoriteItems.size() == 0)
+                    emptyCategory.setVisibility(View.VISIBLE);
+                else
+                    emptyCategory.setVisibility(View.GONE);
                 configureThumbnailList(favoriteItems, "videos");
                 currentMenu = FAVORITE_ITEMS;
                 toggleMenuButton(currentMenu);
@@ -573,6 +581,10 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         soundBoardsButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                if(soundBoards.length() == 0)
+                    emptyCategory.setVisibility(View.VISIBLE);
+                else
+                    emptyCategory.setVisibility(View.GONE);
                 configureThumbnailList(soundBoards, "soundBoards");
                 currentMenu = SOUND_BOARDS;
                 toggleMenuButton(currentMenu);
@@ -597,7 +609,10 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
                     playlistItems.add(playlistObject);
                 }
-
+                if(playlistItems.size() == 0)
+                    emptyCategory.setVisibility(View.VISIBLE);
+                else
+                    emptyCategory.setVisibility(View.GONE);
                 configureThumbnailList(playlistItems, "playlists");
 
                 currentMenu = PLAYLISTS;
@@ -607,6 +622,10 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         moviesButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                if(movies.length() == 0)
+                    emptyCategory.setVisibility(View.VISIBLE);
+                else
+                    emptyCategory.setVisibility(View.GONE);
                 configureThumbnailList(movies, "section");
                 //Log.d(LOGVAR, "movies item:" + movies.toString());
                 currentMenu = MOVIES;
@@ -616,6 +635,10 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         musicButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                if(music.length() == 0)
+                    emptyCategory.setVisibility(View.VISIBLE);
+                else
+                    emptyCategory.setVisibility(View.GONE);
                 configureThumbnailList(music, "section");
                 currentMenu = MUSIC;
                 toggleMenuButton(currentMenu);
@@ -624,6 +647,10 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         nightLightsButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                if(nightLights.length() == 0)
+                    emptyCategory.setVisibility(View.VISIBLE);
+                else
+                    emptyCategory.setVisibility(View.GONE);
                 configureThumbnailList(nightLights, "section");
                 currentMenu = NIGHT_LIGHTS;
                 toggleMenuButton(currentMenu);
@@ -632,6 +659,10 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         audioBooksButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                if(audioBooks.length() == 0)
+                    emptyCategory.setVisibility(View.VISIBLE);
+                else
+                    emptyCategory.setVisibility(View.GONE);
                 configureThumbnailList(audioBooks, "section");
                 currentMenu = AUDIO_BOOKS;
                 toggleMenuButton(currentMenu);
@@ -641,6 +672,10 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         hearingImpairedButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                if(hearingImpaired.length() == 0)
+                    emptyCategory.setVisibility(View.VISIBLE);
+                else
+                    emptyCategory.setVisibility(View.GONE);
                 configureThumbnailList(hearingImpaired, "section");
                 currentMenu = HEARING_IMPAIRED;
                 toggleMenuButton(currentMenu);
@@ -910,6 +945,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             } else if (purchase.getSku().equals(ITEM_SKU)) {
                 Log.d(LOGVAR, "Purchase:" + purchase.getSku());
                 SELECT_FLAG = "purchase_video";
+                purchasedItems.put(productJSON);
                 try {
                     AsynEditPassword(productJSON.getString("SKU"));
                 }
@@ -1496,6 +1532,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         soundBoardsButton = (ImageView) findViewById(R.id.soundboards);
         hearingImpairedButton = (ImageView) findViewById(R.id.hearingimpaired);
         settings = (ImageView) findViewById(R.id.settings);
+
+        emptyCategory = (TextView) findViewById(R.id.item_empty_placeholder);
 
         videoToggleButton = (TextView) findViewById(R.id.video_toggle_button);
         videoCloseButton = (TextView) findViewById(R.id.video_close_button);
