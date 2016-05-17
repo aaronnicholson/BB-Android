@@ -27,6 +27,7 @@ import com.thecodebuilders.babysbrilliant.R;
 import com.thecodebuilders.model.Playlist;
 import com.thecodebuilders.network.VolleySingleton;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -90,7 +91,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
                 //subcategories have a name field instead of a title field. We use that difference to determine if it is a product or subcategory item.
                 //if it is a list of products
                 if (itemJSON.isNull("name")) {
-                    name = itemJSON.getString("title");
+                    name = StringEscapeUtils.unescapeJava(itemJSON.getString("title"));
                     isSubcategory = false;
 
                     //if it is a list of subcategories

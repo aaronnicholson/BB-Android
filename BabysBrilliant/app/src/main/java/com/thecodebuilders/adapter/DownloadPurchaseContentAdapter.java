@@ -75,6 +75,7 @@ public class DownloadPurchaseContentAdapter extends BaseAdapter {
             holder.txtDate = (TextView) convertView.findViewById(R.id.date);
             holder.progressBar = (ProgressBar) convertView.findViewById(R.id.progressBar);
             holder.relativeLayout = (RelativeLayout) convertView.findViewById(R.id.relative_layout);
+            holder.arrow = (ImageView) convertView.findViewById(R.id.arrow);
             convertView.setTag(holder);
         }
         else {
@@ -85,6 +86,10 @@ public class DownloadPurchaseContentAdapter extends BaseAdapter {
 
         holder.txtDate.setVisibility(View.GONE);
         holder.txtTitle.setText(map.get("title"));
+        String videoURL = map.get("file");
+        String fileLocation = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + videoURL;
+
+
         holder.relativeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -101,11 +106,20 @@ public class DownloadPurchaseContentAdapter extends BaseAdapter {
                 }
             }
         });
-        Log.e("PositionCall", ".."+position+"::"+showProgressArray.get(position));
-        if(showProgressArray.get(position))
+        if(showProgressArray.get(position)) {
             holder.progressBar.setVisibility(View.VISIBLE);
-        else
+            holder.arrow.setVisibility(View.GONE);
+        }
+        else {
             holder.progressBar.setVisibility(View.GONE);
+            holder.arrow.setVisibility(View.VISIBLE);
+        }
+        if (Utils.checkFileExist(context, fileLocation, videoURL)) {
+            Log.d("DownloadPurchaseAdapter", "FILE EXISTS");
+            holder.arrow.setImageResource(R.drawable.checked);
+        }
+        else
+            holder.arrow.setImageResource(R.drawable.right_arrow);
         return convertView;
     }
 
@@ -114,13 +128,14 @@ public class DownloadPurchaseContentAdapter extends BaseAdapter {
         public TextView txtDate;
         public ProgressBar progressBar;
         public RelativeLayout relativeLayout;
+        public ImageView arrow;
     }
 
     public  void downloadVideo(final String videoUrl, final ProgressBar progressBar, final int position) {
         String mUrl;
-        mUrl = context.getResources().getString(R.string.media_url) + videoUrl;
-        // mUrl = "http://goo.gl/Mfyya";
-
+        //mUrl = context.getResources().getString(R.string.media_url) + videoUrl;
+         mUrl = "http://goo.gl/Mfyya";
+        Log.e("Log", "URL:"+mUrl);
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(mUrl));
         //   request.setTitle("File Download");
         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN);
@@ -148,6 +163,7 @@ public class DownloadPurchaseContentAdapter extends BaseAdapter {
                     final int dl_progress = (int) ((bytesDownloaded * 100l) / bytesTotal);
                     Log.d("Adapter", "Download:" + dl_progress + ":" + bytesDownloaded + " Total Length:" + bytesTotal +":"+
                             cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)));
+                    Log.e("File","Size:"+videoUrl);
                     PreferenceStorage.saveFileLength(context, videoUrl, bytesTotal);
                     if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_SUCCESSFUL) {
                         downloading = false;

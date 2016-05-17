@@ -38,9 +38,9 @@
 
             <ImageView
                 android:id="@+id/close_btn"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:background="@drawable/close_button" />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/close_button" />
 
 
         </LinearLayout>
@@ -72,6 +72,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
+                        android:layout_centerVertical="true"
                         android:layout_marginLeft="10dp"
                         android:text="Loop Playlists"
                         android:textColor="#070709"
@@ -79,11 +80,12 @@
 
 
                     <ImageView
-                        android:layout_width="15dp"
-                        android:layout_height="15dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
                         android:layout_marginRight="10dp"
-                        android:background="@drawable/right_arrow" />
+                        android:src="@drawable/right_arrow" />
 
 
                 </RelativeLayout>
@@ -103,6 +105,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
+                        android:layout_centerVertical="true"
                         android:layout_marginLeft="10dp"
                         android:text="Show Intro"
                         android:textColor="#070709"
@@ -110,11 +113,12 @@
 
 
                     <ImageView
-                        android:layout_width="15dp"
-                        android:layout_height="15dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
                         android:layout_marginRight="10dp"
-                        android:background="@drawable/right_arrow" />
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/right_arrow" />
 
 
                 </RelativeLayout>
@@ -136,16 +140,18 @@
                         android:layout_gravity="center"
                         android:layout_marginLeft="10dp"
                         android:text="Our Story"
+                        android:layout_centerVertical="true"
                         android:textColor="#070709"
                         android:textSize="18sp" />
 
 
                     <ImageView
-                        android:layout_width="15dp"
-                        android:layout_height="15dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
                         android:layout_marginRight="10dp"
-                        android:background="@drawable/right_arrow" />
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/right_arrow" />
 
 
                 </RelativeLayout>
@@ -167,16 +173,18 @@
                         android:layout_gravity="center"
                         android:layout_marginLeft="10dp"
                         android:text="Social Media"
+                        android:layout_centerVertical="true"
                         android:textColor="#070709"
                         android:textSize="18sp" />
 
 
                     <ImageView
-                        android:layout_width="15dp"
-                        android:layout_height="15dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
                         android:layout_marginRight="10dp"
-                        android:background="@drawable/right_arrow" />
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/right_arrow" />
 
 
                 </RelativeLayout>
@@ -198,16 +206,18 @@
                         android:layout_gravity="center"
                         android:layout_marginLeft="10dp"
                         android:text="Contact Support"
+                        android:layout_centerVertical="true"
                         android:textColor="#070709"
                         android:textSize="18sp" />
 
 
                     <ImageView
-                        android:layout_width="15dp"
-                        android:layout_height="15dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
                         android:layout_marginRight="10dp"
-                        android:background="@drawable/right_arrow" />
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/right_arrow" />
 
 
                 </RelativeLayout>
@@ -229,16 +239,18 @@
                         android:layout_gravity="center"
                         android:layout_marginLeft="10dp"
                         android:text="Email/Password Update"
+                        android:layout_centerVertical="true"
                         android:textColor="#070709"
                         android:textSize="18sp" />
 
 
                     <ImageView
-                        android:layout_width="15dp"
-                        android:layout_height="15dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
                         android:layout_marginRight="10dp"
-                        android:background="@drawable/right_arrow" />
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/right_arrow" />
 
 
                 </RelativeLayout>
@@ -259,17 +271,19 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_marginLeft="10dp"
+                        android:layout_centerVertical="true"
                         android:text="Purchase History"
                         android:textColor="#070709"
                         android:textSize="18sp" />
 
 
                     <ImageView
-                        android:layout_width="15dp"
-                        android:layout_height="15dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
                         android:layout_marginRight="10dp"
-                        android:background="@drawable/right_arrow" />
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/right_arrow" />
 
 
                 </RelativeLayout>
@@ -290,17 +304,19 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_marginLeft="10dp"
+                        android:layout_centerVertical="true"
                         android:text="Log Out"
                         android:textColor="#070709"
                         android:textSize="18sp" />
 
 
                     <ImageView
-                        android:layout_width="15dp"
-                        android:layout_height="15dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
                         android:layout_marginRight="10dp"
-                        android:background="@drawable/right_arrow" />
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/right_arrow" />
 
 
                 </RelativeLayout>
@@ -323,16 +339,18 @@
                         android:layout_gravity="center"
                         android:layout_marginLeft="10dp"
                         android:text="Privacy Policy"
+                        android:layout_centerVertical="true"
                         android:textColor="#070709"
                         android:textSize="18sp" />
 
 
                     <ImageView
-                        android:layout_width="15dp"
-                        android:layout_height="15dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
                         android:layout_marginRight="10dp"
-                        android:background="@drawable/right_arrow" />
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/right_arrow" />
 
 
                 </RelativeLayout>
@@ -355,16 +373,18 @@
                         android:layout_gravity="center"
                         android:layout_marginLeft="10dp"
                         android:text="Check For New Content"
+                        android:layout_centerVertical="true"
                         android:textColor="#070709"
                         android:textSize="18sp" />
 
 
                     <ImageView
-                        android:layout_width="15dp"
-                        android:layout_height="15dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
                         android:layout_marginRight="10dp"
-                        android:background="@drawable/right_arrow" />
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/right_arrow" />
 
 
                 </RelativeLayout>
@@ -387,16 +407,18 @@
                         android:layout_gravity="center"
                         android:layout_marginLeft="10dp"
                         android:text="Download Purchased Content"
+                        android:layout_centerVertical="true"
                         android:textColor="#070709"
                         android:textSize="18sp" />
 
 
                     <ImageView
-                        android:layout_width="15dp"
-                        android:layout_height="15dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
                         android:layout_marginRight="10dp"
-                        android:background="@drawable/right_arrow" />
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/right_arrow" />
 
 
                 </RelativeLayout>

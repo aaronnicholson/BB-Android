@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.v7.widget.RecyclerView;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,10 +27,12 @@ import com.thecodebuilders.network.VolleySingleton;
 import com.thecodebuilders.utility.PreferenceStorage;
 import com.thecodebuilders.utility.Utils;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 
 
@@ -81,8 +84,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
 
             try {
                 JSONObject itemJSON = assetsList.get(i);
-
-                name = itemJSON.getString("title");
+                name = StringEscapeUtils.unescapeJava(itemJSON.getString("title"));
                 price = "$"+itemJSON.getString("price");
                 for (int purchasedIndex = 0; purchasedIndex < mainActivity.purchasedItems.length(); purchasedIndex++) {
                     //if it has no SKU, skip it

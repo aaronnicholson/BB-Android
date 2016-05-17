@@ -511,7 +511,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                         e.printStackTrace();
                     }
                     Log.e(LOGVAR, "ITEM_SKU:" + ITEM_SKU);
-                    mHelper.launchPurchaseFlow(MainActivity.this, ITEM_SKU, 10001,
+                    mHelper.launchPurchaseFlow(MainActivity.this, Constant.TEST_ITEM_SKU, 10001,
                             mPurchaseFinishedListener, "mypurchasetoken");
                 } else {
 
@@ -942,7 +942,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                 // Handle error
                 Log.d(LOGVAR, "Purcahse Failed");
                 return;
-            } else if (purchase.getSku().equals(ITEM_SKU)) {
+            } else if (purchase.getSku().equals(Constant.TEST_ITEM_SKU)) {
                 Log.d(LOGVAR, "Purchase:" + purchase.getSku());
                 SELECT_FLAG = "purchase_video";
                 purchasedItems.put(productJSON);
@@ -986,7 +986,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             if (result.isFailure()) {
                 // Handle failure
             } else {
-                mHelper.consumeAsync(inventory.getPurchase(ITEM_SKU),
+                mHelper.consumeAsync(inventory.getPurchase(Constant.TEST_ITEM_SKU),
                         mConsumeFinishedListener);
             }
         }
@@ -1392,6 +1392,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                                     purchasedJson = purchasedItems.getJSONObject(i);
                                     if (purchasedJson.getString("title").equalsIgnoreCase(purchasedJson.getString("title"))) {
                                         hash.put("title", purchasedJson.getString("title"));
+                                        hash.put("file", purchasedJson.getString("file"));
                                         arrayList.add(hash);
                                     }
 

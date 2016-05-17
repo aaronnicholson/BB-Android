@@ -15,6 +15,7 @@ import com.thecodebuilders.babysbrilliant.ParentalChallengeScreen;
 import com.thecodebuilders.babysbrilliant.R;
 import com.thecodebuilders.network.VolleySingleton;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -64,7 +65,7 @@ public class PlaylistItemAdapter extends RecyclerView.Adapter<ElementViewHolder>
             try {
                 JSONObject itemJSON = assetsList.get(i);
 
-                name = itemJSON.getString("title");
+                name = StringEscapeUtils.unescapeJava(itemJSON.getString("title"));
 
                 imageResource = itemJSON.getString("thumb");
                 if (!itemJSON.isNull("cat")) category = itemJSON.getString("cat");

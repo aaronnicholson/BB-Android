@@ -19,7 +19,7 @@ public class Constant {
 
 
 
-    /*public static final String TEST_ITEM_SKU = "android.test.purchased";*/
+    public static final String TEST_ITEM_SKU = "android.test.purchased";
 
 
 

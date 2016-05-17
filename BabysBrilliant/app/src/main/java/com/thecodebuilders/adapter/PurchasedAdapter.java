@@ -30,6 +30,7 @@ import com.thecodebuilders.model.Playlist;
 import com.thecodebuilders.network.InputStreamVolleyRequest;
 import com.thecodebuilders.network.VolleySingleton;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -95,7 +96,7 @@ public class PurchasedAdapter extends RecyclerView.Adapter<ElementViewHolder> {
             try {
                 JSONObject itemJSON = assetsList.get(i);
 
-                name = itemJSON.getString("title");
+                name = StringEscapeUtils.unescapeJava(itemJSON.getString("title"));
                 isSection = false;
 
                 //soundboards are meant to play inside their thumbnail. Anything marked with the playInline attribute in the JSON will do so.

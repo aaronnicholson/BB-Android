@@ -16,6 +16,7 @@ import com.thecodebuilders.babysbrilliant.MainActivity;
 import com.thecodebuilders.babysbrilliant.R;
 import com.thecodebuilders.network.VolleySingleton;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -69,7 +70,7 @@ public class SoundBoardsAdapter extends RecyclerView.Adapter<SoundBoardsAdapter.
             try {
                 JSONObject itemJSON = assetsList.get(i);
                 rawJSON = itemJSON;
-                name = itemJSON.getString("name");
+                name = StringEscapeUtils.unescapeJava(itemJSON.getString("name"));
                 imageResource = itemJSON.getString("thumb");
                 if (!itemJSON.isNull("cat")) category = itemJSON.getString("cat");
 
