@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
@@ -22,6 +23,8 @@ import com.thecodebuilders.application.ApplicationContextProvider;
 import com.thecodebuilders.babysbrilliant.ListItem;
 import com.thecodebuilders.babysbrilliant.MainActivity;
 import com.thecodebuilders.babysbrilliant.R;
+import com.thecodebuilders.classes.DownloadAsync;
+import com.thecodebuilders.interfaces.DownloadStatusListener;
 import com.thecodebuilders.model.Playlist;
 import com.thecodebuilders.network.VolleySingleton;
 import com.thecodebuilders.utility.PreferenceStorage;
@@ -39,7 +42,7 @@ import java.util.ArrayList;
 /**
  * Created by aaronnicholson on 8/17/15.
  */
-public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
+public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> implements DownloadStatusListener {
 
     private final String LOGVAR = "VideosAdapter";
     private ArrayList<ListItem> elements;
@@ -49,7 +52,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
     private VolleySingleton volleySingleton;
     private ImageLoader imageLoader;
     public String mediaURL = appContext.getString(R.string.media_url);
-    public static String priceValue = "0.00";
+    public static String priceValue = "$0.00";
 
     public VideosAdapter(ArrayList listData, MainActivity mainActivity) {
         volleySingleton = VolleySingleton.getInstance();
@@ -85,11 +88,11 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
             try {
                 JSONObject itemJSON = assetsList.get(i);
                 name = StringEscapeUtils.unescapeJava(itemJSON.getString("title"));
-                price = "$"+itemJSON.getString("price");
+                price = "$" + itemJSON.getString("price");
                 for (int purchasedIndex = 0; purchasedIndex < mainActivity.purchasedItems.length(); purchasedIndex++) {
                     //if it has no SKU, skip it
-                    if (!itemJSON.isNull("SKU")) {
-                        if (itemJSON.getString("SKU").equals(mainActivity.purchasedItems.getJSONObject(purchasedIndex).getString("SKU"))) {
+                    if (!itemJSON.isNull("title")) {
+                        if (itemJSON.getString("title").equals(mainActivity.purchasedItems.getJSONObject(purchasedIndex).getString("title"))) {
                             isPurchased = true;
                         }
                     }
@@ -147,7 +150,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
         viewHolder.thumbnailImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(!elements.get(position).getIsDownloading()) {
+                if (!elements.get(position).getIsDownloading()) {
                     thumbnailClicked(position, thisViewHolder);
                 }
             }
@@ -170,7 +173,8 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
             @Override
             public void onClick(View v) {
                 ListItem listItem = elements.get(position);
-                mainActivity.downloadVideo(viewHolder, listItem);
+                //mainActivity.downloadVideo(viewHolder, listItem);
+                new DownloadAsync(appContext, viewHolder, listItem, VideosAdapter.this, position, listItem.getMediaFile()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 viewHolder.progressBar.setVisibility(View.VISIBLE);
                 viewHolder.thumbnailImage.setClickable(false);
                 viewHolder.downloadIcon.setVisibility(View.GONE);
@@ -212,7 +216,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
 
 
         //if it has been purchased already or free
-        Log.e(LOGVAR,"Adapter:"+listItem.isPurchased()+":"+listItem.getPrice());
+        Log.e(LOGVAR, "Adapter:" + listItem.isPurchased() + ":" + listItem.getPrice());
         if (listItem.isPurchased() || listItem.getPrice().equalsIgnoreCase(priceValue)) {
             setLookToPurchased(viewHolder);
         }
@@ -228,7 +232,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
         } else {
             setLookToNotPlaylistItem(viewHolder);
         }
-        if(listItem.isPurchased())
+        if (listItem.isPurchased())
             setFileDownloadedListItem(viewHolder, listItem);
 
         setFileDownloadingListItem(viewHolder, listItem);
@@ -262,21 +266,23 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
 
         if ((listItem.isPurchasable() && listItem.isPurchased()) || listItem.getPrice().equalsIgnoreCase(priceValue)) {
             String videoURL = listItem.getMediaFile();
-            String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) +  "/" + videoURL;
-            if(Utils.checkFileExist(mainActivity, fileLocation, videoURL)) {
+            String fileLocation = Environment.getExternalStorageDirectory()
+                    + "/" + mainActivity.getResources().getString(R.string.app_name) +
+                    "/" + videoURL;
+            if (Utils.checkFileExist(mainActivity, fileLocation, videoURL)) {
                 Log.d(LOGVAR, "FILE EXISTS");
                 mainActivity.playVideo(fileLocation);
-            //otherwise, go get it
+                //otherwise, go get it
             } else {
                 Log.d(LOGVAR, "FILE DOES NOT EXIST");
                 //TODO: Stop multiple downloads of the same file
-                alertForDownload(thisViewHolder, listItem);
+                alertForDownload(thisViewHolder, listItem, position);
             }
 
         } else {
             //TODO: do actual purchase round trip here
-           // listItem.setIsPurchased(true);
-          //  setLookToPurchased(thisViewHolder);
+            // listItem.setIsPurchased(true);
+            //  setLookToPurchased(thisViewHolder);
             try {
                 mainActivity.addToPurchased(listItem.getRawJSON(), listItem, thisViewHolder);
             } catch (JSONException e) {
@@ -308,24 +314,26 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
 //        viewHolder.priceText.setVisibility(View.INVISIBLE);
         viewHolder.playlistIcon.setColorFilter(Color.YELLOW);
     }
+
     private void setFileDownloadedListItem(ElementViewHolder viewHolder, ListItem listItem) {
         String videoURL = listItem.getMediaFile();
-        String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) +  "/" + videoURL;
-        if(Utils.checkFileExist(mainActivity, fileLocation, videoURL))
-             viewHolder.downloadIcon.setVisibility(View.GONE);
+        String fileLocation = Environment.getExternalStorageDirectory()
+                + "/" + mainActivity.getResources().getString(R.string.app_name) +
+                "/" + videoURL;
+        if (Utils.checkFileExist(mainActivity, fileLocation, videoURL))
+            viewHolder.downloadIcon.setVisibility(View.GONE);
         else
             viewHolder.downloadIcon.setVisibility(View.VISIBLE);
     }
 
     private void setFileDownloadingListItem(ElementViewHolder viewHolder, ListItem listItem) {
-        Log.d(LOGVAR,"setFileDownloadingListItem"+listItem.getIsDownloading()+":"+listItem.getMediaFile());
-        if(listItem.getIsDownloading()) {
+        Log.d(LOGVAR, "setFileDownloadingListItem" + listItem.getIsDownloading() + ":" + listItem.getMediaFile());
+        if (listItem.getIsDownloading()) {
             viewHolder.progressBar.setVisibility(View.VISIBLE);
             viewHolder.thumbnailImage.setClickable(false);
             viewHolder.downloadIcon.setVisibility(View.GONE);
 
-        }
-        else {
+        } else {
             viewHolder.progressBar.setVisibility(View.GONE);
             viewHolder.thumbnailImage.setClickable(true);
         }
@@ -363,7 +371,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
     }
 
 
-    private void alertForDownload(final ElementViewHolder viewHolder, final ListItem listItem){
+    private void alertForDownload(final ElementViewHolder viewHolder, final ListItem listItem, final int position) {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(mainActivity);
         alertDialog.setTitle(mainActivity.getResources().getString(R.string.alert_download_title));
         alertDialog.setMessage(mainActivity.getResources().getString(R.string.alert_download_summary));
@@ -373,7 +381,8 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
                 viewHolder.progressBar.setVisibility(View.VISIBLE);
                 viewHolder.thumbnailImage.setClickable(false);
                 viewHolder.downloadIcon.setVisibility(View.GONE);
-                mainActivity.downloadVideo(viewHolder, listItem);
+                // mainActivity.downloadVideo(viewHolder, listItem);
+                new DownloadAsync(appContext, viewHolder, listItem, VideosAdapter.this, position, listItem.getMediaFile()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             }
         });
         alertDialog.setNegativeButton(mainActivity.getResources().getString(R.string.cancel), null);
@@ -381,6 +390,8 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> {
         builder.show();
     }
 
-
-
+    @Override
+    public void onDownloadComplete(int position) {
+        notifyDataSetChanged();
+    }
 }

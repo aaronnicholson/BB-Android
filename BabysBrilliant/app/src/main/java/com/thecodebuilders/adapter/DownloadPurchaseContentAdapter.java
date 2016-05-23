@@ -5,6 +5,7 @@ import android.app.DownloadManager;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,13 +21,16 @@ import android.widget.TextView;
 
 import com.thecodebuilders.babysbrilliant.ListItem;
 import com.thecodebuilders.babysbrilliant.R;
+import com.thecodebuilders.classes.DownloadAsync;
+import com.thecodebuilders.interfaces.DownloadStatusListener;
 import com.thecodebuilders.utility.PreferenceStorage;
 import com.thecodebuilders.utility.Utils;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class DownloadPurchaseContentAdapter extends BaseAdapter {
+public class DownloadPurchaseContentAdapter extends BaseAdapter implements DownloadStatusListener {
 
 
     private Context context;
@@ -77,8 +81,7 @@ public class DownloadPurchaseContentAdapter extends BaseAdapter {
             holder.relativeLayout = (RelativeLayout) convertView.findViewById(R.id.relative_layout);
             holder.arrow = (ImageView) convertView.findViewById(R.id.arrow);
             convertView.setTag(holder);
-        }
-        else {
+        } else {
             holder = (ViewHolder) convertView.getTag();
         }
         map = new HashMap<String, String>();
@@ -86,39 +89,47 @@ public class DownloadPurchaseContentAdapter extends BaseAdapter {
 
         holder.txtDate.setVisibility(View.GONE);
         holder.txtTitle.setText(map.get("title"));
-        String videoURL = map.get("file");
-        String fileLocation = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + videoURL;
 
 
         holder.relativeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String videoURL = map.get("file");
-                String fileLocation = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + videoURL;
+                String videoURL = postItems.get(position).get("file");
+                //String fileLocation = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + videoURL;
+                String fileLocation = Environment.getExternalStorageDirectory()
+                        + "/" + context.getResources().getString(R.string.app_name) +
+                        "/" + videoURL;
                 if (Utils.checkFileExist(context, fileLocation, videoURL)) {
                     Log.d("DownloadPurchaseAdapter", "FILE EXISTS");
                 } else {
                     Log.e("Position", "..." + position);
                     showProgressArray.set(position, true);
                     holder.progressBar.setVisibility(View.VISIBLE);
-                    downloadVideo(videoURL, holder.progressBar, position);
+                    holder.relativeLayout.setClickable(false);
+                    //downloadVideo(videoURL, holder.progressBar, position);
+                    new DownloadAsync(context, null, null, DownloadPurchaseContentAdapter.this, position, videoURL).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                     notifyDataSetChanged();
                 }
             }
         });
-        if(showProgressArray.get(position)) {
+        if (showProgressArray.get(position)) {
             holder.progressBar.setVisibility(View.VISIBLE);
             holder.arrow.setVisibility(View.GONE);
-        }
-        else {
+            holder.relativeLayout.setClickable(false);
+        } else {
             holder.progressBar.setVisibility(View.GONE);
             holder.arrow.setVisibility(View.VISIBLE);
+            holder.relativeLayout.setClickable(true);
         }
+
+        String videoURL = map.get("file");
+        String fileLocation = Environment.getExternalStorageDirectory()
+                + "/" + context.getResources().getString(R.string.app_name) +
+                "/" + videoURL;
         if (Utils.checkFileExist(context, fileLocation, videoURL)) {
             Log.d("DownloadPurchaseAdapter", "FILE EXISTS");
             holder.arrow.setImageResource(R.drawable.checked);
-        }
-        else
+        } else
             holder.arrow.setImageResource(R.drawable.right_arrow);
         return convertView;
     }
@@ -131,17 +142,17 @@ public class DownloadPurchaseContentAdapter extends BaseAdapter {
         public ImageView arrow;
     }
 
-    public  void downloadVideo(final String videoUrl, final ProgressBar progressBar, final int position) {
+    public void downloadVideo(final String videoUrl, final ProgressBar progressBar, final int position) {
         String mUrl;
-        //mUrl = context.getResources().getString(R.string.media_url) + videoUrl;
-         mUrl = "http://goo.gl/Mfyya";
-        Log.e("Log", "URL:"+mUrl);
+        mUrl = context.getResources().getString(R.string.media_url) + videoUrl;
+        // mUrl = "http://goo.gl/Mfyya";
+        Log.e("Log", "URL:" + mUrl);
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(mUrl));
         //   request.setTitle("File Download");
         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN);
         request.setVisibleInDownloadsUi(false);
         String nameOfFile = URLUtil.guessFileName(mUrl, null, MimeTypeMap.getFileExtensionFromUrl(mUrl));
-
+        Log.e("Log", "FileName:" + nameOfFile);
         request.setDestinationInExternalFilesDir(context, Environment.DIRECTORY_DOWNLOADS, nameOfFile);
 
         DownloadManager downloadManager = (DownloadManager) context.getSystemService(context.DOWNLOAD_SERVICE);
@@ -156,34 +167,50 @@ public class DownloadPurchaseContentAdapter extends BaseAdapter {
                 while (downloading) {
                     DownloadManager.Query q = new DownloadManager.Query();
                     q.setFilterById(downloadID);
-                    Cursor cursor = downloadManager.query(q);
-                    cursor.moveToFirst();
-                    final int bytesDownloaded = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
-                    int bytesTotal = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
-                    final int dl_progress = (int) ((bytesDownloaded * 100l) / bytesTotal);
-                    Log.d("Adapter", "Download:" + dl_progress + ":" + bytesDownloaded + " Total Length:" + bytesTotal +":"+
-                            cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)));
-                    Log.e("File","Size:"+videoUrl);
-                    PreferenceStorage.saveFileLength(context, videoUrl, bytesTotal);
-                    if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_SUCCESSFUL) {
-                        downloading = false;
-                        Activity activity = (Activity)context;
-                        activity.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                               showProgressArray.set(position, false);
+                    final Cursor cursor = downloadManager.query(q);
+                    if (cursor != null) {
+                        if (cursor.moveToFirst()) {
+                            final int bytesDownloaded = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
+                            int bytesTotal = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
+                            final int dl_progress = (int) ((bytesDownloaded * 100l) / bytesTotal);
+                            Log.d("Adapter", "Download:" + dl_progress + ":" + bytesDownloaded + " Total Length:" + bytesTotal + ":" +
+                                    cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)));
+                            Log.e("File", "Size:" + videoUrl);
+                            PreferenceStorage.saveFileLength(context, videoUrl, bytesTotal);
+                            if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_SUCCESSFUL) {
+                                downloading = false;
+                                Activity activity = (Activity) context;
+                                activity.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        cursor.close();
+                                        showProgressArray.set(position, false);
+                                        notifyDataSetChanged();
+                                    }
+                                });
+                                // listItem.setIsDownloading(false);
+                            } else if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_RUNNING) {
+                                // listItem.setIsDownloading(true);
                             }
-                        });
-                       // listItem.setIsDownloading(false);
-                    }
-                    else if(cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_RUNNING){
-                       // listItem.setIsDownloading(true);
-                    }
 
+                        }
+                        else {
+                            cursor.close();
+                        }
+                    }
                 }
             }
         }).start();
 
 
+    }
+
+
+
+    @Override
+    public void onDownloadComplete(int position) {
+        showProgressArray.set(position, false);
+        holder.relativeLayout.setClickable(true);
+        notifyDataSetChanged();
     }
 }

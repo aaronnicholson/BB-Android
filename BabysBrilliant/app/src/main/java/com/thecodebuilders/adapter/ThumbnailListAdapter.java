@@ -112,8 +112,8 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
                 //if this item is in there, mark it as purchased
                 for (int purchasedIndex = 0; purchasedIndex < mainActivity.purchasedItems.length(); purchasedIndex++) {
                     //if it has no SKU, skip it
-                    if (!itemJSON.isNull("SKU")) {
-                        if (itemJSON.getString("SKU").equals(mainActivity.purchasedItems.getJSONObject(purchasedIndex).getString("SKU"))) {
+                    if (!itemJSON.isNull("title")) {
+                        if (itemJSON.getString("title").equals(mainActivity.purchasedItems.getJSONObject(purchasedIndex).getString("title"))) {
                             isPurchased = true;
                         }
                     }
