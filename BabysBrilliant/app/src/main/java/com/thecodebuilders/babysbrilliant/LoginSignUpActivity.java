@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -20,6 +21,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.thecodebuilders.network.VolleySingleton;
 import com.thecodebuilders.utility.Constant;
 import com.thecodebuilders.utility.CustomizeDialog;
+import com.thecodebuilders.utility.Utils;
 
 import org.json.JSONObject;
 
@@ -65,7 +67,11 @@ public class LoginSignUpActivity extends AppCompatActivity {
             } else {
                 reset_pass.setVisibility(View.GONE);
                 progressBar.setVisibility(View.VISIBLE);
-                getRemoteJSON(Constant.URL + "a=lgn&u=" + email.getText().toString() + "&p=" + passwd.getText().toString(), email.getText().toString(), passwd.getText().toString(), "SignIn");
+                if(Utils.isNetworkAvailable(LoginSignUpActivity.this))
+                     getRemoteJSON(Constant.URL + "a=lgn&u=" + email.getText().toString() + "&p=" + passwd.getText().toString(), email.getText().toString(), passwd.getText().toString(), "SignIn");
+                else
+                    Toast.makeText(this, getResources().getString(R.string.no_network), Toast.LENGTH_LONG).show();
+
             }
 
         } else if (v.getId() == R.id.sign_up) {

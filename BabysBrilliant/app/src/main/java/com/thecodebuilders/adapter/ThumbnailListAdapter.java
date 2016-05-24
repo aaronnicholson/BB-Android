@@ -314,7 +314,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
 
     private void previewClicked(int position) {
         ListItem listItem = elements.get(position);
-        if (!listItem.getMediaFile().equals("")) mainActivity.playVideo(listItem.getMediaFile());
+        if (!listItem.getMediaFile().equals("")) mainActivity.playVideo(listItem.getMediaFile(), false);
     }
 
     private void favoritesClicked(int position, ElementViewHolder thisViewHolder) {
@@ -418,7 +418,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
                     );
                 } else {
                     //play in the main player
-                    mainActivity.playVideo(listItem.getMediaFile());
+                    mainActivity.playVideo(listItem.getMediaFile(), false);
                 }
             }
         }

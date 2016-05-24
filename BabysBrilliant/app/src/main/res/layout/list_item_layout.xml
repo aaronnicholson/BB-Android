@@ -42,23 +42,24 @@
                 <ImageView
                     android:id="@+id/download_icon"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:adjustViewBounds="true"
+                    android:maxHeight="@dimen/download_icon_height"
                     android:layout_gravity="center_vertical"
                     android:paddingTop="3dp"
-                    android:maxWidth="@dimen/product_icon_width"
-                    android:src="@drawable/playlists"
+                    android:src="@drawable/download_btn"
                     android:visibility="invisible"
                     />
 
                 <ImageView
                     android:id="@+id/playlist_icon"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:adjustViewBounds="true"
                     android:maxWidth="@dimen/product_icon_width"
-                    android:layout_marginLeft="12dp"
-                    android:paddingTop="3dp"
+                    android:maxHeight="@dimen/product_icon_width"
+                    android:layout_marginLeft="15dp"
+                    android:paddingTop="5dp"
                     android:layout_gravity="center_vertical"
                     android:src="@drawable/playlists"
                     android:visibility="invisible"
@@ -67,9 +68,11 @@
                 <ImageView
                     android:id="@+id/favorites_icon"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:adjustViewBounds="true"
                     android:maxWidth="@dimen/product_icon_width"
+                    android:maxHeight="@dimen/product_icon_width"
+
                     android:layout_marginLeft="12dp"
                     android:layout_gravity="center_vertical"
                     android:src="@drawable/favorites"

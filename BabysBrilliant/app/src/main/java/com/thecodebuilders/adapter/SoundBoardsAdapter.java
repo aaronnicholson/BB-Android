@@ -233,7 +233,7 @@ public class SoundBoardsAdapter extends RecyclerView.Adapter<SoundBoardsAdapter.
 
     private void previewClicked(int position) {
         ListItem listItem = elements.get(position);
-        if (!listItem.getMediaFile().equals("")) mainActivity.playVideo(listItem.getMediaFile());
+        if (!listItem.getMediaFile().equals("")) mainActivity.playVideo(listItem.getMediaFile(), false);
     }
 
     private void thumbnailClicked(int position, ElementViewHolder thisViewHolder) {

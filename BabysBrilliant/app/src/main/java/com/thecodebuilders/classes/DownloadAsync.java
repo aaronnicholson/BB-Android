@@ -100,7 +100,7 @@ public class DownloadAsync extends AsyncTask<String, String, String> {
 
     @Override
     protected void onProgressUpdate(String... progress) {
-        Log.v(TAG, "Percentage::" + videoName + " :" + progress[0]);
+        Log.v(TAG, "Percentage::" + videoName + " :" + progress[0]+" : "+downloadStatusListener.getClass().getSimpleName());
         this.progress = progress[0];
         if (progress[0].equalsIgnoreCase("100")) {
             if (downloadStatusListener.getClass().getSimpleName().equalsIgnoreCase("VideosAdapter")) {

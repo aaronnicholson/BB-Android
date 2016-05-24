@@ -271,7 +271,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
                     "/" + videoURL;
             if (Utils.checkFileExist(mainActivity, fileLocation, videoURL)) {
                 Log.d(LOGVAR, "FILE EXISTS");
-                mainActivity.playVideo(fileLocation);
+                mainActivity.playVideo(fileLocation, false);
                 //otherwise, go get it
             } else {
                 Log.d(LOGVAR, "FILE DOES NOT EXIST");

@@ -3,6 +3,7 @@ package com.thecodebuilders.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Environment;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -36,6 +37,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<ElementViewHolder> {
     MainActivity mainActivity;
     private VolleySingleton volleySingleton;
 
+
     public PlaylistAdapter(ArrayList listData, MainActivity mainActivity) {
         volleySingleton = VolleySingleton.getInstance();
         assetsList = listData;
@@ -50,7 +52,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<ElementViewHolder> {
     private void parseListItems(int listLength) {
         elements = new ArrayList<ListItem>(listLength);
         products = new ArrayList<JSONArray>();
-
+        Log.e(LOGVAR, "Asset:" + assetsList);
         for (int i = 0; i < listLength; i++) {
             String name;
             Boolean playInline = false;
@@ -67,7 +69,8 @@ public class PlaylistAdapter extends RecyclerView.Adapter<ElementViewHolder> {
             try {
                 JSONObject itemJSON = assetsList.get(i);
 
-                name = StringEscapeUtils.unescapeJava(itemJSON.getString("title"));
+
+                name = StringEscapeUtils.unescapeJava(itemJSON.getString("name"));
                 if (!itemJSON.isNull("products"))
                     products.add(itemJSON.getJSONArray("products"));
 
@@ -108,7 +111,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<ElementViewHolder> {
                 /*Intent mainIntent1 = new Intent(mainIntent, ParentalChallengeScreen.class);
                 mainIntent.putExtra("Key", "fav");*/
                 mainActivity.startActivityForResult(new Intent(mainActivity, ParentalChallengeScreen.class).putExtra("Key", "PlayListAdapter").putExtra("pos", position), 1);
-               // mainActivity.removePlaylist(position);
+                // mainActivity.removePlaylist(position);
             }
         });
         viewHolder.editPlaylistIcon.setOnClickListener(new View.OnClickListener() {
@@ -149,6 +152,24 @@ public class PlaylistAdapter extends RecyclerView.Adapter<ElementViewHolder> {
 
     private void thumbnailClicked(int position, ElementViewHolder thisViewHolder) {
         ListItem listItem = elements.get(position);
+        JSONArray jsonArray = products.get(0);
+
+        Log.e(LOGVAR,"Products:"+products+":"+products.size()+":"+jsonArray.length());
+
+        for(int i = 0; i < jsonArray.length(); i++){
+            try {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                mainActivity.fileArrayList.add(jsonObject.getString("file"));
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        String fileLocation = Environment.getExternalStorageDirectory()
+                + "/" + mainActivity.getResources().getString(R.string.app_name) +
+                "/" + mainActivity.fileArrayList.get(0);
+
+        mainActivity.playVideo(fileLocation, true);
 
         //TODO: play playlist
 

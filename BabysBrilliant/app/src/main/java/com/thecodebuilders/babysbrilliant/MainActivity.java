@@ -196,9 +196,9 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     private RequestQueue rq;
     private StringRequest strReq;
     private EditText et;
-    private ToggleButton toggle;
+    public ToggleButton toggle;
     private CustomizeDialog customizeDialog;
-    CheckedTextView checked1, checked2, checked3, checked4, checked5;
+    public CheckedTextView checked1, checked2, checked3, checked4, checked5;
     private static final String TAG = "Android BillingService";
     IabHelper mHelper;
     String ITEM_SKU;
@@ -216,6 +216,9 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     private VideosAdapter videoAdapter;
     private PurchasedAdapter purchasedAdapter;
+
+    public ArrayList<String> fileArrayList;
+    private int indexOfVideo = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -245,6 +248,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         animationBlink = AnimationUtils.loadAnimation(MainActivity.this, R.anim.blink);
         animationBlink.setAnimationListener(this);
+        fileArrayList = new ArrayList<String>();
         createRawFile();
         setMenuWidth();
 
@@ -600,7 +604,6 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             public void onClick(View v) {
                 //create a list of JSONObjects that the list adapter can understand
                 ArrayList<JSONObject> playlistItems = new ArrayList<>();
-
                 for (int i = 0; i < playlists.size(); i++) {
                     JSONObject playlistObject = new JSONObject();
                     try {
@@ -1130,7 +1133,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     }
 
     @SuppressLint("NewApi")
-    public void playVideo(String videoURL) {
+    public void playVideo(String videoURL, final boolean isPlayList) {
         // Create a progressbar
         pDialog = new ProgressDialog(MainActivity.this);
         // Set progressbar title
@@ -1214,14 +1217,33 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
-                if (mediaPlayer != null) {
-                    mediaPlayer.stop();
+
+                Log.e(LOGVAR,"PlayList:"+isPlayList+":"+fileArrayList.size()+":"+indexOfVideo);
+                if(isPlayList && fileArrayList.size() > indexOfVideo){
+                    String fileLocation = Environment.getExternalStorageDirectory()
+                            + "/" + getResources().getString(R.string.app_name) +
+                            "/" + fileArrayList.get(indexOfVideo);
+                    Log.e(LOGVAR,"Toggle:"+toggle.isChecked());
+                    if(toggle.isChecked()){
+
+                    }
+                    else {
+                        Uri video = Uri.parse(fileLocation);
+                        videoView.setVideoURI(video);
+                        videoView.start();
+                        indexOfVideo++;
+                    }
+                }
+                else {
+                    if (mediaPlayer != null) {
+                        mediaPlayer.stop();
                    /* mediaPlayer.reset();
                     mediaPlayer.release();
                     mediaPlayer = null;*/
+                    }
+                    videoToggleButton.setText(getString(R.string.video_pause));
+                    videoLayout.setVisibility(View.INVISIBLE);
                 }
-                videoToggleButton.setText(getString(R.string.video_pause));
-                videoLayout.setVisibility(View.INVISIBLE);
 
 
             }
