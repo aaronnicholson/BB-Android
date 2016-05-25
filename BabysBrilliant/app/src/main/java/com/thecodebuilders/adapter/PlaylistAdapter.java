@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -153,25 +154,64 @@ public class PlaylistAdapter extends RecyclerView.Adapter<ElementViewHolder> {
     private void thumbnailClicked(int position, ElementViewHolder thisViewHolder) {
         ListItem listItem = elements.get(position);
         JSONArray jsonArray = products.get(0);
+        mainActivity.fileArrayList = new ArrayList<String>();
+        Log.e(LOGVAR, "Products:" + products + ":" + products.size() + ":" + jsonArray.length());
 
-        Log.e(LOGVAR,"Products:"+products+":"+products.size()+":"+jsonArray.length());
-
-        for(int i = 0; i < jsonArray.length(); i++){
+        for (int i = 0; i < jsonArray.length(); i++) {
             try {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                 mainActivity.fileArrayList.add(jsonObject.getString("file"));
-            }
-            catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        String fileLocation = Environment.getExternalStorageDirectory()
+        if (mainActivity.toggle.isChecked())
+            loopPlayList();
+        /*String fileLocation = Environment.getExternalStorageDirectory()
                 + "/" + mainActivity.getResources().getString(R.string.app_name) +
-                "/" + mainActivity.fileArrayList.get(0);
+                "/" + mainActivity.fileArrayList.get(0);*/
+        String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)+"/"+ mainActivity.fileArrayList.get(0);
 
         mainActivity.playVideo(fileLocation, true);
 
         //TODO: play playlist
+
+    }
+
+    private void loopPlayList() {
+        Log.d(LOGVAR,"loopPlayList");
+        long time = 900000;
+
+        if (mainActivity.checked1.isChecked()) {
+            // 15 mints
+            handlerDelayed(time);
+        } else if (mainActivity.checked2.isChecked()) {
+            // 30 mints
+            handlerDelayed(time * 2);
+
+        } else if (mainActivity.checked3.isChecked()) {
+            //45 mints
+            handlerDelayed(time * 3);
+
+        } else if (mainActivity.checked4.isChecked()) {
+            //60 mints
+            handlerDelayed(time * 4);
+
+        } else if (mainActivity.checked5.isChecked()) {
+            //90 mints
+            handlerDelayed(time * 6);
+        }
+    }
+
+    private void handlerDelayed(long time) {
+        Log.d(LOGVAR,"handlerDelayed"+time);
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mainActivity.closeVideo();
+            }
+        }, time);
 
     }
 

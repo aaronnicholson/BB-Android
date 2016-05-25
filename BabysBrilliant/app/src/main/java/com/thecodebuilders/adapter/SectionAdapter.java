@@ -2,6 +2,7 @@ package com.thecodebuilders.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,7 +50,7 @@ public class SectionAdapter extends RecyclerView.Adapter<ElementViewHolder> {
     private void parseListItems(int listLength) {
         elements = new ArrayList<ListItem>(listLength);
         products = new ArrayList<JSONArray>();
-
+        Log.d(LOGVAR, "Assets:" + assetsList);
         for (int i = 0; i < listLength; i++) {
             JSONObject rawJSON;
             String name;

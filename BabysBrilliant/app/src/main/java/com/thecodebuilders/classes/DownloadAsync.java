@@ -6,6 +6,7 @@ package com.thecodebuilders.classes;
 
 
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
@@ -64,19 +65,19 @@ public class DownloadAsync extends AsyncTask<String, String, String> {
             URL url = new URL(mUrl);
             URLConnection connection = url.openConnection();
             connection.connect();
-            File myDirectory = new File(
+           /* File myDirectory = new File(
                     Environment.getExternalStorageDirectory(), "/" + context.getResources().getString(R.string.app_name));
             if (!myDirectory.exists())
-                myDirectory.mkdir();
+                myDirectory.mkdir();*/
+            File file = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS),videoName);
+
 
             int lengthOfFile = connection.getContentLength();
             Log.d(TAG, "Length of file: " + lengthOfFile);
             PreferenceStorage.saveFileLength(context, videoName, lengthOfFile);
 
             InputStream input = new BufferedInputStream(url.openStream());
-            OutputStream output = new FileOutputStream(new File(myDirectory
-                    +
-                    "/" + videoName));
+            OutputStream output = new FileOutputStream(file);
 
             byte data[] = new byte[1024];
             int count = 0;
@@ -109,6 +110,8 @@ public class DownloadAsync extends AsyncTask<String, String, String> {
             }
         } else if (downloadStatusListener.getClass().getSimpleName().equalsIgnoreCase("VideosAdapter"))
             listItem.setIsDownloading(true);
+
+        //Log.e("Downlaoddd", ".." + listItem.getIsDownloading());
 
     }
 

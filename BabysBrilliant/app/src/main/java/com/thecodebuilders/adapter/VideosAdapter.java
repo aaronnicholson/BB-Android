@@ -70,7 +70,6 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
     //Then it adds each ListItem instance to the elements ArrayList.
     private void parseListItems(int listLength) {
         elements = new ArrayList<ListItem>(listLength);
-
         for (int i = 0; i < listLength; i++) {
             JSONObject rawJSON;
             String name;
@@ -166,7 +165,14 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
         viewHolder.playlistIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                playlistClicked(position, thisViewHolder);
+                ListItem listItem = elements.get(position);
+                String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)+"/"+listItem.getMediaFile();
+                if (Utils.checkFileExist(mainActivity, fileLocation, listItem.getMediaFile())) {
+                    playlistClicked(position, thisViewHolder);
+                } else {
+                    alertForDownload(thisViewHolder, listItem, position);
+                }
+
             }
         });
         viewHolder.downloadIcon.setOnClickListener(new View.OnClickListener() {
@@ -266,9 +272,12 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
 
         if ((listItem.isPurchasable() && listItem.isPurchased()) || listItem.getPrice().equalsIgnoreCase(priceValue)) {
             String videoURL = listItem.getMediaFile();
+/*
             String fileLocation = Environment.getExternalStorageDirectory()
                     + "/" + mainActivity.getResources().getString(R.string.app_name) +
                     "/" + videoURL;
+*/
+            String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)+"/"+videoURL;
             if (Utils.checkFileExist(mainActivity, fileLocation, videoURL)) {
                 Log.d(LOGVAR, "FILE EXISTS");
                 mainActivity.playVideo(fileLocation, false);
@@ -317,9 +326,10 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
 
     private void setFileDownloadedListItem(ElementViewHolder viewHolder, ListItem listItem) {
         String videoURL = listItem.getMediaFile();
-        String fileLocation = Environment.getExternalStorageDirectory()
+        /*String fileLocation = Environment.getExternalStorageDirectory()
                 + "/" + mainActivity.getResources().getString(R.string.app_name) +
-                "/" + videoURL;
+                "/" + videoURL;*/
+        String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)+"/"+videoURL;
         if (Utils.checkFileExist(mainActivity, fileLocation, videoURL))
             viewHolder.downloadIcon.setVisibility(View.GONE);
         else

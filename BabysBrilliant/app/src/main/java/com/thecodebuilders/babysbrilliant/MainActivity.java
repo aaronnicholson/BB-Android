@@ -248,7 +248,6 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         animationBlink = AnimationUtils.loadAnimation(MainActivity.this, R.anim.blink);
         animationBlink.setAnimationListener(this);
-        fileArrayList = new ArrayList<String>();
         createRawFile();
         setMenuWidth();
 
@@ -972,9 +971,10 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         viewHolder.favoritesIcon.setVisibility(View.VISIBLE);
         viewHolder.playlistIcon.setVisibility(View.VISIBLE);
         String videoURL = listItem.getMediaFile();
-        String fileLocation = Environment.getExternalStorageDirectory()
+    /*    String fileLocation = Environment.getExternalStorageDirectory()
                 + "/" + getResources().getString(R.string.app_name) +
-                "/" + videoURL;
+                "/" + videoURL;*/
+        String fileLocation = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)+"/"+videoURL;
         if (Utils.checkFileExist(this, fileLocation, videoURL))
             viewHolder.downloadIcon.setVisibility(View.GONE);
         else
@@ -1134,6 +1134,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     @SuppressLint("NewApi")
     public void playVideo(String videoURL, final boolean isPlayList) {
+
+
         // Create a progressbar
         pDialog = new ProgressDialog(MainActivity.this);
         // Set progressbar title
@@ -1218,23 +1220,25 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             @Override
             public void onCompletion(MediaPlayer mp) {
 
-                Log.e(LOGVAR,"PlayList:"+isPlayList+":"+fileArrayList.size()+":"+indexOfVideo);
-                if(isPlayList && fileArrayList.size() > indexOfVideo){
-                    String fileLocation = Environment.getExternalStorageDirectory()
-                            + "/" + getResources().getString(R.string.app_name) +
-                            "/" + fileArrayList.get(indexOfVideo);
-                    Log.e(LOGVAR,"Toggle:"+toggle.isChecked());
-                    if(toggle.isChecked()){
-
-                    }
-                    else {
-                        Uri video = Uri.parse(fileLocation);
-                        videoView.setVideoURI(video);
-                        videoView.start();
-                        indexOfVideo++;
+                Log.e(LOGVAR, "PlayList:" + isPlayList + ":" + fileArrayList.size() + ":" + indexOfVideo +" toggel:"+toggle.isChecked());
+                if(isPlayList && toggle.isChecked()){
+                    if(fileArrayList.size() == indexOfVideo){
+                        indexOfVideo = 0;
                     }
                 }
-                else {
+                Log.e(LOGVAR, "index:" + indexOfVideo);
+                if (isPlayList && fileArrayList.size() > indexOfVideo) {
+                   /* String fileLocation = Environment.getExternalStorageDirectory()
+                            + "/" + getResources().getString(R.string.app_name) +
+                            "/" + fileArrayList.get(indexOfVideo);*/
+                    String fileLocation = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)+"/"+ fileArrayList.get(0);
+
+                    Log.e(LOGVAR, "Toggle:" + toggle.isChecked()+" File Name:"+fileArrayList.get(indexOfVideo));
+                    Uri video = Uri.parse(fileLocation);
+                    videoView.setVideoURI(video);
+                    videoView.start();
+                    indexOfVideo++;
+                } else {
                     if (mediaPlayer != null) {
                         mediaPlayer.stop();
                    /* mediaPlayer.reset();
@@ -1302,7 +1306,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Log.d(LOGVAR, "Response:" + Uri.decode(response));
+                Log.d(LOGVAR, From+":Response:" + Uri.decode(response));
                 try {
                     if (From.equalsIgnoreCase("Main")) {
                         processJSON(response);
@@ -2137,6 +2141,17 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     @Override
     public void onAnimationRepeat(Animation animation) {
+
+    }
+
+    public void closeVideo() {
+
+        Log.d(LOGVAR, "VIDEO CLOSE PRESS");
+        videoView.pause();
+        videoView.stopPlayback();
+        videoView.suspend();
+        videoToggleButton.setText(getString(R.string.video_pause));
+        videoLayout.setVisibility(View.INVISIBLE);
 
     }
 }

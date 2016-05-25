@@ -2,6 +2,7 @@ package com.thecodebuilders.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,7 +53,7 @@ public class SoundBoardsAdapter extends RecyclerView.Adapter<SoundBoardsAdapter.
     private void parseListItems(int listLength) {
         elements = new ArrayList<ListItem>(listLength);
         products = new ArrayList<JSONArray>();
-
+        Log.d(LOGVAR,"Assets:"+assetsList);
         for (int i = 0; i < listLength; i++) {
             JSONObject rawJSON;
             String name;
@@ -84,6 +85,7 @@ public class SoundBoardsAdapter extends RecyclerView.Adapter<SoundBoardsAdapter.
 
                 elements.add(listItem);//TODO: make image dynamic
             } catch (Throwable t) {
+                t.printStackTrace();
                 //Log.e(LOGVAR, "JSON Error " + t.getMessage() + assetsList);
             }
         }

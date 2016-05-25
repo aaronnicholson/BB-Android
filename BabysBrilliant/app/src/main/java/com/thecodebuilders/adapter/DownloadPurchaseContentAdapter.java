@@ -95,10 +95,10 @@ public class DownloadPurchaseContentAdapter extends BaseAdapter implements Downl
             @Override
             public void onClick(View v) {
                 String videoURL = postItems.get(position).get("file");
-                //String fileLocation = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + videoURL;
-                String fileLocation = Environment.getExternalStorageDirectory()
+               /* String fileLocation = Environment.getExternalStorageDirectory()
                         + "/" + context.getResources().getString(R.string.app_name) +
-                        "/" + videoURL;
+                        "/" + videoURL;*/
+                String fileLocation = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)+"/"+videoURL;
                 if (Utils.checkFileExist(context, fileLocation, videoURL)) {
                     Log.d("DownloadPurchaseAdapter", "FILE EXISTS");
                 } else {
@@ -124,9 +124,10 @@ public class DownloadPurchaseContentAdapter extends BaseAdapter implements Downl
         }
 
         String videoURL = map.get("file");
-        String fileLocation = Environment.getExternalStorageDirectory()
+        /*String fileLocation = Environment.getExternalStorageDirectory()
                 + "/" + context.getResources().getString(R.string.app_name) +
-                "/" + videoURL;
+                "/" + videoURL;*/
+        String fileLocation = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)+"/"+videoURL;
         if (Utils.checkFileExist(context, fileLocation, videoURL)) {
             Log.d("DownloadPurchaseAdapter", "FILE EXISTS");
             holder.arrow.setImageResource(R.drawable.checked);
