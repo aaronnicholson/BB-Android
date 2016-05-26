@@ -340,7 +340,9 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
     }
 
     private void thumbnailClicked(int position, ElementViewHolder thisViewHolder) {
-        ListItem listItem = elements.get(position);
+
+        mainActivity.configureThumbnailList(products.get(position), "videos");
+        /*ListItem listItem = elements.get(position);
 
         //TODO: Handle for soundboard items - using "bundle" in JSON
 
@@ -352,16 +354,16 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
             } else {
                 listItem.setIsPurchased(true);
                 setLookToPurchased(thisViewHolder);
-               /* try {
+               *//* try {
                     mainActivity.addToPurchased(listItem.getRawJSON());
                 } catch (JSONException e) {
                     e.printStackTrace();
-                }*/
+                }*//*
             }
         } else {
             //send the list of products for the clicked subcategory to make a new view showing them
             playOrOpen(position, listItem, thisViewHolder);
-        }
+        }*/
     }
 
     private void setLookToFavorite(ElementViewHolder viewHolder) {

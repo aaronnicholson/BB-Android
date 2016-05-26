@@ -1,6 +1,7 @@
 package com.thecodebuilders.babysbrilliant;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 
 import org.json.JSONObject;
@@ -140,6 +141,8 @@ public class ListItem extends View {
         if (!category.equals("5") && !isSection) {
             isPurchasable = true;
         }
+        if(category.equals("5") && !isSection)
+            isPurchasable = true;
 
     }
 

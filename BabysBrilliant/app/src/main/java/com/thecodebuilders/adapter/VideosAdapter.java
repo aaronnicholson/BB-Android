@@ -215,14 +215,14 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
         //hide text background for certain sections
         //for music, hide subcategory and product text background
         if (!listItem.doShowBackground()) {
-            viewHolder.textBackground.setVisibility(View.INVISIBLE);
+           // viewHolder.textBackground.setVisibility(View.INVISIBLE);
+            viewHolder.textBackground.setBackgroundColor(appContext.getResources().getColor(android.R.color.transparent));
         }
 
         viewHolder.titleText.setTextSize(13);
 
 
         //if it has been purchased already or free
-        Log.e(LOGVAR, "Adapter:" + listItem.isPurchased() + ":" + listItem.getPrice());
         if (listItem.isPurchased() || listItem.getPrice().equalsIgnoreCase(priceValue)) {
             setLookToPurchased(viewHolder);
         }
@@ -269,7 +269,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
 
     private void thumbnailClicked(int position, ElementViewHolder thisViewHolder) {
         ListItem listItem = elements.get(position);
-
+        Log.e(LOGVAR,"List:"+listItem.isPurchased()+"::;"+listItem.isPurchasable()+";;"+listItem.getPrice());
         if ((listItem.isPurchasable() && listItem.isPurchased()) || listItem.getPrice().equalsIgnoreCase(priceValue)) {
             String videoURL = listItem.getMediaFile();
 /*

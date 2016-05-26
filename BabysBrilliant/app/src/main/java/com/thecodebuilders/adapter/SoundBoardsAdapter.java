@@ -74,9 +74,12 @@ public class SoundBoardsAdapter extends RecyclerView.Adapter<SoundBoardsAdapter.
                 name = StringEscapeUtils.unescapeJava(itemJSON.getString("name"));
                 imageResource = itemJSON.getString("thumb");
                 if (!itemJSON.isNull("cat")) category = itemJSON.getString("cat");
-
-                if (!itemJSON.isNull("products"))
-                    products.add(itemJSON.getJSONArray("products"));
+                JSONArray subcategories = itemJSON.getJSONArray("subSubCategories");
+                //if (!itemJSON.isNull("products"))
+                //for(int j = 0; j < subcategories.length(); j++) {
+                    //JSONObject object = subcategories.getJSONObject(j);
+                    products.add(itemJSON.getJSONArray("subSubCategories"));
+               // }
 
                 mediaFile = itemJSON.getString("preview");
 
@@ -245,7 +248,7 @@ public class SoundBoardsAdapter extends RecyclerView.Adapter<SoundBoardsAdapter.
 
     private void updateThumbnailList(int position) {
         setSectionTitle(position);
-        mainActivity.configureThumbnailList(products.get(position), "videos");
+        mainActivity.configureThumbnailList(products.get(position), "");
     }
 
     private void setSectionTitle(int position) {

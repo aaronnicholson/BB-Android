@@ -30,6 +30,7 @@
             android:layout_alignBottom="@id/thumbnailImage"
             android:background="#f00">
             <LinearLayout
+                android:id="@+id/linear_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_alignParentBottom="true"
