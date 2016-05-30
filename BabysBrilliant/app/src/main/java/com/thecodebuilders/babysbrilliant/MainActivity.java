@@ -233,7 +233,6 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         //do not show the action bar
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
-
         purchasedItemTitle = new ArrayList<String>();
         mHelper = new IabHelper(getApplicationContext(), Constant.base64EncodedPublicKey);
         mHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
@@ -293,7 +292,6 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
             fOut.write(s.getBytes());
             fOut.close();
-            Toast.makeText(getBaseContext(), "file saved", Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -555,6 +553,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         homeButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+
                 if (purchasedItems.length() == 0)
                     emptyCategory.setVisibility(View.VISIBLE);
                 else
@@ -876,7 +875,6 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
         configureThumbnailList(listData, adapterType);
     }
 
@@ -910,7 +908,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             PlaylistItemAdapter adapter = new PlaylistItemAdapter(listData, this);
             thumbnailList.setAdapter(adapter);
         } else if (adapterType == "purchased") {
-            purchasedAdapter = new PurchasedAdapter(listData, this);
+            VideosAdapter  purchasedAdapter = new VideosAdapter(listData, this);
             thumbnailList.setAdapter(purchasedAdapter);
         }
        /* else if (adapterType == "favorites") {
@@ -1220,20 +1218,18 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             @Override
             public void onCompletion(MediaPlayer mp) {
 
-                Log.e(LOGVAR, "PlayList:" + isPlayList + ":" + fileArrayList.size() + ":" + indexOfVideo +" toggel:"+toggle.isChecked());
                 if(isPlayList && toggle.isChecked()){
                     if(fileArrayList.size() == indexOfVideo){
                         indexOfVideo = 0;
                     }
                 }
-                Log.e(LOGVAR, "index:" + indexOfVideo);
                 if (isPlayList && fileArrayList.size() > indexOfVideo) {
                    /* String fileLocation = Environment.getExternalStorageDirectory()
                             + "/" + getResources().getString(R.string.app_name) +
                             "/" + fileArrayList.get(indexOfVideo);*/
-                    String fileLocation = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)+"/"+ fileArrayList.get(0);
+                    Log.e(LOGVAR,"Index:"+indexOfVideo+":"+fileArrayList.get(indexOfVideo)+" Size:"+fileArrayList.size());
+                    String fileLocation = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)+"/"+ fileArrayList.get(indexOfVideo);
 
-                    Log.e(LOGVAR, "Toggle:" + toggle.isChecked()+" File Name:"+fileArrayList.get(indexOfVideo));
                     Uri video = Uri.parse(fileLocation);
                     videoView.setVideoURI(video);
                     videoView.start();
@@ -2024,8 +2020,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                                     showDialog("", "Changed Successfully");
 
                                 } else if (SELECT_FLAG.equalsIgnoreCase("purchase_video")) {
-
-                                    Toast.makeText(MainActivity.this, arg0, Toast.LENGTH_SHORT).show();
+                                    Log.d(TAG,"Purchase:"+arg0);
+//                                    Toast.makeText(MainActivity.this, arg0, Toast.LENGTH_SHORT).show();
                                 } else {
 
                                     showDialog("", "Changed Successfully");

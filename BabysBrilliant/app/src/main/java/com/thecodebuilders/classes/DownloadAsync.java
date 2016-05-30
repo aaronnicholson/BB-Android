@@ -111,7 +111,6 @@ public class DownloadAsync extends AsyncTask<String, String, String> {
         } else if (downloadStatusListener.getClass().getSimpleName().equalsIgnoreCase("VideosAdapter"))
             listItem.setIsDownloading(true);
 
-        //Log.e("Downlaoddd", ".." + listItem.getIsDownloading());
 
     }
 

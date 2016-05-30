@@ -28,7 +28,7 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/text_area_height"
             android:layout_alignBottom="@id/thumbnailImage"
-            android:background="#f00">
+            android:background="@color/red">
             <LinearLayout
                 android:id="@+id/linear_layout"
                 android:layout_width="wrap_content"
@@ -73,26 +73,28 @@
                     android:adjustViewBounds="true"
                     android:maxWidth="@dimen/product_icon_width"
                     android:maxHeight="@dimen/product_icon_width"
-
                     android:layout_marginLeft="12dp"
                     android:layout_gravity="center_vertical"
                     android:src="@drawable/favorites"
                     android:visibility="invisible"
                     />
             </LinearLayout>
+            <TextView
+                android:id="@+id/titleText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toLeftOf="@+id/linear_layout"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:paddingRight="3dp"
+                android:paddingLeft="10dp"
+                android:textAllCaps="false"
+                android:textColor="#ffffff"
+                android:textSize="14sp" />
 
         </RelativeLayout>
 
-        <TextView
-            android:id="@+id/titleText"
-            android:layout_width="300dp"
-            android:layout_height="@dimen/text_area_height"
-            android:layout_alignBottom="@id/thumbnailImage"
-            android:gravity="center_vertical"
-            android:paddingLeft="10dp"
-            android:textAllCaps="false"
-            android:textColor="#ffffff"
-            android:textSize="14sp" />
+
 
 
 

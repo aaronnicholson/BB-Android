@@ -29,6 +29,7 @@ import com.thecodebuilders.babysbrilliant.R;
 import com.thecodebuilders.model.Playlist;
 import com.thecodebuilders.network.InputStreamVolleyRequest;
 import com.thecodebuilders.network.VolleySingleton;
+import com.thecodebuilders.utility.Utils;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.json.JSONArray;
@@ -197,7 +198,30 @@ public class PurchasedAdapter extends RecyclerView.Adapter<ElementViewHolder> {
 
 
     }
+    private void setFileDownloadedListItem(ElementViewHolder viewHolder, ListItem listItem) {
+        String videoURL = listItem.getMediaFile();
+        /*String fileLocation = Environment.getExternalStorageDirectory()
+                + "/" + mainActivity.getResources().getString(R.string.app_name) +
+                "/" + videoURL;*/
+        String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)+"/"+videoURL;
+        if (Utils.checkFileExist(mainActivity, fileLocation, videoURL))
+            viewHolder.downloadIcon.setVisibility(View.GONE);
+        else
+            viewHolder.downloadIcon.setVisibility(View.VISIBLE);
+    }
+    private void setFileDownloadingListItem(ElementViewHolder viewHolder, ListItem listItem) {
+        Log.d(LOGVAR, "setFileDownloadingListItem" + listItem.getIsDownloading() + ":" + listItem.getMediaFile());
+        if (listItem.getIsDownloading()) {
+            viewHolder.progressBar.setVisibility(View.VISIBLE);
+            viewHolder.thumbnailImage.setClickable(false);
+            viewHolder.downloadIcon.setVisibility(View.GONE);
 
+        } else {
+            viewHolder.progressBar.setVisibility(View.GONE);
+            viewHolder.thumbnailImage.setClickable(true);
+        }
+
+    }
     private void configureListItemLook(final ElementViewHolder viewHolder, final ListItem listItem) {
 
         viewHolder.videoView.setVisibility(View.INVISIBLE);
@@ -218,9 +242,9 @@ public class PurchasedAdapter extends RecyclerView.Adapter<ElementViewHolder> {
         }
 
         //for soundboards, hide product footer entirely
-        if (!listItem.doShowText()) {
+        /*if (!listItem.doShowText()) {
             viewHolder.titleText.setVisibility(View.INVISIBLE);
-        }
+        }*/
 
 
         viewHolder.titleText.setTextSize(13);
@@ -246,6 +270,11 @@ public class PurchasedAdapter extends RecyclerView.Adapter<ElementViewHolder> {
             setLookToNotPlaylistItem(viewHolder);
         }
 
+        if (listItem.isPurchased())
+            setFileDownloadedListItem(viewHolder, listItem);
+
+        setFileDownloadingListItem(viewHolder, listItem);
+
         viewHolder.previewIcon.setVisibility(View.INVISIBLE);
 
 
@@ -257,6 +286,7 @@ public class PurchasedAdapter extends RecyclerView.Adapter<ElementViewHolder> {
         CommonAdapterUtility.setThumbnailImage(listItem, viewHolder.thumbnailImage);
 
         viewHolder.itemView.setTag(listItem);
+        viewHolder.progressBar.setTag(listItem);
     }
 
     private void previewClicked(int position) {

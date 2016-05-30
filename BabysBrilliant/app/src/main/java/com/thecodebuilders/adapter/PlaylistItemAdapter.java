@@ -108,8 +108,8 @@ public class PlaylistItemAdapter extends RecyclerView.Adapter<ElementViewHolder>
     }
 
     private void configureListItemLook(final ElementViewHolder viewHolder, final ListItem listItem) {
-        viewHolder.bumpLeftIcon.setVisibility(View.VISIBLE);
-        viewHolder.bumpRightIcon.setVisibility(View.VISIBLE);
+        viewHolder.bumpLeftIcon.setVisibility(View.GONE);
+        viewHolder.bumpRightIcon.setVisibility(View.GONE);
         viewHolder.deletePlaylistItemIcon.setVisibility(View.VISIBLE);
 
         //set text

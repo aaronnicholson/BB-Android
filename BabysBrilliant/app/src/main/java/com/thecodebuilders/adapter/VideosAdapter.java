@@ -87,7 +87,8 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
             try {
                 JSONObject itemJSON = assetsList.get(i);
                 name = StringEscapeUtils.unescapeJava(itemJSON.getString("title"));
-                price = "$" + itemJSON.getString("price");
+                if (!itemJSON.isNull("price"))
+                    price = "$" + itemJSON.getString("price");
                 for (int purchasedIndex = 0; purchasedIndex < mainActivity.purchasedItems.length(); purchasedIndex++) {
                     //if it has no SKU, skip it
                     if (!itemJSON.isNull("title")) {
@@ -158,19 +159,23 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
         viewHolder.favoritesIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                favoritesClicked(position, thisViewHolder);
+                if (!elements.get(position).getIsDownloading())
+                    favoritesClicked(position, thisViewHolder);
             }
         });
 
         viewHolder.playlistIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ListItem listItem = elements.get(position);
-                String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)+"/"+listItem.getMediaFile();
-                if (Utils.checkFileExist(mainActivity, fileLocation, listItem.getMediaFile())) {
-                    playlistClicked(position, thisViewHolder);
-                } else {
-                    alertForDownload(thisViewHolder, listItem, position);
+                if (!elements.get(position).getIsDownloading()) {
+
+                    ListItem listItem = elements.get(position);
+                    String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + listItem.getMediaFile();
+                    if (Utils.checkFileExist(mainActivity, fileLocation, listItem.getMediaFile())) {
+                        playlistClicked(position, thisViewHolder);
+                    } else {
+                        alertForDownload(thisViewHolder, listItem, position);
+                    }
                 }
 
             }
@@ -194,9 +199,9 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
 
         viewHolder.videoView.setVisibility(View.INVISIBLE);
 
-        viewHolder.favoritesIcon.setVisibility(View.INVISIBLE);
-        viewHolder.playlistIcon.setVisibility(View.INVISIBLE);
-        viewHolder.downloadIcon.setVisibility(View.INVISIBLE);
+        viewHolder.favoritesIcon.setVisibility(View.GONE);
+        viewHolder.playlistIcon.setVisibility(View.GONE);
+        viewHolder.downloadIcon.setVisibility(View.GONE);
         viewHolder.progressBar.setVisibility(View.INVISIBLE);
         viewHolder.priceText.setVisibility(View.VISIBLE);
 
@@ -215,8 +220,11 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
         //hide text background for certain sections
         //for music, hide subcategory and product text background
         if (!listItem.doShowBackground()) {
-           // viewHolder.textBackground.setVisibility(View.INVISIBLE);
+            // viewHolder.textBackground.setVisibility(View.INVISIBLE);
             viewHolder.textBackground.setBackgroundColor(appContext.getResources().getColor(android.R.color.transparent));
+        }
+        else{
+            viewHolder.textBackground.setBackgroundColor(appContext.getResources().getColor(R.color.red));
         }
 
         viewHolder.titleText.setTextSize(13);
@@ -269,7 +277,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
 
     private void thumbnailClicked(int position, ElementViewHolder thisViewHolder) {
         ListItem listItem = elements.get(position);
-        Log.e(LOGVAR,"List:"+listItem.isPurchased()+"::;"+listItem.isPurchasable()+";;"+listItem.getPrice());
+        Log.e(LOGVAR, "List:" + listItem.isPurchased() + "::;" + listItem.isPurchasable() + ";;" + listItem.getPrice());
         if ((listItem.isPurchasable() && listItem.isPurchased()) || listItem.getPrice().equalsIgnoreCase(priceValue)) {
             String videoURL = listItem.getMediaFile();
 /*
@@ -277,7 +285,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
                     + "/" + mainActivity.getResources().getString(R.string.app_name) +
                     "/" + videoURL;
 */
-            String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)+"/"+videoURL;
+            String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + videoURL;
             if (Utils.checkFileExist(mainActivity, fileLocation, videoURL)) {
                 Log.d(LOGVAR, "FILE EXISTS");
                 mainActivity.playVideo(fileLocation, false);
@@ -329,7 +337,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
         /*String fileLocation = Environment.getExternalStorageDirectory()
                 + "/" + mainActivity.getResources().getString(R.string.app_name) +
                 "/" + videoURL;*/
-        String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)+"/"+videoURL;
+        String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + videoURL;
         if (Utils.checkFileExist(mainActivity, fileLocation, videoURL))
             viewHolder.downloadIcon.setVisibility(View.GONE);
         else

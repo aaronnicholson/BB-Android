@@ -155,7 +155,6 @@ public class PlaylistAdapter extends RecyclerView.Adapter<ElementViewHolder> {
         ListItem listItem = elements.get(position);
         JSONArray jsonArray = products.get(0);
         mainActivity.fileArrayList = new ArrayList<String>();
-        Log.e(LOGVAR, "Products:" + products + ":" + products.size() + ":" + jsonArray.length());
 
         for (int i = 0; i < jsonArray.length(); i++) {
             try {

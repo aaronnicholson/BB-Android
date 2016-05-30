@@ -117,7 +117,10 @@ public class SectionAdapter extends RecyclerView.Adapter<ElementViewHolder> {
         //hide text background for certain sections
         //for music, hide subcategory and product text background
         if (!listItem.doShowBackground()) {
-            viewHolder.textBackground.setVisibility(View.INVISIBLE);
+            viewHolder.textBackground.setBackgroundColor(appContext.getResources().getColor(android.R.color.transparent));
+        }
+        else{
+            viewHolder.textBackground.setBackgroundColor(appContext.getResources().getColor(R.color.red));
         }
 
         //set text size differently if it is a section
