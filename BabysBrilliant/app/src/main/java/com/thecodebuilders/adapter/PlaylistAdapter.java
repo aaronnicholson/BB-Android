@@ -72,8 +72,8 @@ public class PlaylistAdapter extends RecyclerView.Adapter<ElementViewHolder> {
 
 
                 name = StringEscapeUtils.unescapeJava(itemJSON.getString("name"));
-                if (!itemJSON.isNull("products"))
-                    products.add(itemJSON.getJSONArray("products"));
+                    if (!itemJSON.isNull("products"))
+                        products.add(itemJSON.getJSONArray("products"));
 
                 imageResource = itemJSON.getString("thumb");
                 if (!itemJSON.isNull("cat")) category = itemJSON.getString("cat");
@@ -153,7 +153,8 @@ public class PlaylistAdapter extends RecyclerView.Adapter<ElementViewHolder> {
 
     private void thumbnailClicked(int position, ElementViewHolder thisViewHolder) {
         ListItem listItem = elements.get(position);
-        JSONArray jsonArray = products.get(0);
+        Log.e(LOGVAR,"Product:"+products.get(position)+"::"+position);
+        JSONArray jsonArray = products.get(position);
         mainActivity.fileArrayList = new ArrayList<String>();
 
         for (int i = 0; i < jsonArray.length(); i++) {
