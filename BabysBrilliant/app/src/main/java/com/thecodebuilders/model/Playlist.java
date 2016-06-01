@@ -2,12 +2,13 @@ package com.thecodebuilders.model;
 
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * Created by aaronnicholson on 9/1/15.
  */
-public class Playlist {
+public class Playlist implements Serializable{
     String name;
    public  ArrayList<JSONObject> playlistItems;
 

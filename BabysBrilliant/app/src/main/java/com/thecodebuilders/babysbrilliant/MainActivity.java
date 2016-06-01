@@ -71,6 +71,7 @@ import com.thecodebuilders.adapter.SoundBoardsAdapter;
 import com.thecodebuilders.adapter.ThumbnailListAdapter;
 import com.thecodebuilders.adapter.VideosAdapter;
 import com.thecodebuilders.application.ApplicationContextProvider;
+import com.thecodebuilders.classes.ObjectSerializer;
 import com.thecodebuilders.innapppurchase.IabHelper;
 import com.thecodebuilders.innapppurchase.IabResult;
 import com.thecodebuilders.innapppurchase.Inventory;
@@ -274,7 +275,6 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 //        purchaseHistory();
         downloadPurchaseContent();
 //        checkForNewContent();
-
 
     }
 
@@ -574,10 +574,14 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                 mainIntent.putExtra("Key", "fav");
                 startActivityForResult(mainIntent, 1);*/
 
-                if (favoriteItems.size() == 0)
+                if (favoriteItems.size() == 0) {
                     emptyCategory.setVisibility(View.VISIBLE);
+                    emptyCategory.setText(getResources().getString(R.string.empty_category_favorite_msg));
+                }
                 else
                     emptyCategory.setVisibility(View.GONE);
+
+                Log.d(LOGVAR,"FavouriteItems:"+favoriteItems);
                 configureThumbnailList(favoriteItems, "videos");
                 currentMenu = FAVORITE_ITEMS;
                 toggleMenuButton(currentMenu);
@@ -615,8 +619,10 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
                     playlistItems.add(playlistObject);
                 }
-                if (playlistItems.size() == 0)
+                if (playlistItems.size() == 0) {
                     emptyCategory.setVisibility(View.VISIBLE);
+                    emptyCategory.setText(getResources().getString(R.string.empty_category_playlist_msg));
+                }
                 else
                     emptyCategory.setVisibility(View.GONE);
                 configureThumbnailList(playlistItems, "playlists");
@@ -628,10 +634,12 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         moviesButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                if (movies.length() == 0)
-                    emptyCategory.setVisibility(View.VISIBLE);
-                else
-                    emptyCategory.setVisibility(View.GONE);
+                if(movies != null) {
+                    if (movies.length() == 0)
+                        emptyCategory.setVisibility(View.VISIBLE);
+                    else
+                        emptyCategory.setVisibility(View.GONE);
+                }
                 configureThumbnailList(movies, "section");
                 //Log.d(LOGVAR, "movies item:" + movies.toString());
                 currentMenu = MOVIES;
@@ -1023,7 +1031,6 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         //TODO: save to user database
         Log.d(LOGVAR, "..." + productJSON);
         favoriteItems.add(productJSON);
-
 
     }
 
@@ -1634,6 +1641,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         videoFFButton.setTypeface(MainActivity.fontAwesome);
         videoRewButton.setTypeface(MainActivity.fontAwesome);
         sectionTitle.setTypeface(MainActivity.proximaBold);
+        emptyCategory.setTypeface(MainActivity.proximaBold);
 
         close_btn.setOnClickListener(new View.OnClickListener() {
             @Override

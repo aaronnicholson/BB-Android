@@ -147,7 +147,7 @@
             android:layout_centerInParent="true"
             android:layout_marginRight="@dimen/small_margin"
             android:adjustViewBounds="true"
-            android:maxWidth="20dp"
+            android:maxWidth="25dp"
             android:src="@drawable/settings" />
     </RelativeLayout>
 
@@ -169,9 +169,10 @@
         android:textColor="@color/black"
         android:layout_centerInParent="true"
         android:text="@string/empty_category_msg"
-        android:paddingTop="20dp"
+        android:padding="40dp"
+        android:lineSpacingExtra="3dp"
         android:visibility="gone"
-        android:textSize="22sp" />
+        android:textSize="18sp" />
 
 
     <RelativeLayout
