@@ -259,7 +259,6 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
 
     private void favoritesClicked(int position, ElementViewHolder thisViewHolder) {
         ListItem listItem = elements.get(position);
-
         if (listItem.isFavorite()) {
             //TODO: remove from favorites
             mainActivity.removeFromFavorites(listItem.getRawJSON());
@@ -268,6 +267,9 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
             mainActivity.addToFavorites(listItem.getRawJSON());
             setLookToFavorite(thisViewHolder);
         }
+        String favoriteString = mainActivity.favoriteItems.toString();
+        PreferenceStorage.saveFavourites(appContext, PreferenceStorage.FAVOURITE_SAVE, favoriteString);
+        Log.e(LOGVAR,"Element:"+mainActivity.favoriteItems.toString());
     }
 
     private void playlistClicked(int position, ElementViewHolder thisViewHolder) {

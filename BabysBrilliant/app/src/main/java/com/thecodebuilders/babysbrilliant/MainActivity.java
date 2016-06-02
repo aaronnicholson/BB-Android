@@ -275,6 +275,21 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 //        purchaseHistory();
         downloadPurchaseContent();
 //        checkForNewContent();
+        String favourite = PreferenceStorage.getFavourites(MainActivity.this);
+        Log.e(LOGVAR,"favo:"+favourite+"::"+favoriteItems);
+        if(!favourite.isEmpty() && favoriteItems.isEmpty()){
+            try {
+                JSONArray array = new JSONArray(favourite);
+                for(int i = 0; i < array.length(); i++){
+                    JSONObject jsonObject = array.getJSONObject(i);
+                    favoriteItems.add(jsonObject);
+                }
+                Log.e(LOGVAR, "favo111:" + array + "::" + favoriteItems);
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+        }
 
     }
 

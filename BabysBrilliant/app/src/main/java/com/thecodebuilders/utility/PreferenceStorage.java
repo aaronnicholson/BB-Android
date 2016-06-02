@@ -40,6 +40,11 @@ public class PreferenceStorage {
         editor.commit();
     }
 
+    public static String getFavourites (Context context){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return preferences.getString(FAVOURITE_SAVE, "");
+    }
+
 
     public static String returnFavourites(Context context, String key){
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
