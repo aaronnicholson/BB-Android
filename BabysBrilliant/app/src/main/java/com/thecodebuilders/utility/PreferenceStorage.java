@@ -19,6 +19,7 @@ import java.util.ArrayList;
 public class PreferenceStorage {
 
     public static final String FAVOURITE_SAVE = "favourite_save";
+    public static final String PLAYLIST_SAVE = "playlist_save";
 
     public static void  saveFileLength (Context context, String key, int value){
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -45,6 +46,31 @@ public class PreferenceStorage {
         return preferences.getString(FAVOURITE_SAVE, "");
     }
 
+    public static void  clearDefaultFavouritePref (Context context){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.remove(FAVOURITE_SAVE);
+        editor.commit();
+    }
+
+    public static void  savePlaylist (Context context, String value){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(PLAYLIST_SAVE, value);
+        editor.commit();
+    }
+
+    public static String getPlaylist (Context context){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return preferences.getString(PLAYLIST_SAVE, "");
+    }
+
+    public static void  clearDefaultPlaylistPref (Context context){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.remove(PLAYLIST_SAVE);
+        editor.commit();
+    }
 
     public static String returnFavourites(Context context, String key){
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -58,7 +84,7 @@ public class PreferenceStorage {
     }
 
 
-    public static void saveFavouriteObject (Context context, ArrayList<Playlist> favoriteItems){
+    public static void saveFavouriteObject (Context context, Playlist favoriteItems){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = prefs.edit();
         try {

@@ -17,6 +17,7 @@ import com.thecodebuilders.babysbrilliant.MainActivity;
 import com.thecodebuilders.babysbrilliant.ParentalChallengeScreen;
 import com.thecodebuilders.babysbrilliant.R;
 import com.thecodebuilders.network.VolleySingleton;
+import com.thecodebuilders.utility.PreferenceStorage;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.json.JSONArray;
@@ -54,6 +55,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<ElementViewHolder> {
         elements = new ArrayList<ListItem>(listLength);
         products = new ArrayList<JSONArray>();
         Log.e(LOGVAR, "Asset:" + assetsList);
+        PreferenceStorage.savePlaylist(appContext,assetsList.toString());
         for (int i = 0; i < listLength; i++) {
             String name;
             Boolean playInline = false;

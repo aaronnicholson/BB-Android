@@ -1,5 +1,7 @@
 package com.thecodebuilders.model;
 
+import android.util.Log;
+
 import org.json.JSONObject;
 
 import java.io.Serializable;
@@ -35,11 +37,13 @@ public class Playlist implements Serializable{
 
     public ArrayList<JSONObject> addPlaylistItem(JSONObject item) {
         playlistItems.add(item);
+        Log.e("PlayList:","Item:"+""+name+"///////"+playlistItems.toString());
         return playlistItems;
     }
 
     public ArrayList<JSONObject> removePlaylistItemAtIndex(int itemIndex) {
         playlistItems.remove(itemIndex);
+        Log.e("PlayList:","Item:Remove"+":"+name+"///////"+playlistItems.toString());
         return playlistItems;
     }
 

@@ -214,6 +214,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     private Animation animationBlink;
     private ListItem listItem;
     private ElementViewHolder viewHolder;
+    private ThumbnailListAdapter.ElementViewHolder  thumbnailViewHolder;
 
     private VideosAdapter videoAdapter;
     private PurchasedAdapter purchasedAdapter;
@@ -276,7 +277,6 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         downloadPurchaseContent();
 //        checkForNewContent();
         String favourite = PreferenceStorage.getFavourites(MainActivity.this);
-        Log.e(LOGVAR,"favo:"+favourite+"::"+favoriteItems);
         if(!favourite.isEmpty() && favoriteItems.isEmpty()){
             try {
                 JSONArray array = new JSONArray(favourite);
@@ -290,6 +290,41 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                 e.printStackTrace();
             }
         }
+        String playlist = PreferenceStorage.getPlaylist(MainActivity.this);
+        Log.e(LOGVAR,"PlayList:"+playlist);
+        if(!playlist.isEmpty() && playlists.isEmpty()){
+            try {
+                JSONArray playListArray = new JSONArray(playlist);
+                for(int j = 0; j < playListArray.length(); j++){
+                    JSONObject jsonObj = playListArray.getJSONObject(j);
+                    ArrayList<JSONObject> jsonObjects = new ArrayList<JSONObject>();
+                    JSONArray productArray = jsonObj.getJSONArray("products");
+                    for(int k = 0; k < productArray.length(); k++){
+                        jsonObjects.add(productArray.getJSONObject(k));
+                    }
+                    playlists.add(j, new Playlist(jsonObj.getString("name"), jsonObjects));
+
+                }
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+
+        }
+       /* ArrayList<JSONObject> playlistItems = new ArrayList<>();
+        for (int i = 0; i < playlists.size(); i++) {
+            JSONObject playlistObject = new JSONObject();
+            try {
+                playlistObject.put("name", playlists.get(i).getName());
+                playlistObject.put("isPlaylist", "true");
+                playlistObject.put("thumb", playlists.get(i).getPlaylistItems().get(0).getString("thumb"));
+                playlistObject.put("products", new JSONArray(playlists.get(i).getPlaylistItems()));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            playlistItems.add(playlistObject);
+        }*/
 
     }
 
@@ -490,6 +525,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                     SharedPreferences.Editor editor = pref.edit();
                     editor.putString("user_id", "");
                     editor.commit(); // commit changes
+                    PreferenceStorage.clearDefaultFavouritePref(MainActivity.this);
+                    PreferenceStorage.clearDefaultPlaylistPref(MainActivity.this);
 
                     Intent mainIntent = new Intent(MainActivity.this, LoginSignUpActivity.class);
                     startActivity(mainIntent);
@@ -962,6 +999,20 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     }
 
+    public void addToPurchasedSoundBoards(JSONObject productJSON, ListItem listItem, ThumbnailListAdapter.ElementViewHolder viewHolder) throws JSONException {
+        //TODO: run through actual app store purchase routine
+        //TODO: check for duplicate purchase
+        //TODO: save to user database
+        this.productJSON = productJSON;
+        this.listItem = listItem;
+        this.thumbnailViewHolder = viewHolder;
+        Intent purchase = new Intent(MainActivity.this, ParentalChallengeScreen.class);
+        purchase.putExtra("Key", "Purchase");
+        startActivityForResult(purchase, 1);
+
+
+    }
+
     IabHelper.OnIabPurchaseFinishedListener mPurchaseFinishedListener
             = new IabHelper.OnIabPurchaseFinishedListener() {
         public void onIabPurchaseFinished(IabResult result,
@@ -988,18 +1039,23 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     private void purchaseDone() {
         listItem.setIsPurchased(true);
-        viewHolder.priceText.setVisibility(View.INVISIBLE);
-        viewHolder.favoritesIcon.setVisibility(View.VISIBLE);
-        viewHolder.playlistIcon.setVisibility(View.VISIBLE);
-        String videoURL = listItem.getMediaFile();
+        if(viewHolder != null) {
+            viewHolder.priceText.setVisibility(View.INVISIBLE);
+            viewHolder.favoritesIcon.setVisibility(View.VISIBLE);
+            viewHolder.playlistIcon.setVisibility(View.VISIBLE);
+            String videoURL = listItem.getMediaFile();
     /*    String fileLocation = Environment.getExternalStorageDirectory()
                 + "/" + getResources().getString(R.string.app_name) +
                 "/" + videoURL;*/
-        String fileLocation = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)+"/"+videoURL;
-        if (Utils.checkFileExist(this, fileLocation, videoURL))
-            viewHolder.downloadIcon.setVisibility(View.GONE);
-        else
-            viewHolder.downloadIcon.setVisibility(View.VISIBLE);
+            String fileLocation = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + videoURL;
+            if (Utils.checkFileExist(this, fileLocation, videoURL))
+                viewHolder.downloadIcon.setVisibility(View.GONE);
+            else
+                viewHolder.downloadIcon.setVisibility(View.VISIBLE);
+        }
+        else {
+            thumbnailViewHolder.priceText.setVisibility(View.GONE);
+        }
         Log.d(LOGVAR, "ProductJson:" + productJSON);
 
     }

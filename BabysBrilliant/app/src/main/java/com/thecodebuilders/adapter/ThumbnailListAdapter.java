@@ -50,6 +50,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
     MainActivity mainActivity;
     private VolleySingleton volleySingleton;
     private ImageLoader imageLoader;
+    public static String priceValue = "$0.00";
 
 
     int listIncrement = 0; //for testing only
@@ -71,7 +72,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
     private void parseListItems(int listLength) {
         elements = new ArrayList<ListItem>(listLength);
         products = new ArrayList<JSONArray>();
-
+        Log.d(LOGVAR, "Thumbnail:" + assetsList.toString());
         for (int i = 0; i < listLength; i++) {
             JSONObject rawJSON;
             String name;
@@ -90,6 +91,9 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
                 JSONObject itemJSON = assetsList.get(i);
                 //subcategories have a name field instead of a title field. We use that difference to determine if it is a product or subcategory item.
                 //if it is a list of products
+
+                if (!itemJSON.isNull("price"))
+                    price = "$" + itemJSON.getString("price");
                 if (itemJSON.isNull("name")) {
                     name = StringEscapeUtils.unescapeJava(itemJSON.getString("title"));
                     isSubcategory = false;
@@ -215,6 +219,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
 
         viewHolder.favoritesIcon.setVisibility(View.INVISIBLE);
         viewHolder.playlistIcon.setVisibility(View.INVISIBLE);
+        viewHolder.priceText.setVisibility(View.VISIBLE);
 
         //set text
         viewHolder.titleText.setText(listItem.getTitle());
@@ -244,9 +249,9 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         }
 
         //hide price on subcategories
-        if (!listItem.isPurchasable()) {
+       /* if (!listItem.isPurchasable()) {
             viewHolder.priceText.setVisibility(View.INVISIBLE);
-        }
+        }*/
 
         //if it has been purchased already
         if (listItem.isPurchased()) {
@@ -340,8 +345,20 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
     }
 
     private void thumbnailClicked(int position, ElementViewHolder thisViewHolder) {
+        ListItem listItem = elements.get(position);
+        Log.e("ThumbnailList","Adapter:11"+thisViewHolder.priceText.getVisibility());
+        if (!(listItem.isPurchasable() && listItem.isPurchased())
+                || !listItem.getPrice().equalsIgnoreCase(priceValue)) {
+            try {
+                mainActivity.addToPurchasedSoundBoards(listItem.getRawJSON(), listItem, thisViewHolder);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        else {
+            mainActivity.configureThumbnailList(products.get(position), "videos");
+        }
 
-        mainActivity.configureThumbnailList(products.get(position), "videos");
         /*ListItem listItem = elements.get(position);
 
         //TODO: Handle for soundboard items - using "bundle" in JSON
@@ -384,12 +401,12 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
     }
 
     private void setLookToPlaylistItem(ElementViewHolder viewHolder) {
-        viewHolder.priceText.setVisibility(View.INVISIBLE);
+       // viewHolder.priceText.setVisibility(View.INVISIBLE);
         viewHolder.playlistIcon.setColorFilter(Color.YELLOW);
     }
 
     private void setLookToNotPlaylistItem(ElementViewHolder viewHolder) {
-        viewHolder.priceText.setVisibility(View.INVISIBLE);
+       // viewHolder.priceText.setVisibility(View.INVISIBLE);
         viewHolder.playlistIcon.setColorFilter(Color.WHITE);
 
     }
@@ -564,6 +581,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         configureListItemLook(viewHolder, rowData);
 
         configureListItemListeners(viewHolder, position);
+        Log.e("ThumbnailList","Adapter:"+viewHolder.priceText.getVisibility());
 
     }
 
@@ -576,7 +594,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
     public class ElementViewHolder extends RecyclerView.ViewHolder {
         private final TextView titleText;
         private final ImageView thumbnailImage;
-        private final TextView priceText;
+        public final TextView priceText;
         private final RelativeLayout textBackground;
         private final ImageView favoritesIcon;
         private final ImageView playlistIcon;

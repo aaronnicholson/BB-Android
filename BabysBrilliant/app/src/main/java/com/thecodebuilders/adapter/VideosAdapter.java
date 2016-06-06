@@ -269,7 +269,6 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
         }
         String favoriteString = mainActivity.favoriteItems.toString();
         PreferenceStorage.saveFavourites(appContext, PreferenceStorage.FAVOURITE_SAVE, favoriteString);
-        Log.e(LOGVAR,"Element:"+mainActivity.favoriteItems.toString());
     }
 
     private void playlistClicked(int position, ElementViewHolder thisViewHolder) {
@@ -279,7 +278,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
 
     private void thumbnailClicked(int position, ElementViewHolder thisViewHolder) {
         ListItem listItem = elements.get(position);
-        Log.e(LOGVAR, "List:" + listItem.isPurchased() + "::;" + listItem.isPurchasable() + ";;" + listItem.getPrice());
+
         if ((listItem.isPurchasable() && listItem.isPurchased()) || listItem.getPrice().equalsIgnoreCase(priceValue)) {
             String videoURL = listItem.getMediaFile();
 /*
