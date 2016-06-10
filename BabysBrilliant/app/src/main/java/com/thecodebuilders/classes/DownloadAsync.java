@@ -13,6 +13,7 @@ import android.util.Log;
 
 
 import com.thecodebuilders.adapter.ElementViewHolder;
+import com.thecodebuilders.adapter.ThumbnailListAdapter;
 import com.thecodebuilders.babysbrilliant.ListItem;
 import com.thecodebuilders.babysbrilliant.R;
 import com.thecodebuilders.interfaces.DownloadStatusListener;
@@ -32,6 +33,7 @@ public class DownloadAsync extends AsyncTask<String, String, String> {
     private static final String TAG = "DownloadAsync";
     private Context context;
     private ElementViewHolder viewHolder;
+    private ThumbnailListAdapter.ElementViewHolder elementViewHolder;
     private ListItem listItem;
     private String mUrl;
     private String videoName;
@@ -49,6 +51,20 @@ public class DownloadAsync extends AsyncTask<String, String, String> {
         this.position = position;
         mUrl = context.getResources().getString(R.string.media_url) + videoName;
         if (listener.getClass().getSimpleName().equalsIgnoreCase("VideosAdapter"))
+            listItem.setIsDownloading(true);
+
+    }
+
+    public DownloadAsync(ThumbnailListAdapter.ElementViewHolder viewHolder, ListItem listItem, DownloadStatusListener listener,
+                         int position, String videoName, Context context) {
+        this.context = context;
+        this.elementViewHolder = viewHolder;
+        this.listItem = listItem;
+        this.videoName = videoName;
+        this.downloadStatusListener = listener;
+        this.position = position;
+        mUrl = context.getResources().getString(R.string.media_url) + videoName;
+        if (listener.getClass().getSimpleName().equalsIgnoreCase("ThumbnailListAdapter"))
             listItem.setIsDownloading(true);
 
     }
@@ -107,8 +123,12 @@ public class DownloadAsync extends AsyncTask<String, String, String> {
             if (downloadStatusListener.getClass().getSimpleName().equalsIgnoreCase("VideosAdapter")) {
                 listItem.setIsDownloading(false);
                 viewHolder.thumbnailImage.setClickable(true);
+            }else  if(downloadStatusListener.getClass().getSimpleName().equalsIgnoreCase("ThumbnailListAdapter")) {
+                listItem.setIsDownloading(false);
+                //elementViewHolder.thumbnailImage.setClickable(true);
             }
-        } else if (downloadStatusListener.getClass().getSimpleName().equalsIgnoreCase("VideosAdapter"))
+        } else if (downloadStatusListener.getClass().getSimpleName().equalsIgnoreCase("VideosAdapter")
+                || downloadStatusListener.getClass().getSimpleName().equalsIgnoreCase("ThumbnailListAdapter"))
             listItem.setIsDownloading(true);
 
 
@@ -121,6 +141,12 @@ public class DownloadAsync extends AsyncTask<String, String, String> {
                 listItem.setIsDownloading(false);
                 viewHolder.thumbnailImage.setClickable(true);
             }
+            else  if(downloadStatusListener.getClass().getSimpleName().equalsIgnoreCase("ThumbnailListAdapter")) {
+                listItem.setIsDownloading(false);
+               // elementViewHolder.thumbnailImage.setClickable(true);
+            }
+
+
             downloadStatusListener.onDownloadComplete(position);
         }
 

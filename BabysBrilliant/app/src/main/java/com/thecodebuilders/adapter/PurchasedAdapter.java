@@ -482,7 +482,7 @@ public class PurchasedAdapter extends RecyclerView.Adapter<ElementViewHolder> {
     }
 
     public void playInlineVideo(String videoURL, final ElementViewHolder viewHolder) {
-        String url = mainActivity.mediaURL + videoURL;
+       /* String url = mainActivity.mediaURL + videoURL;
         viewHolder.videoView.setAlpha(0);
         viewHolder.videoView.setVisibility(View.VISIBLE);
 
@@ -553,7 +553,7 @@ public class PurchasedAdapter extends RecyclerView.Adapter<ElementViewHolder> {
 
             }
         });
-
+*/
 
     }
 

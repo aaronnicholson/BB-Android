@@ -91,12 +91,21 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
                     price = "$" + itemJSON.getString("price");
                 for (int purchasedIndex = 0; purchasedIndex < mainActivity.purchasedItems.length(); purchasedIndex++) {
                     //if it has no SKU, skip it
-                    if (!itemJSON.isNull("title")) {
-                        if (itemJSON.getString("title").equals(mainActivity.purchasedItems.getJSONObject(purchasedIndex).getString("title"))) {
-                            isPurchased = true;
+                    try {
+                        if (!itemJSON.isNull("SKU")) {
+                            if (itemJSON.getString("SKU").equals(mainActivity.purchasedItems.getJSONObject(purchasedIndex).getString("SKU"))) {
+                                isPurchased = true;
+                            }
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        if (!itemJSON.isNull("SKU")) {
+                            if (itemJSON.getString("SKU").equals(mainActivity.purchasedItems.getJSONObject(purchasedIndex).getString("SKU"))) {
+                                isPurchased = true;
+                            }
+
                         }
                     }
-
                 }
 
                 //look through items in the FAVORITES list
@@ -222,8 +231,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
         if (!listItem.doShowBackground()) {
             // viewHolder.textBackground.setVisibility(View.INVISIBLE);
             viewHolder.textBackground.setBackgroundColor(appContext.getResources().getColor(android.R.color.transparent));
-        }
-        else{
+        } else {
             viewHolder.textBackground.setBackgroundColor(appContext.getResources().getColor(R.color.red));
         }
 
@@ -231,8 +239,9 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
 
 
         //if it has been purchased already or free
-        if (listItem.isPurchased() || listItem.getPrice().equalsIgnoreCase(priceValue)) {
-            setLookToPurchased(viewHolder);
+        if (listItem.isPurchased() || listItem.getPrice().equalsIgnoreCase(priceValue)
+                || !listItem.isPurchasable()) {
+                 setLookToPurchased(viewHolder);
         }
 
         if (listItem.isFavorite()) {
@@ -246,8 +255,14 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
         } else {
             setLookToNotPlaylistItem(viewHolder);
         }
-        if (listItem.isPurchased())
+        Log.e("Title:",".."+listItem.isPurchased()+"::"+listItem.getTitle());
+        if(listItem.getCategory().equals("5") && !listItem.isSection()){
             setFileDownloadedListItem(viewHolder, listItem);
+        }
+        else {
+            if (listItem.isPurchased())
+                setFileDownloadedListItem(viewHolder, listItem);
+        }
 
         setFileDownloadingListItem(viewHolder, listItem);
 
@@ -278,8 +293,8 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
 
     private void thumbnailClicked(int position, ElementViewHolder thisViewHolder) {
         ListItem listItem = elements.get(position);
-
         if ((listItem.isPurchasable() && listItem.isPurchased()) || listItem.getPrice().equalsIgnoreCase(priceValue)) {
+
             String videoURL = listItem.getMediaFile();
 /*
             String fileLocation = Environment.getExternalStorageDirectory()
@@ -287,6 +302,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
                     "/" + videoURL;
 */
             String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + videoURL;
+            Log.e(LOGVAR,".."+listItem.getMediaFile());
             if (Utils.checkFileExist(mainActivity, fileLocation, videoURL)) {
                 Log.d(LOGVAR, "FILE EXISTS");
                 mainActivity.playVideo(fileLocation, false);
@@ -301,10 +317,25 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
             //TODO: do actual purchase round trip here
             // listItem.setIsPurchased(true);
             //  setLookToPurchased(thisViewHolder);
-            try {
-                mainActivity.addToPurchased(listItem.getRawJSON(), listItem, thisViewHolder);
-            } catch (JSONException e) {
-                e.printStackTrace();
+            if(listItem.getCategory().equals("5") && !listItem.isSection()){
+                String videoURL = listItem.getMediaFile();
+                String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + videoURL;
+                if (Utils.checkFileExist(mainActivity, fileLocation, videoURL)) {
+                    Log.d(LOGVAR, "FILE EXISTS");
+                    mainActivity.playVideo(fileLocation, false);
+                    //otherwise, go get it
+                } else {
+                    Log.d(LOGVAR, "FILE DOES NOT EXIST");
+                    //TODO: Stop multiple downloads of the same file
+                    alertForDownload(thisViewHolder, listItem, position);
+                }
+            }
+            else {
+                try {
+                    mainActivity.addToPurchased(listItem.getRawJSON(), listItem, thisViewHolder);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

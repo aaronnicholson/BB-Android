@@ -141,8 +141,8 @@ public class ListItem extends View {
         if (!category.equals("5") && !isSection) {
             isPurchasable = true;
         }
-        if(category.equals("5") && !isSection)
-            isPurchasable = true;
+       /* if(category.equals("5") && !isSection)
+            isPurchasable = true;*/
 
     }
 

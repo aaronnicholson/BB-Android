@@ -1,12 +1,17 @@
 package com.thecodebuilders.adapter;
 
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.SurfaceTexture;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Environment;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,6 +20,7 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.VideoView;
@@ -24,8 +30,11 @@ import com.thecodebuilders.application.ApplicationContextProvider;
 import com.thecodebuilders.babysbrilliant.ListItem;
 import com.thecodebuilders.babysbrilliant.MainActivity;
 import com.thecodebuilders.babysbrilliant.R;
+import com.thecodebuilders.classes.DownloadAsync;
+import com.thecodebuilders.interfaces.DownloadStatusListener;
 import com.thecodebuilders.model.Playlist;
 import com.thecodebuilders.network.VolleySingleton;
+import com.thecodebuilders.utility.Utils;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.json.JSONArray;
@@ -41,7 +50,7 @@ import java.util.ArrayList;
 /**
  * Created by aaronnicholson on 8/17/15.
  */
-public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdapter.ElementViewHolder> {
+public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdapter.ElementViewHolder> implements DownloadStatusListener {
     private final String LOGVAR = "ThumbnailListAdapter";
     private ArrayList<ListItem> elements;
     private final Context appContext = ApplicationContextProvider.getContext();
@@ -51,7 +60,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
     private VolleySingleton volleySingleton;
     private ImageLoader imageLoader;
     public static String priceValue = "$0.00";
-
+    private boolean isMediaPlayingDone = true;
 
     int listIncrement = 0; //for testing only
 
@@ -97,7 +106,6 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
                 if (itemJSON.isNull("name")) {
                     name = StringEscapeUtils.unescapeJava(itemJSON.getString("title"));
                     isSubcategory = false;
-
                     //if it is a list of subcategories
                 } else {
                     name = itemJSON.getString("name");
@@ -116,10 +124,18 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
                 //if this item is in there, mark it as purchased
                 for (int purchasedIndex = 0; purchasedIndex < mainActivity.purchasedItems.length(); purchasedIndex++) {
                     //if it has no SKU, skip it
-                    if (!itemJSON.isNull("title")) {
-                        if (itemJSON.getString("title").equals(mainActivity.purchasedItems.getJSONObject(purchasedIndex).getString("title"))) {
-                            isPurchased = true;
+                    try {
+                        if (!itemJSON.isNull("SKU")) {
+                          //  if (!mainActivity.purchasedItems.getJSONObject(purchasedIndex).isNull("title")) {
+
+                                if ((itemJSON.getString("SKU").equals(mainActivity.purchasedItems.getJSONObject(purchasedIndex).getString("SKU")))) {
+                                    isPurchased = true;
+                                }
+                           // }
                         }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+
                     }
 
                 }
@@ -173,6 +189,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
 
                 elements.add(listItem);//TODO: make image dynamic
             } catch (Throwable t) {
+                t.printStackTrace();
                 //Log.e(LOGVAR, "JSON Error " + t.getMessage() + assetsList);
             }
         }
@@ -213,7 +230,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
 
     }
 
-    private void configureListItemLook(final ElementViewHolder viewHolder, final ListItem listItem) {
+    private void configureListItemLook(final ElementViewHolder viewHolder, final ListItem listItem, int pos) {
 
         viewHolder.videoView.setVisibility(View.INVISIBLE);
 
@@ -254,9 +271,8 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         }*/
 
         //if it has been purchased already
-        if (listItem.isPurchased()) {
+        if (listItem.isPurchased() || listItem.getPrice().equalsIgnoreCase(priceValue)) {
             setLookToPurchased(viewHolder);
-
         }
 
         if (listItem.isFavorite()) {
@@ -290,6 +306,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         if (listItem.isPlaylist()) {
             setLookToPlaylist(viewHolder);
         }
+        setFileDownloadingListItem(viewHolder, listItem, pos);
 
         /*This section will first look for the thumbnail in the assets folder.
         * If it is not found there, it will look to see if it was previously downloaded and saved to internal memory.
@@ -313,13 +330,16 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
                 CommonAdapterUtility.loadImageFromServer(listItem, viewHolder.thumbnailImage);
             }
         }
-
+        if (listItem.getCategory().contains("5") && !listItem.isSection()) {
+            viewHolder.priceText.setVisibility(View.GONE);
+        }
         viewHolder.itemView.setTag(listItem);
     }
 
     private void previewClicked(int position) {
         ListItem listItem = elements.get(position);
-        if (!listItem.getMediaFile().equals("")) mainActivity.playVideo(listItem.getMediaFile(), false);
+        if (!listItem.getMediaFile().equals(""))
+            mainActivity.playVideo(listItem.getMediaFile(), false);
     }
 
     private void favoritesClicked(int position, ElementViewHolder thisViewHolder) {
@@ -346,18 +366,42 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
 
     private void thumbnailClicked(int position, ElementViewHolder thisViewHolder) {
         ListItem listItem = elements.get(position);
-        Log.e("ThumbnailList","Adapter:11"+thisViewHolder.priceText.getVisibility());
-        if (!(listItem.isPurchasable() && listItem.isPurchased())
-                || !listItem.getPrice().equalsIgnoreCase(priceValue)) {
-            try {
-                mainActivity.addToPurchasedSoundBoards(listItem.getRawJSON(), listItem, thisViewHolder);
-            } catch (JSONException e) {
-                e.printStackTrace();
+        if (!elements.get(position).getIsDownloading()) {
+            if (listItem.getCategory().contains("5") && !listItem.isSection()) {
+                if(isMediaPlayingDone)
+                    playOrOpen(position, listItem, thisViewHolder);
+            } else if ((listItem.isPurchasable() && listItem.isPurchased()) || listItem.getPrice().equalsIgnoreCase(priceValue)) {
+
+                int checkAllFileExists = 0;
+                for (int i = 0; i < products.get(position).length(); i++) {
+                    try {
+                        JSONArray array = new JSONArray("" + products.get(position));
+                        JSONObject jsonObject = array.getJSONObject(i);
+                        String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + jsonObject.getString("file");
+
+                        if (Utils.checkFileExist(mainActivity, fileLocation, jsonObject.getString("file"))) {
+                            checkAllFileExists++;
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
+                if (checkAllFileExists == products.get(position).length()) {
+                    playOrOpen(position, listItem, thisViewHolder);
+                } else {
+                    alertForDownload(thisViewHolder, listItem, position);
+                }
+
+                // mainActivity.configureThumbnailList(products.get(position), "videos");
+            } else {
+                try {
+                    mainActivity.addToPurchasedSoundBoards(listItem.getRawJSON(), listItem, thisViewHolder);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
-        }
-        else {
-            mainActivity.configureThumbnailList(products.get(position), "videos");
-        }
 
         /*ListItem listItem = elements.get(position);
 
@@ -381,6 +425,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
             //send the list of products for the clicked subcategory to make a new view showing them
             playOrOpen(position, listItem, thisViewHolder);
         }*/
+        }
     }
 
     private void setLookToFavorite(ElementViewHolder viewHolder) {
@@ -395,24 +440,56 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         viewHolder.priceText.setVisibility(View.INVISIBLE);
 
         //TODO: hide these on soundboards?
-        viewHolder.favoritesIcon.setVisibility(View.VISIBLE);
-        viewHolder.playlistIcon.setVisibility(View.VISIBLE);
+        viewHolder.favoritesIcon.setVisibility(View.INVISIBLE);
+        viewHolder.playlistIcon.setVisibility(View.INVISIBLE);
         //Log.d(LOGVAR, "set to visible");
     }
 
     private void setLookToPlaylistItem(ElementViewHolder viewHolder) {
-       // viewHolder.priceText.setVisibility(View.INVISIBLE);
+        // viewHolder.priceText.setVisibility(View.INVISIBLE);
         viewHolder.playlistIcon.setColorFilter(Color.YELLOW);
     }
 
     private void setLookToNotPlaylistItem(ElementViewHolder viewHolder) {
-       // viewHolder.priceText.setVisibility(View.INVISIBLE);
+        // viewHolder.priceText.setVisibility(View.INVISIBLE);
         viewHolder.playlistIcon.setColorFilter(Color.WHITE);
 
     }
 
     private void setLookToPlaylist(ElementViewHolder viewHolder) {
         viewHolder.previewIcon.setVisibility(View.INVISIBLE);
+    }
+
+    private void setFileDownloadingListItem(ThumbnailListAdapter.ElementViewHolder viewHolder, ListItem listItem, int position) {
+        Log.d(LOGVAR, "setFileDownloadingListItem" + listItem.getIsDownloading() + ":" + listItem.getMediaFile());
+        if (listItem.getIsDownloading()) {
+            viewHolder.progressBar.setVisibility(View.VISIBLE);
+            viewHolder.thumbnailImage.setClickable(false);
+
+        } else {
+/*
+            int checkAllFileExists = 0;
+            for(int i = 0; i < products.get(position).length(); i++) {
+                try {
+                    JSONArray array = new JSONArray(""+products.get(position));
+                    JSONObject jsonObject = array.getJSONObject(i);
+                    String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + jsonObject.getString("file");
+                    if(Utils.checkFileExist(mainActivity, fileLocation, jsonObject.getString("file"))){
+                        checkAllFileExists++;
+                    }
+                }
+                catch (JSONException e){
+                    e.printStackTrace();
+                }
+
+            }
+            Log.e("File 11","exists:"+checkAllFileExists+":;"+products.get(position).length());
+            if(checkAllFileExists == products.get(position).length()) {*/
+            viewHolder.progressBar.setVisibility(View.GONE);
+            viewHolder.thumbnailImage.setClickable(true);
+            //   }
+        }
+
     }
 
     private void playOrOpen(int position, ListItem listItem, ElementViewHolder viewHolder) {
@@ -445,15 +522,19 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
 
     public void playInlineVideo(String videoURL, final ElementViewHolder viewHolder, int position) {
         Log.d(LOGVAR, "play inline video");
+        ListItem listItem = elements.get(position);
         Object s = viewHolder.thumbnailImage.getTag().equals("0");
         // if(viewHolder.thumbnailImage.getTag().equals(0)||viewHolder.thumbnailImage.getTag().equals("0")) {
         //   viewHolder.videoHolder.setVisibility(View.VISIBLE);
         //     viewHolder.rel1.setVisibility(View.INVISIBLE);
         //String url = mainActivity.mediaURL + videoURL;
         String url = "https://s3-us-west-1.amazonaws.com/babysbrilliant-media/SoundboardCow2.mp4";
+        Uri video = null;
 
-        Uri video = Uri.parse("android.resource://" + mainActivity.getPackageName() + "/"
-                + R.raw.cow_sound);
+        String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + listItem.getMediaFile();
+        video = Uri.parse(fileLocation);
+        // Uri video = Uri.parse("android.resource://" + mainActivity.getPackageName() + "/"
+        //      + R.raw.cow_sound);
 
 
           /*  try {
@@ -482,15 +563,105 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
 //        viewHolder.videoView.setAlpha(0);
         viewHolder.videoView.setVisibility(View.VISIBLE);
 
+
+
+       /* try {
+            Uri video1 = Uri.parse(fileLocation);
+            viewHolder.videoView.setVideoURI(video1);
+
+            // videoView.setAlpha(0);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        /*//* videoView.requestFocus();
+        viewHolder.videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+
+                //TODO: come up with more accurate solution to hide previous video image before playback starts
+                //show the video after a short delay to allow previous video image to clear out
+                new android.os.Handler().postDelayed(
+                        new Runnable() {
+                            @SuppressLint("NewApi")
+                            public void run() {
+
+                                //pDialog.dismiss();
+                                // videoLayout.setVisibility(View.VISIBLE);
+                                Log.e("Preapare","on Prepare22");
+                                viewHolder.videoView.start();
+                                viewHolder.videoView.setAlpha(1);
+                            }
+                        },
+                        500);
+
+                mediaPlayer = mp;
+            }
+        });
+
+        viewHolder.videoView.requestFocus();
+        viewHolder.videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            // Close the progress bar and play the video
+            public void onPrepared(MediaPlayer mp) {
+                //videoLayout.setVisibility(View.VISIBLE);
+                //pDialog.dismiss();
+                Log.e("Preapare","on Prepare");
+                viewHolder.videoView.start();
+                viewHolder.videoView.setAlpha(1);
+
+                mediaPlayer = mp;
+            }
+
+        });
+
+        viewHolder.videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+
+                *//*if (isPlayList && toggle.isChecked()) {
+                    if (fileArrayList.size() == indexOfVideo) {
+                        indexOfVideo = 0;
+                    }
+                }
+                if (isPlayList && fileArrayList.size() > indexOfVideo) {
+                   *//**//* String fileLocation = Environment.getExternalStorageDirectory()
+                            + "/" + getResources().getString(R.string.app_name) +
+                            "/" + fileArrayList.get(indexOfVideo);*//**//*
+                    Log.e(LOGVAR, "Index:" + indexOfVideo + ":" + fileArrayList.get(indexOfVideo) + " Size:" + fileArrayList.size());
+                    String fileLocation = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + fileArrayList.get(indexOfVideo);
+
+                    Uri video = Uri.parse(fileLocation);
+                    videoView.setVideoURI(video);
+                    videoView.start();
+                    indexOfVideo++;
+                } else {*//*
+                if (mediaPlayer != null) {
+                    mediaPlayer.stop();
+                   *//* mediaPlayer.reset();
+                    mediaPlayer.release();
+                    mediaPlayer = null;*//*
+                    //   }
+                    //videoToggleButton.setText(getString(R.string.video_pause));
+                    //videoLayout.setVisibility(View.INVISIBLE);
+                }
+
+
+            }
+        });*/
+
+        isMediaPlayingDone = false;
         mediaPlayer = new MediaPlayer();
         try {
             Log.d(LOGVAR, "set data source");
 
-            mediaPlayer.setDataSource(mainActivity, video); //this triggers the listener, which plays the video
+            mediaPlayer.setDataSource(fileLocation); //this triggers the listener, which plays the video
 
         } catch (IOException e) {
             e.printStackTrace();
         }
+
 
         //TODO: show preloader
 
@@ -499,18 +670,28 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         viewHolder.videoView.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
             @Override
             public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-                Surface s = new Surface(surface);
+                final Surface s = new Surface(surface);
+                Log.d(LOGVAR, "surface TRY block");
 
                 try {
-                    Log.d(LOGVAR, "surface TRY block");
-
-                    mediaPlayer.setSurface(s);
-                    mediaPlayer.prepare();
+                    if(mediaPlayer != null) {
+                        mediaPlayer.setSurface(s);
+                        mediaPlayer.prepare();
+                    }
 //                    mediaPlayer.setOnBufferingUpdateListener(this);
                     mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                         @Override
                         public void onCompletion(MediaPlayer mp) {
+
+
                             viewHolder.videoView.setAlpha(1);
+                            if (mediaPlayer != null) {
+                                mediaPlayer.stop();
+                                mediaPlayer.release();
+                                mediaPlayer = null;
+                            }
+                            isMediaPlayingDone = true;
+                            notifyDataSetChanged();
 //                            viewHolder.videoView.setVisibility(View.INVISIBLE);
                         }
                     });
@@ -521,8 +702,16 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
                         }
                     });
 //                    mediaPlayer.setOnVideoSizeChangedListener(this);
-                    mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                    mediaPlayer.start();
+                    mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                        @Override
+                        public void onPrepared(MediaPlayer mp) {
+                            if(mediaPlayer != null) {
+                                mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                                mediaPlayer.start();
+                            }
+                        }
+                    });
+
                 } catch (IllegalArgumentException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -532,7 +721,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
                 } catch (IllegalStateException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
-                } catch (IOException e) {
+                } catch (Exception e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
@@ -546,6 +735,13 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
 
             @Override
             public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+                Log.d(LOGVAR,"onSurfaceTextureDestroyed");
+               /* if (mediaPlayer != null) {
+                    mediaPlayer.stop();
+                    mediaPlayer.reset();
+                    mediaPlayer.release();
+                    mediaPlayer = null;
+                }*/
                 return false;
             }
 
@@ -559,7 +755,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
     }
 
     private void updateThumbnailList(int position) {
-        mainActivity.configureThumbnailList(products.get(position), "videos");
+        mainActivity.configureThumbnailList(products.get(position), "");
     }
 
     //attaches the xml layout doc to each menu item to configure it visually.
@@ -578,10 +774,10 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
 
         final ListItem rowData = elements.get(position);
 
-        configureListItemLook(viewHolder, rowData);
+        configureListItemLook(viewHolder, rowData, position);
 
         configureListItemListeners(viewHolder, position);
-        Log.e("ThumbnailList","Adapter:"+viewHolder.priceText.getVisibility());
+
 
     }
 
@@ -590,10 +786,74 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         return elements.size();
     }
 
+
+    @Override
+    public void onDownloadComplete(int position) {
+
+        int checkAllFileExists = 0;
+        for (int i = 0; i < products.get(position).length(); i++) {
+            try {
+                JSONArray array = new JSONArray("" + products.get(position));
+                JSONObject jsonObject = array.getJSONObject(i);
+                String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + jsonObject.getString("file");
+                if (Utils.checkFileExist(mainActivity, fileLocation, jsonObject.getString("file"))) {
+                    checkAllFileExists++;
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        if (checkAllFileExists == products.get(position).length()) {
+            notifyDataSetChanged();
+        }
+    }
+
+    private void alertForDownload(final ThumbnailListAdapter.ElementViewHolder viewHolder, final ListItem listItem, final int position) {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(mainActivity);
+        alertDialog.setTitle(mainActivity.getResources().getString(R.string.alert_download_title));
+        alertDialog.setMessage(mainActivity.getResources().getString(R.string.alert_download_summary));
+        alertDialog.setPositiveButton(mainActivity.getResources().getString(R.string.download), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        viewHolder.progressBar.setVisibility(View.VISIBLE);
+                        viewHolder.thumbnailImage.setClickable(false);
+                        for (int i = 0; i < products.get(position).length(); i++) {
+                            try {
+                                JSONArray array = new JSONArray("" + products.get(position));
+                                JSONObject jsonObject = array.getJSONObject(i);
+                                // mainActivity.downloadVideo(viewHolder, listItem);
+
+                                String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + jsonObject.getString("file");
+                                if (!Utils.checkFileExist(mainActivity, fileLocation, jsonObject.getString("file"))) {
+                                    new DownloadAsync(viewHolder, listItem, ThumbnailListAdapter.this, position, jsonObject.getString("file"), appContext).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+
+                    }
+                }
+
+        );
+        alertDialog.setNegativeButton(mainActivity.getResources().
+
+                        getString(R.string.cancel),
+
+                null);
+        AlertDialog builder = alertDialog.create();
+        builder.show();
+    }
+
+
     //just sets java handles for the layout items configured in the xml doc.
     public class ElementViewHolder extends RecyclerView.ViewHolder {
         private final TextView titleText;
-        private final ImageView thumbnailImage;
+        public final ImageView thumbnailImage;
         public final TextView priceText;
         private final RelativeLayout textBackground;
         private final ImageView favoritesIcon;
@@ -601,6 +861,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         private final TextView previewIcon;
         private final TextureView videoView;
         private final RelativeLayout listItemContainer;
+        private final ProgressBar progressBar;
 
         private final RelativeLayout rel1;
         VideoView videoHolder;
@@ -617,6 +878,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
             previewIcon = (TextView) itemView.findViewById(R.id.preview_icon);
             videoView = (TextureView) itemView.findViewById(R.id.video_view_inline);
             listItemContainer = (RelativeLayout) itemView.findViewById(R.id.list_item_container);
+            progressBar = (ProgressBar) itemView.findViewById(R.id.progressBar);
 
 
             rel1 = (RelativeLayout) itemView.findViewById(R.id.rel1);

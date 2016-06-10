@@ -284,14 +284,12 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                     JSONObject jsonObject = array.getJSONObject(i);
                     favoriteItems.add(jsonObject);
                 }
-                Log.e(LOGVAR, "favo111:" + array + "::" + favoriteItems);
             }
             catch (Exception e){
                 e.printStackTrace();
             }
         }
         String playlist = PreferenceStorage.getPlaylist(MainActivity.this);
-        Log.e(LOGVAR,"PlayList:"+playlist);
         if(!playlist.isEmpty() && playlists.isEmpty()){
             try {
                 JSONArray playListArray = new JSONArray(playlist);
@@ -992,6 +990,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         this.productJSON = productJSON;
         this.listItem = listItem;
         this.viewHolder = viewHolder;
+        Log.d(LOGVAR,"PuchaseProduct:"+productJSON);
         Intent purchase = new Intent(MainActivity.this, ParentalChallengeScreen.class);
         purchase.putExtra("Key", "Purchase");
         startActivityForResult(purchase, 1);
@@ -1006,6 +1005,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         this.productJSON = productJSON;
         this.listItem = listItem;
         this.thumbnailViewHolder = viewHolder;
+        Log.d(LOGVAR,"PuchaseProduct:"+productJSON);
         Intent purchase = new Intent(MainActivity.this, ParentalChallengeScreen.class);
         purchase.putExtra("Key", "Purchase");
         startActivityForResult(purchase, 1);
@@ -1022,7 +1022,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                 Log.d(LOGVAR, "Purcahse Failed");
                 return;
             } else if (purchase.getSku().equals(Constant.TEST_ITEM_SKU)) {
-                Log.d(LOGVAR, "Purchase:" + purchase.getSku());
+                Log.d(LOGVAR, "Purchase:" + purchase.getSku()+":::"+productJSON);
                 SELECT_FLAG = "purchase_video";
                 purchasedItems.put(productJSON);
                 try {
@@ -1470,6 +1470,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                         JSONArray purchasedItems1 = new JSONArray(Uri.decode(response));
                         downloadItems = downloadItems1;
                         purchasedItems = purchasedItems1;
+
                         pDialog.hide();
                         purchaseJSON(response);
                     } else if (From.equalsIgnoreCase("PurchaseContent")) {
