@@ -1,9 +1,9 @@
 package com.thecodebuilders.babysbrilliant;
 
-import android.support.v7.app.AppCompatActivity;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;

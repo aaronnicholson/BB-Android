@@ -5,11 +5,9 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -21,7 +19,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.ParcelFileDescriptor;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -36,7 +33,6 @@ import android.view.animation.AnimationUtils;
 import android.webkit.MimeTypeMap;
 import android.webkit.URLUtil;
 import android.webkit.WebView;
-import android.widget.AdapterView;
 import android.widget.CheckedTextView;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -55,11 +51,8 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.HurlStack;
-import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.thecodebuilders.adapter.CommonAdapterUtility;
 import com.thecodebuilders.adapter.DownloadPurchaseContentAdapter;
 import com.thecodebuilders.adapter.ElementViewHolder;
 import com.thecodebuilders.adapter.PlaylistAdapter;
@@ -71,13 +64,11 @@ import com.thecodebuilders.adapter.SoundBoardsAdapter;
 import com.thecodebuilders.adapter.ThumbnailListAdapter;
 import com.thecodebuilders.adapter.VideosAdapter;
 import com.thecodebuilders.application.ApplicationContextProvider;
-import com.thecodebuilders.classes.ObjectSerializer;
 import com.thecodebuilders.innapppurchase.IabHelper;
 import com.thecodebuilders.innapppurchase.IabResult;
 import com.thecodebuilders.innapppurchase.Inventory;
 import com.thecodebuilders.innapppurchase.Purchase;
 import com.thecodebuilders.model.Playlist;
-import com.thecodebuilders.network.InputStreamVolleyRequest;
 import com.thecodebuilders.network.VolleySingleton;
 import com.thecodebuilders.utility.Constant;
 import com.thecodebuilders.utility.CustomizeDialog;
@@ -88,18 +79,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements PlaylistChooser.PlaylistChooserListener, Animation.AnimationListener {
@@ -562,12 +546,12 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                 } else if (data.getStringExtra("Key").equalsIgnoreCase("Purchase")) {
 
                     try {
-                        ITEM_SKU = productJSON.getString("google_play_id");
+                        ITEM_SKU = productJSON.getString("SKU");
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                     Log.e(LOGVAR, "ITEM_SKU:" + ITEM_SKU);
-                    mHelper.launchPurchaseFlow(MainActivity.this, Constant.TEST_ITEM_SKU, 10001,
+                    mHelper.launchPurchaseFlow(MainActivity.this, ITEM_SKU, 10001,
                             mPurchaseFinishedListener, "mypurchasetoken");
                 } else {
 
@@ -603,14 +587,15 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         homeButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-
-                if (purchasedItems.length() == 0)
-                    emptyCategory.setVisibility(View.VISIBLE);
-                else
-                    emptyCategory.setVisibility(View.GONE);
-                configureThumbnailList(purchasedItems, "purchased");
-                currentMenu = PURCHASED_ITEMS;
-                toggleMenuButton(currentMenu);
+                if(purchasedItems != null) {
+                    if (purchasedItems.length() == 0)
+                        emptyCategory.setVisibility(View.VISIBLE);
+                    else
+                        emptyCategory.setVisibility(View.GONE);
+                    configureThumbnailList(purchasedItems, "purchased");
+                    currentMenu = PURCHASED_ITEMS;
+                    toggleMenuButton(currentMenu);
+                }
             }
         });
 
@@ -623,62 +608,64 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
               /*  Intent mainIntent = new Intent(MainActivity.this, ParentalChallengeScreen.class);
                 mainIntent.putExtra("Key", "fav");
                 startActivityForResult(mainIntent, 1);*/
+                if(favoriteItems != null) {
+                    if (favoriteItems.size() == 0) {
+                        emptyCategory.setVisibility(View.VISIBLE);
+                        emptyCategory.setText(getResources().getString(R.string.empty_category_favorite_msg));
+                    } else
+                        emptyCategory.setVisibility(View.GONE);
 
-                if (favoriteItems.size() == 0) {
-                    emptyCategory.setVisibility(View.VISIBLE);
-                    emptyCategory.setText(getResources().getString(R.string.empty_category_favorite_msg));
+                    Log.d(LOGVAR, "FavouriteItems:" + favoriteItems);
+                    configureThumbnailList(favoriteItems, "videos");
+                    currentMenu = FAVORITE_ITEMS;
+                    toggleMenuButton(currentMenu);
                 }
-                else
-                    emptyCategory.setVisibility(View.GONE);
-
-                Log.d(LOGVAR,"FavouriteItems:"+favoriteItems);
-                configureThumbnailList(favoriteItems, "videos");
-                currentMenu = FAVORITE_ITEMS;
-                toggleMenuButton(currentMenu);
-
 
             }
         });
 
         soundBoardsButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                if (soundBoards.length() == 0)
-                    emptyCategory.setVisibility(View.VISIBLE);
-                else
-                    emptyCategory.setVisibility(View.GONE);
-                configureThumbnailList(soundBoards, "soundBoards");
-                currentMenu = SOUND_BOARDS;
-                toggleMenuButton(currentMenu);
+                if(soundBoards != null) {
+                    if (soundBoards.length() == 0)
+                        emptyCategory.setVisibility(View.VISIBLE);
+                    else
+                        emptyCategory.setVisibility(View.GONE);
+                    configureThumbnailList(soundBoards, "soundBoards");
+                    currentMenu = SOUND_BOARDS;
+                    toggleMenuButton(currentMenu);
+                }
             }
         });
 
         playListButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 //create a list of JSONObjects that the list adapter can understand
-                ArrayList<JSONObject> playlistItems = new ArrayList<>();
-                for (int i = 0; i < playlists.size(); i++) {
-                    JSONObject playlistObject = new JSONObject();
-                    try {
-                        playlistObject.put("name", playlists.get(i).getName());
-                        playlistObject.put("isPlaylist", "true");
-                        playlistObject.put("thumb", playlists.get(i).getPlaylistItems().get(0).getString("thumb"));
-                        playlistObject.put("products", new JSONArray(playlists.get(i).getPlaylistItems()));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                if(playlists != null) {
+                    ArrayList<JSONObject> playlistItems = new ArrayList<>();
+                    for (int i = 0; i < playlists.size(); i++) {
+                        JSONObject playlistObject = new JSONObject();
+                        try {
+                            playlistObject.put("name", playlists.get(i).getName());
+                            playlistObject.put("isPlaylist", "true");
+                            playlistObject.put("thumb", playlists.get(i).getPlaylistItems().get(0).getString("thumb"));
+                            playlistObject.put("products", new JSONArray(playlists.get(i).getPlaylistItems()));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        playlistItems.add(playlistObject);
                     }
+                    if (playlistItems.size() == 0) {
+                        emptyCategory.setVisibility(View.VISIBLE);
+                        emptyCategory.setText(getResources().getString(R.string.empty_category_playlist_msg));
+                    } else
+                        emptyCategory.setVisibility(View.GONE);
+                    configureThumbnailList(playlistItems, "playlists");
 
-                    playlistItems.add(playlistObject);
+                    currentMenu = PLAYLISTS;
+                    toggleMenuButton(currentMenu);
                 }
-                if (playlistItems.size() == 0) {
-                    emptyCategory.setVisibility(View.VISIBLE);
-                    emptyCategory.setText(getResources().getString(R.string.empty_category_playlist_msg));
-                }
-                else
-                    emptyCategory.setVisibility(View.GONE);
-                configureThumbnailList(playlistItems, "playlists");
-
-                currentMenu = PLAYLISTS;
-                toggleMenuButton(currentMenu);
             }
         });
 
@@ -689,60 +676,69 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                         emptyCategory.setVisibility(View.VISIBLE);
                     else
                         emptyCategory.setVisibility(View.GONE);
-                }
+
                 configureThumbnailList(movies, "section");
                 //Log.d(LOGVAR, "movies item:" + movies.toString());
                 currentMenu = MOVIES;
                 toggleMenuButton(currentMenu);
+                }
             }
         });
 
         musicButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                if (music.length() == 0)
-                    emptyCategory.setVisibility(View.VISIBLE);
-                else
-                    emptyCategory.setVisibility(View.GONE);
-                configureThumbnailList(music, "section");
-                currentMenu = MUSIC;
-                toggleMenuButton(currentMenu);
+                if(music != null) {
+                    if (music.length() == 0)
+                        emptyCategory.setVisibility(View.VISIBLE);
+                    else
+                        emptyCategory.setVisibility(View.GONE);
+                    configureThumbnailList(music, "section");
+                    currentMenu = MUSIC;
+                    toggleMenuButton(currentMenu);
+                }
             }
         });
 
         nightLightsButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                if (nightLights.length() == 0)
-                    emptyCategory.setVisibility(View.VISIBLE);
-                else
-                    emptyCategory.setVisibility(View.GONE);
-                configureThumbnailList(nightLights, "section");
-                currentMenu = NIGHT_LIGHTS;
-                toggleMenuButton(currentMenu);
+                if(nightLights != null) {
+                    if (nightLights.length() == 0)
+                        emptyCategory.setVisibility(View.VISIBLE);
+                    else
+                        emptyCategory.setVisibility(View.GONE);
+                    configureThumbnailList(nightLights, "section");
+                    currentMenu = NIGHT_LIGHTS;
+                    toggleMenuButton(currentMenu);
+                }
             }
         });
 
         audioBooksButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                if (audioBooks.length() == 0)
-                    emptyCategory.setVisibility(View.VISIBLE);
-                else
-                    emptyCategory.setVisibility(View.GONE);
-                configureThumbnailList(audioBooks, "section");
-                currentMenu = AUDIO_BOOKS;
-                toggleMenuButton(currentMenu);
+                if(audioBooks != null) {
+                    if (audioBooks.length() == 0)
+                        emptyCategory.setVisibility(View.VISIBLE);
+                    else
+                        emptyCategory.setVisibility(View.GONE);
+                    configureThumbnailList(audioBooks, "section");
+                    currentMenu = AUDIO_BOOKS;
+                    toggleMenuButton(currentMenu);
+                }
             }
         });
 
 
         hearingImpairedButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                if (hearingImpaired.length() == 0)
-                    emptyCategory.setVisibility(View.VISIBLE);
-                else
-                    emptyCategory.setVisibility(View.GONE);
-                configureThumbnailList(hearingImpaired, "section");
-                currentMenu = HEARING_IMPAIRED;
-                toggleMenuButton(currentMenu);
+                if(hearingImpaired != null) {
+                    if (hearingImpaired.length() == 0)
+                        emptyCategory.setVisibility(View.VISIBLE);
+                    else
+                        emptyCategory.setVisibility(View.GONE);
+                    configureThumbnailList(hearingImpaired, "section");
+                    currentMenu = HEARING_IMPAIRED;
+                    toggleMenuButton(currentMenu);
+                }
             }
         });
 
@@ -930,7 +926,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                 JSONObject itemToAdd = jsonData.getJSONObject(i);
                 listData.add(itemToAdd);
             }
-        } catch (JSONException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         configureThumbnailList(listData, adapterType);
@@ -1021,7 +1017,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                 // Handle error
                 Log.d(LOGVAR, "Purcahse Failed");
                 return;
-            } else if (purchase.getSku().equals(Constant.TEST_ITEM_SKU)) {
+            } else if (purchase.getSku().equals(ITEM_SKU)) {
                 Log.d(LOGVAR, "Purchase:" + purchase.getSku()+":::"+productJSON);
                 SELECT_FLAG = "purchase_video";
                 purchasedItems.put(productJSON);
@@ -1072,8 +1068,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             if (result.isFailure()) {
                 // Handle failure
             } else {
-                mHelper.consumeAsync(inventory.getPurchase(Constant.TEST_ITEM_SKU),
-                        mConsumeFinishedListener);
+                //mHelper.consumeAsync(inventory.getPurchase(Constant.TEST_ITEM_SKU),
+                     //   mConsumeFinishedListener);
             }
         }
     };
@@ -1295,7 +1291,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
-
+                Log.e(LOGVAR,"Playlist:"+isPlayList +":"+toggle.isChecked()+"::"+fileArrayList.size());
                 if(isPlayList && toggle.isChecked()){
                     if(fileArrayList.size() == indexOfVideo){
                         indexOfVideo = 0;
@@ -1510,7 +1506,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                             }
 
                             ListView lv = (ListView) includedDownloadPuchaseContentLayout.findViewById(R.id.listView);
-                            DownloadPurchaseContentAdapter downloadPurchaseContentAdapter = new DownloadPurchaseContentAdapter(MainActivity.this, arrayList);
+                            TextView downloadAll  = (TextView) includedDownloadPuchaseContentLayout.findViewById(R.id.download_all);
+                            DownloadPurchaseContentAdapter downloadPurchaseContentAdapter = new DownloadPurchaseContentAdapter(MainActivity.this, arrayList, downloadAll);
                             lv.setAdapter(downloadPurchaseContentAdapter);
 
 
@@ -1599,6 +1596,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     private void initApp() throws JSONException {
         //TODO: add preloader
+        currentMenu = MOVIES;
         configureThumbnailList(jsonData.getJSONArray(currentMenu), "section");
         toggleMenuButton(MOVIES);
 

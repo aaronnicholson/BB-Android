@@ -5,11 +5,8 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Environment;
 import android.util.DisplayMetrics;
 import android.util.Log;
-
-import com.thecodebuilders.babysbrilliant.ListItem;
 
 import java.io.File;
 

@@ -19,14 +19,12 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.thecodebuilders.babysbrilliant.ListItem;
 import com.thecodebuilders.babysbrilliant.R;
 import com.thecodebuilders.classes.DownloadAsync;
 import com.thecodebuilders.interfaces.DownloadStatusListener;
 import com.thecodebuilders.utility.PreferenceStorage;
 import com.thecodebuilders.utility.Utils;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -40,14 +38,35 @@ public class DownloadPurchaseContentAdapter extends BaseAdapter implements Downl
     private ArrayList<Boolean> showProgressArray = new ArrayList<Boolean>();
 
 
-    public DownloadPurchaseContentAdapter(Context context,
-                                          ArrayList<HashMap<String, String>> arraylist) {
+    public DownloadPurchaseContentAdapter(final Context context,
+                                          ArrayList<HashMap<String, String>> arraylist, TextView downlaodAll) {
         this.context = context;
 
         postItems = arraylist;
         for (int i = 0; i < arraylist.size(); i++) {
             showProgressArray.add(i, false); // initializes all items value with false
         }
+        downlaodAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                for(int j  = 0; j < postItems.size(); j++){
+                    String videoURL = postItems.get(j).get("file");
+                    String fileLocation = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)+"/"+videoURL;
+                    if (Utils.checkFileExist(context, fileLocation, videoURL)) {
+                        Log.d("DownloadPurchaseAdapter", "FILE EXISTS");
+                    } else {
+
+                        Log.e("Position", "..." + j);
+                        showProgressArray.set(j, true);
+                        holder.progressBar.setVisibility(View.VISIBLE);
+                        holder.relativeLayout.setClickable(false);
+                        //downloadVideo(videoURL, holder.progressBar, position);
+                        new DownloadAsync(context, null, null, DownloadPurchaseContentAdapter.this, j, videoURL).execute("");
+                        notifyDataSetChanged();
+                    }
+                }
+            }
+        });
 
 
     }

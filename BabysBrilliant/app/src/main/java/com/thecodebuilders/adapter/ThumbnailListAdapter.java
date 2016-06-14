@@ -1,6 +1,5 @@
 package com.thecodebuilders.adapter;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -691,6 +690,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
                                 mediaPlayer = null;
                             }
                             isMediaPlayingDone = true;
+                            Log.d(LOGVAR,"MediaPlayer Completion");
                             notifyDataSetChanged();
 //                            viewHolder.videoView.setVisibility(View.INVISIBLE);
                         }

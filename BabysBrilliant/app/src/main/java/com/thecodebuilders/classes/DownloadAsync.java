@@ -6,11 +6,9 @@ package com.thecodebuilders.classes;
 
 
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
-
 
 import com.thecodebuilders.adapter.ElementViewHolder;
 import com.thecodebuilders.adapter.ThumbnailListAdapter;

@@ -7,7 +7,6 @@ import android.preference.PreferenceManager;
 import com.thecodebuilders.classes.ObjectSerializer;
 import com.thecodebuilders.model.Playlist;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
