@@ -55,12 +55,9 @@ public class DownloadPurchaseContentAdapter extends BaseAdapter implements Downl
                     if (Utils.checkFileExist(context, fileLocation, videoURL)) {
                         Log.d("DownloadPurchaseAdapter", "FILE EXISTS");
                     } else {
-
-                        Log.e("Position", "..." + j);
                         showProgressArray.set(j, true);
                         holder.progressBar.setVisibility(View.VISIBLE);
                         holder.relativeLayout.setClickable(false);
-                        //downloadVideo(videoURL, holder.progressBar, position);
                         new DownloadAsync(context, null, null, DownloadPurchaseContentAdapter.this, j, videoURL).execute("");
                         notifyDataSetChanged();
                     }

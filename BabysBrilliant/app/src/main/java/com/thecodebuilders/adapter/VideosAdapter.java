@@ -45,12 +45,14 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
     private ImageLoader imageLoader;
     public String mediaURL = appContext.getString(R.string.media_url);
     public static String priceValue = "$0.00";
+    private String purchased;
 
-    public VideosAdapter(ArrayList listData, MainActivity mainActivity) {
+    public VideosAdapter(ArrayList listData, MainActivity mainActivity, String purchased) {
         volleySingleton = VolleySingleton.getInstance();
         imageLoader = volleySingleton.getImageLoader();
         assetsList = listData;
         this.mainActivity = mainActivity;
+        this.purchased = purchased;
         parseListItems(assetsList.size());
         //checkDownloadingProgress(assetsList.size());
         Log.d(LOGVAR, "VIDEO assets: " + assetsList);
@@ -133,11 +135,17 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
                 if (!itemJSON.isNull("cat")) category = itemJSON.getString("cat");
 
                 mediaFile = itemJSON.getString("file");
+                boolean isSoundBoard = false;
+                if(!itemJSON.isNull("catT"))
+                    if(purchased.equalsIgnoreCase("purchased"))
+                        isSoundBoard = itemJSON.getString("catT").equalsIgnoreCase("Soundboard");
 
-                ListItem listItem = new ListItem(itemJSON, name, playInline, imageResource, mediaFile, price, category, isSection,
-                        isPurchased, isPlaylistItem, isPlaylist, isFavorite, appContext, false, MainActivity.DOWNLOAD_ID);
+                if(!isSoundBoard ) {
+                    ListItem listItem = new ListItem(itemJSON, name, playInline, imageResource, mediaFile, price, category, isSection,
+                            isPurchased, isPlaylistItem, isPlaylist, isFavorite, appContext, false, MainActivity.DOWNLOAD_ID);
 
-                elements.add(listItem);//TODO: make image dynamic
+                    elements.add(listItem);//TODO: make image dynamic
+                }
             } catch (Throwable t) {
                 t.printStackTrace();
                 //Log.e(LOGVAR, "JSON Error " + t.getMessage() + assetsList);
@@ -247,7 +255,6 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
         } else {
             setLookToNotPlaylistItem(viewHolder);
         }
-        Log.e("Title:",".."+listItem.isPurchased()+"::"+listItem.getTitle());
         if(listItem.getCategory().equals("5") && !listItem.isSection()){
             setFileDownloadedListItem(viewHolder, listItem);
         }

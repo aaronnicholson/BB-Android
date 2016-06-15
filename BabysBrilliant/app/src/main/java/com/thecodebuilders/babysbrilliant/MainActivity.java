@@ -952,7 +952,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             SectionAdapter adapter = new SectionAdapter(listData, this);
             thumbnailList.setAdapter(adapter);
         } else if (adapterType == "videos") {
-            videoAdapter = new VideosAdapter(listData, this);
+            videoAdapter = new VideosAdapter(listData, this, "");
             thumbnailList.setAdapter(videoAdapter);
 
         } else if (adapterType == "playlists") {
@@ -962,7 +962,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             PlaylistItemAdapter adapter = new PlaylistItemAdapter(listData, this);
             thumbnailList.setAdapter(adapter);
         } else if (adapterType == "purchased") {
-            VideosAdapter  purchasedAdapter = new VideosAdapter(listData, this);
+            VideosAdapter  purchasedAdapter = new VideosAdapter(listData, this,"purchased");
             thumbnailList.setAdapter(purchasedAdapter);
         }
        /* else if (adapterType == "favorites") {
@@ -1022,12 +1022,12 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                 SELECT_FLAG = "purchase_video";
                 purchasedItems.put(productJSON);
                 try {
-                    AsynEditPassword(productJSON.getString("SKU"));
+                    AsyncEditPassword(productJSON.getString("SKU"));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
                 purchaseDone();
-                consumeItem();
+             //   consumeItem();
             }
 
         }
@@ -1291,7 +1291,6 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
-                Log.e(LOGVAR,"Playlist:"+isPlayList +":"+toggle.isChecked()+"::"+fileArrayList.size());
                 if(isPlayList && toggle.isChecked()){
                     if(fileArrayList.size() == indexOfVideo){
                         indexOfVideo = 0;
@@ -1991,7 +1990,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                 if (et.getText().length() == 0 || et.getText().toString().equalsIgnoreCase("")) {
 
                 } else {
-                    AsynEditPassword(et.getText().toString());
+                    AsyncEditPassword(et.getText().toString());
                 }
             }
         });
@@ -2061,7 +2060,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         });
     }
 
-    public void AsynEditPassword(final String value) {
+    public void AsyncEditPassword(final String value) {
 
         //TODO: put this on the standard "queue" RequestQueue
         rq = Volley.newRequestQueue(MainActivity.this);
