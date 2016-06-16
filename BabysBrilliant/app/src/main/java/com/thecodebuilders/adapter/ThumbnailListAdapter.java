@@ -8,7 +8,6 @@ import android.graphics.SurfaceTexture;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.v7.widget.RecyclerView;
@@ -125,12 +124,12 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
                     //if it has no SKU, skip it
                     try {
                         if (!itemJSON.isNull("SKU")) {
-                          //  if (!mainActivity.purchasedItems.getJSONObject(purchasedIndex).isNull("title")) {
+                            //  if (!mainActivity.purchasedItems.getJSONObject(purchasedIndex).isNull("title")) {
 
-                                if ((itemJSON.getString("SKU").equals(mainActivity.purchasedItems.getJSONObject(purchasedIndex).getString("SKU")))) {
-                                    isPurchased = true;
-                                }
-                           // }
+                            if ((itemJSON.getString("SKU").equals(mainActivity.purchasedItems.getJSONObject(purchasedIndex).getString("SKU")))) {
+                                isPurchased = true;
+                            }
+                            // }
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -367,7 +366,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         ListItem listItem = elements.get(position);
         if (!elements.get(position).getIsDownloading()) {
             if (listItem.getCategory().contains("5") && !listItem.isSection()) {
-                if(isMediaPlayingDone)
+                if (isMediaPlayingDone)
                     playOrOpen(position, listItem, thisViewHolder);
             } else if ((listItem.isPurchasable() && listItem.isPurchased()) || listItem.getPrice().equalsIgnoreCase(priceValue)) {
 
@@ -402,28 +401,6 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
                 }
             }
 
-        /*ListItem listItem = elements.get(position);
-
-        //TODO: Handle for soundboard items - using "bundle" in JSON
-
-        if (listItem.isPurchasable()) {
-            //if it has been purchased already
-            if (listItem.isPurchased()) {
-                playOrOpen(position, listItem, thisViewHolder);
-                //if it has not been purchased already
-            } else {
-                listItem.setIsPurchased(true);
-                setLookToPurchased(thisViewHolder);
-               *//* try {
-                    mainActivity.addToPurchased(listItem.getRawJSON());
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }*//*
-            }
-        } else {
-            //send the list of products for the clicked subcategory to make a new view showing them
-            playOrOpen(position, listItem, thisViewHolder);
-        }*/
         }
     }
 
@@ -466,27 +443,9 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
             viewHolder.thumbnailImage.setClickable(false);
 
         } else {
-/*
-            int checkAllFileExists = 0;
-            for(int i = 0; i < products.get(position).length(); i++) {
-                try {
-                    JSONArray array = new JSONArray(""+products.get(position));
-                    JSONObject jsonObject = array.getJSONObject(i);
-                    String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + jsonObject.getString("file");
-                    if(Utils.checkFileExist(mainActivity, fileLocation, jsonObject.getString("file"))){
-                        checkAllFileExists++;
-                    }
-                }
-                catch (JSONException e){
-                    e.printStackTrace();
-                }
 
-            }
-            Log.e("File 11","exists:"+checkAllFileExists+":;"+products.get(position).length());
-            if(checkAllFileExists == products.get(position).length()) {*/
             viewHolder.progressBar.setVisibility(View.GONE);
             viewHolder.thumbnailImage.setClickable(true);
-            //   }
         }
 
     }
@@ -523,132 +482,11 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         Log.d(LOGVAR, "play inline video");
         ListItem listItem = elements.get(position);
         Object s = viewHolder.thumbnailImage.getTag().equals("0");
-        // if(viewHolder.thumbnailImage.getTag().equals(0)||viewHolder.thumbnailImage.getTag().equals("0")) {
-        //   viewHolder.videoHolder.setVisibility(View.VISIBLE);
-        //     viewHolder.rel1.setVisibility(View.INVISIBLE);
-        //String url = mainActivity.mediaURL + videoURL;
         String url = "https://s3-us-west-1.amazonaws.com/babysbrilliant-media/SoundboardCow2.mp4";
-        Uri video = null;
 
         String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + listItem.getMediaFile();
-        video = Uri.parse(fileLocation);
-        // Uri video = Uri.parse("android.resource://" + mainActivity.getPackageName() + "/"
-        //      + R.raw.cow_sound);
 
-
-          /*  try {
-                // Uri video = Uri.parse(url);
-                Uri video = Uri.parse("android.resource://" + mainActivity.getPackageName() + "/"
-                        + R.raw.cow_sound);
-                viewHolder.videoHolder.setVideoURI(video);
-                viewHolder.videoHolder.requestFocus();
-                viewHolder.videoHolder.start();
-                viewHolder.videoHolder.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-
-                    public void onCompletion(MediaPlayer mp) {
-                        //viewHolder.videoHolder.start();
-                        viewHolder.videoHolder.setVisibility(View.INVISIBLE);
-                        viewHolder.rel1.setVisibility(View.VISIBLE);
-                    }
-
-                });
-
-            } catch (Exception ex) {
-
-            }*/
-        //    }
-
-
-//        viewHolder.videoView.setAlpha(0);
         viewHolder.videoView.setVisibility(View.VISIBLE);
-
-
-
-       /* try {
-            Uri video1 = Uri.parse(fileLocation);
-            viewHolder.videoView.setVideoURI(video1);
-
-            // videoView.setAlpha(0);
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        /*//* videoView.requestFocus();
-        viewHolder.videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer mp) {
-
-                //TODO: come up with more accurate solution to hide previous video image before playback starts
-                //show the video after a short delay to allow previous video image to clear out
-                new android.os.Handler().postDelayed(
-                        new Runnable() {
-                            @SuppressLint("NewApi")
-                            public void run() {
-
-                                //pDialog.dismiss();
-                                // videoLayout.setVisibility(View.VISIBLE);
-                                Log.e("Preapare","on Prepare22");
-                                viewHolder.videoView.start();
-                                viewHolder.videoView.setAlpha(1);
-                            }
-                        },
-                        500);
-
-                mediaPlayer = mp;
-            }
-        });
-
-        viewHolder.videoView.requestFocus();
-        viewHolder.videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            // Close the progress bar and play the video
-            public void onPrepared(MediaPlayer mp) {
-                //videoLayout.setVisibility(View.VISIBLE);
-                //pDialog.dismiss();
-                Log.e("Preapare","on Prepare");
-                viewHolder.videoView.start();
-                viewHolder.videoView.setAlpha(1);
-
-                mediaPlayer = mp;
-            }
-
-        });
-
-        viewHolder.videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-
-                *//*if (isPlayList && toggle.isChecked()) {
-                    if (fileArrayList.size() == indexOfVideo) {
-                        indexOfVideo = 0;
-                    }
-                }
-                if (isPlayList && fileArrayList.size() > indexOfVideo) {
-                   *//**//* String fileLocation = Environment.getExternalStorageDirectory()
-                            + "/" + getResources().getString(R.string.app_name) +
-                            "/" + fileArrayList.get(indexOfVideo);*//**//*
-                    Log.e(LOGVAR, "Index:" + indexOfVideo + ":" + fileArrayList.get(indexOfVideo) + " Size:" + fileArrayList.size());
-                    String fileLocation = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + fileArrayList.get(indexOfVideo);
-
-                    Uri video = Uri.parse(fileLocation);
-                    videoView.setVideoURI(video);
-                    videoView.start();
-                    indexOfVideo++;
-                } else {*//*
-                if (mediaPlayer != null) {
-                    mediaPlayer.stop();
-                   *//* mediaPlayer.reset();
-                    mediaPlayer.release();
-                    mediaPlayer = null;*//*
-                    //   }
-                    //videoToggleButton.setText(getString(R.string.video_pause));
-                    //videoLayout.setVisibility(View.INVISIBLE);
-                }
-
-
-            }
-        });*/
 
         isMediaPlayingDone = false;
         mediaPlayer = new MediaPlayer();
@@ -673,7 +511,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
                 Log.d(LOGVAR, "surface TRY block");
 
                 try {
-                    if(mediaPlayer != null) {
+                    if (mediaPlayer != null) {
                         mediaPlayer.setSurface(s);
                         mediaPlayer.prepare();
                     }
@@ -690,7 +528,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
                                 mediaPlayer = null;
                             }
                             isMediaPlayingDone = true;
-                            Log.d(LOGVAR,"MediaPlayer Completion");
+                            Log.d(LOGVAR, "MediaPlayer Completion");
                             notifyDataSetChanged();
 //                            viewHolder.videoView.setVisibility(View.INVISIBLE);
                         }
@@ -705,7 +543,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
                     mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                         @Override
                         public void onPrepared(MediaPlayer mp) {
-                            if(mediaPlayer != null) {
+                            if (mediaPlayer != null) {
                                 mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
                                 mediaPlayer.start();
                             }
@@ -735,13 +573,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
 
             @Override
             public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-                Log.d(LOGVAR,"onSurfaceTextureDestroyed");
-               /* if (mediaPlayer != null) {
-                    mediaPlayer.stop();
-                    mediaPlayer.reset();
-                    mediaPlayer.release();
-                    mediaPlayer = null;
-                }*/
+                Log.d(LOGVAR, "onSurfaceTextureDestroyed");
                 return false;
             }
 

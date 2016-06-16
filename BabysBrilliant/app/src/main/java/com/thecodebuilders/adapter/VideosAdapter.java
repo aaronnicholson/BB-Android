@@ -295,11 +295,6 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
         if ((listItem.isPurchasable() && listItem.isPurchased()) || listItem.getPrice().equalsIgnoreCase(priceValue)) {
 
             String videoURL = listItem.getMediaFile();
-/*
-            String fileLocation = Environment.getExternalStorageDirectory()
-                    + "/" + mainActivity.getResources().getString(R.string.app_name) +
-                    "/" + videoURL;
-*/
             String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + videoURL;
             Log.e(LOGVAR,".."+listItem.getMediaFile());
             if (Utils.checkFileExist(mainActivity, fileLocation, videoURL)) {
@@ -365,9 +360,6 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
 
     private void setFileDownloadedListItem(ElementViewHolder viewHolder, ListItem listItem) {
         String videoURL = listItem.getMediaFile();
-        /*String fileLocation = Environment.getExternalStorageDirectory()
-                + "/" + mainActivity.getResources().getString(R.string.app_name) +
-                "/" + videoURL;*/
         String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + videoURL;
         if (Utils.checkFileExist(mainActivity, fileLocation, videoURL))
             viewHolder.downloadIcon.setVisibility(View.GONE);

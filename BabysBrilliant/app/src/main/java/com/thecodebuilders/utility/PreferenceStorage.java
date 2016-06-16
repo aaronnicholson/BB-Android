@@ -4,14 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import com.thecodebuilders.classes.ObjectSerializer;
-import com.thecodebuilders.model.Playlist;
-
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.util.ArrayList;
-
 /**
  * Created by Yuvaraj on 04-May-16.
  */
@@ -82,25 +74,4 @@ public class PreferenceStorage {
         editor.commit();
     }
 
-
-    public static void saveFavouriteObject (Context context, Playlist favoriteItems){
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = prefs.edit();
-        try {
-            editor.putString(FAVOURITE_SAVE, ObjectSerializer.serialize(favoriteItems));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        editor.commit();
-    }
-    public static ArrayList<JSONObject> getFavouriteObject (Context context){
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        ArrayList<JSONObject> favouriteItems = null;
-        try {
-            favouriteItems = (ArrayList<JSONObject>) ObjectSerializer.deserialize(prefs.getString(FAVOURITE_SAVE, ObjectSerializer.serialize(new ArrayList<JSONObject>())));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return favouriteItems;
-    }
 }

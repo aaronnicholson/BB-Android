@@ -196,9 +196,6 @@ public class PurchasedAdapter extends RecyclerView.Adapter<ElementViewHolder> {
     }
     private void setFileDownloadedListItem(ElementViewHolder viewHolder, ListItem listItem) {
         String videoURL = listItem.getMediaFile();
-        /*String fileLocation = Environment.getExternalStorageDirectory()
-                + "/" + mainActivity.getResources().getString(R.string.app_name) +
-                "/" + videoURL;*/
         String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)+"/"+videoURL;
         if (Utils.checkFileExist(mainActivity, fileLocation, videoURL))
             viewHolder.downloadIcon.setVisibility(View.GONE);
