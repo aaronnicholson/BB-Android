@@ -54,7 +54,6 @@ public class PlaylistAdapter extends RecyclerView.Adapter<ElementViewHolder> {
     private void parseListItems(int listLength) {
         elements = new ArrayList<ListItem>(listLength);
         products = new ArrayList<JSONArray>();
-        Log.e(LOGVAR, "Asset:" + assetsList);
         PreferenceStorage.savePlaylist(appContext,assetsList.toString());
         for (int i = 0; i < listLength; i++) {
             String name;
@@ -155,10 +154,9 @@ public class PlaylistAdapter extends RecyclerView.Adapter<ElementViewHolder> {
 
     private void thumbnailClicked(int position, ElementViewHolder thisViewHolder) {
         ListItem listItem = elements.get(position);
-        Log.e(LOGVAR,"Product:"+products.get(position)+"::"+position);
         JSONArray jsonArray = products.get(position);
         mainActivity.fileArrayList = new ArrayList<String>();
-
+        mainActivity.indexOfVideo = 1;
         for (int i = 0; i < jsonArray.length(); i++) {
             try {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);

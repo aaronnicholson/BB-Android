@@ -200,7 +200,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     private PurchasedAdapter purchasedAdapter;
 
     public ArrayList<String> fileArrayList;
-    private int indexOfVideo = 1;
+    public int indexOfVideo = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -1107,11 +1107,13 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             @Override
             public void onCompletion(MediaPlayer mp) {
                 if (isPlayList && toggle.isChecked()) {
+                    Log.e(LOGVAR,".."+fileArrayList.size()+":"+indexOfVideo);
                     if (fileArrayList.size() == indexOfVideo) {
                         indexOfVideo = 0;
                     }
                 }
                 if (isPlayList && fileArrayList.size() > indexOfVideo) {
+                    Log.e(LOGVAR,"PlayList:"+fileArrayList.size()+":"+indexOfVideo+":"+fileArrayList.get(indexOfVideo));
                     String fileLocation = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + fileArrayList.get(indexOfVideo);
 
                     Uri video = Uri.parse(fileLocation);
