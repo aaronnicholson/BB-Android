@@ -401,7 +401,6 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
 
         final ListItem rowData = elements.get(position);
         configureListItemLook(viewHolder, rowData);
-        Log.d("VideosAdapter","onBindViewHolder");
 
         configureListItemListeners(viewHolder, position);
 
@@ -424,7 +423,6 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
                 viewHolder.thumbnailImage.setClickable(false);
                 viewHolder.downloadIcon.setVisibility(View.GONE);
                 // mainActivity.downloadVideo(viewHolder, listItem);
-                //mainActivity.downloadVideo(viewHolder, listItem);
                 new DownloadAsync(appContext, viewHolder, listItem, VideosAdapter.this, position, listItem.getMediaFile()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             }
         });
@@ -437,6 +435,4 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
     public void onDownloadComplete(int position) {
         notifyDataSetChanged();
     }
-
-
 }

@@ -192,7 +192,8 @@ public class ShowIntroActivity extends AppCompatActivity {
                 R.layout.intro_7,
                 R.layout.intro_8,
                 R.layout.intro_9,
-                R.layout.intro_10
+                R.layout.intro_10,
+                R.layout.intro_11
 
         };
 

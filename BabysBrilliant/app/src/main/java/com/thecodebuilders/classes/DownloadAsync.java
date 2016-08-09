@@ -23,21 +23,12 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
+import java.net.URLConnection;
 
 
 public class DownloadAsync extends AsyncTask<String, String, String> {
 
     private static final String TAG = "DownloadAsync";
-    private static final int BYTE_SIZE = 1024 * 1024;
     private Context context;
     private ElementViewHolder viewHolder;
     private ThumbnailListAdapter.ElementViewHolder elementViewHolder;
@@ -83,56 +74,26 @@ public class DownloadAsync extends AsyncTask<String, String, String> {
 
     @Override
     protected String doInBackground(String... urlString) {
-        InputStream input = null;
-        OutputStream output = null;
-        HttpsURLConnection connection = null;
-        URL url = null;
-
-     /*   TrustManager[] trustAllCerts = new TrustManager[]{
-                new X509TrustManager() {
-                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                        return null;
-                    }
-
-                    public void checkClientTrusted(
-                            java.security.cert.X509Certificate[] certs, String authType) {
-                    }
-
-                    public void checkServerTrusted(
-                            java.security.cert.X509Certificate[] certs, String authType) {
-                    }
-                }
-        };*/
-        try {
-           /* SSLContext sc = SSLContext.getInstance("SSL");
-            sc.init(null, trustAllCerts, new java.security.SecureRandom());
-            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());*/
-            url = new URL(mUrl);
-            trustAllHosts();
-            connection = (HttpsURLConnection) url.openConnection();
-            connection.setHostnameVerifier(DO_NOT_VERIFY);
-           /* SSLContext context = SSLContext.getInstance("SSL");
-            TrustManager[] tmlist = {new MyTrustManager()};
-            context.init(null, tmlist, null);
-            connection.setDefaultSSLSocketFactory(context.getSocketFactory());*/
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         try {
 
-            // connection.setRequestProperty("Connection","Keep-Alive");
+            URL url = new URL(mUrl);
+            URLConnection connection = url.openConnection();
             connection.connect();
-            File file = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), videoName);
+           /* File myDirectory = new File(
+                    Environment.getExternalStorageDirectory(), "/" + context.getResources().getString(R.string.app_name));
+            if (!myDirectory.exists())
+                myDirectory.mkdir();*/
+            File file = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS),videoName);
+
 
             int lengthOfFile = connection.getContentLength();
             Log.d(TAG, "Length of file: " + lengthOfFile);
             PreferenceStorage.saveFileLength(context, videoName, lengthOfFile);
 
-            input = new BufferedInputStream(url.openStream());
-            output = new FileOutputStream(file);
+            InputStream input = new BufferedInputStream(url.openStream());
+            OutputStream output = new FileOutputStream(file);
 
-            byte data[] = new byte[BYTE_SIZE];
+            byte data[] = new byte[1024];
             int count = 0;
             long total = 0;
 
@@ -142,36 +103,25 @@ public class DownloadAsync extends AsyncTask<String, String, String> {
                 output.write(data, 0, count);
             }
 
+            output.flush();
+            output.close();
+            input.close();
 
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            try {
-                if (output != null) {
-                    output.flush();
-                    output.close();
-                }
-                if (input != null)
-                    input.close();
-                if (connection != null)
-                    connection.disconnect();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
         }
         return null;
     }
 
     @Override
     protected void onProgressUpdate(String... progress) {
-        Log.v(TAG, "Percentage::" + videoName + " :" + progress[0] + " : " + downloadStatusListener.getClass().getSimpleName());
+        Log.v(TAG, "Percentage::" + videoName + " :" + progress[0]+" : "+downloadStatusListener.getClass().getSimpleName());
         this.progress = progress[0];
         if (progress[0].equalsIgnoreCase("100")) {
             if (downloadStatusListener.getClass().getSimpleName().equalsIgnoreCase("VideosAdapter")) {
                 listItem.setIsDownloading(false);
                 viewHolder.thumbnailImage.setClickable(true);
-            } else if (downloadStatusListener.getClass().getSimpleName().equalsIgnoreCase("ThumbnailListAdapter")) {
+            }else  if(downloadStatusListener.getClass().getSimpleName().equalsIgnoreCase("ThumbnailListAdapter")) {
                 listItem.setIsDownloading(false);
                 //elementViewHolder.thumbnailImage.setClickable(true);
             }
@@ -185,12 +135,13 @@ public class DownloadAsync extends AsyncTask<String, String, String> {
     @Override
     protected void onPostExecute(String response) {
         if (progress.equalsIgnoreCase("100")) {
-            if (downloadStatusListener.getClass().getSimpleName().equalsIgnoreCase("VideosAdapter")) {
+            if(downloadStatusListener.getClass().getSimpleName().equalsIgnoreCase("VideosAdapter")) {
                 listItem.setIsDownloading(false);
                 viewHolder.thumbnailImage.setClickable(true);
-            } else if (downloadStatusListener.getClass().getSimpleName().equalsIgnoreCase("ThumbnailListAdapter")) {
+            }
+            else  if(downloadStatusListener.getClass().getSimpleName().equalsIgnoreCase("ThumbnailListAdapter")) {
                 listItem.setIsDownloading(false);
-                // elementViewHolder.thumbnailImage.setClickable(true);
+               // elementViewHolder.thumbnailImage.setClickable(true);
             }
 
 
@@ -199,59 +150,5 @@ public class DownloadAsync extends AsyncTask<String, String, String> {
 
     }
 
-    private static class MyTrustManager implements X509TrustManager {
-
-        @Override
-        public void checkClientTrusted(X509Certificate[] chain, String authType)
-                throws CertificateException {
-        }
-
-        @Override
-        public void checkServerTrusted(X509Certificate[] chain, String authType)
-                throws CertificateException {
-        }
-
-        @Override
-        public X509Certificate[] getAcceptedIssuers() {
-            return null;
-        }
-
-    }
-
-    final static HostnameVerifier DO_NOT_VERIFY = new HostnameVerifier() {
-        public boolean verify(String hostname, SSLSession session) {
-            return true;
-        }
-    };
-
-    /**
-     * Trust every server - dont check for any certificate
-     */
-    private static void trustAllHosts() {
-        // Create a trust manager that does not validate certificate chains
-        TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
-            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                return new java.security.cert.X509Certificate[]{};
-            }
-
-            public void checkClientTrusted(X509Certificate[] chain,
-                                           String authType) throws CertificateException {
-            }
-
-            public void checkServerTrusted(X509Certificate[] chain,
-                                           String authType) throws CertificateException {
-            }
-        }};
-
-        // Install the all-trusting trust manager
-        try {
-            SSLContext sc = SSLContext.getInstance("TLS");
-            sc.init(null, trustAllCerts, new java.security.SecureRandom());
-            HttpsURLConnection
-                    .setDefaultSSLSocketFactory(sc.getSocketFactory());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
 }
