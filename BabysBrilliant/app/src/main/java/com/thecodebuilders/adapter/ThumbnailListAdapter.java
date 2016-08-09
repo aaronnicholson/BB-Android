@@ -21,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.android.volley.toolbox.ImageLoader;
@@ -368,6 +369,8 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
             if (listItem.getCategory().contains("5") && !listItem.isSection()) {
                 if (isMediaPlayingDone)
                     playOrOpen(position, listItem, thisViewHolder);
+                else
+                    Toast.makeText(appContext, appContext.getResources().getString(R.string.another_media_play_progress), Toast.LENGTH_LONG).show();
             } else if ((listItem.isPurchasable() && listItem.isPurchased()) || listItem.getPrice().equalsIgnoreCase(priceValue)) {
 
                 int checkAllFileExists = 0;
@@ -481,8 +484,6 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
     public void playInlineVideo(String videoURL, final ElementViewHolder viewHolder, int position) {
         Log.d(LOGVAR, "play inline video");
         ListItem listItem = elements.get(position);
-        Object s = viewHolder.thumbnailImage.getTag().equals("0");
-        String url = "https://s3-us-west-1.amazonaws.com/babysbrilliant-media/SoundboardCow2.mp4";
 
         String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + listItem.getMediaFile();
 
@@ -491,8 +492,6 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         isMediaPlayingDone = false;
         mediaPlayer = new MediaPlayer();
         try {
-            Log.d(LOGVAR, "set data source");
-
             mediaPlayer.setDataSource(fileLocation); //this triggers the listener, which plays the video
 
         } catch (IOException e) {

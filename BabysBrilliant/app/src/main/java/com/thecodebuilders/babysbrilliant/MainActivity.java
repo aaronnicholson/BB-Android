@@ -201,12 +201,15 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     public ArrayList<String> fileArrayList;
     public int indexOfVideo = 1;
+    private boolean isVideoClose = false;
+    private int videoStopPosition = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Log.d(TAG, "onCreate");
         assetsURL = Constant.URL + "a=pDBstandard";
         customizeDialog = new CustomizeDialog(MainActivity.this);
         pref = getApplicationContext().getSharedPreferences("BabyBrilliantPref", MODE_PRIVATE);
@@ -273,6 +276,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     }
 
+
     public void createRawFile() {
 
         //  File file = new File(Environment.getExternalStorageDirectory() + File.separator + "raw.txt");
@@ -313,7 +317,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
             }
             InputRead.close();
-            Toast.makeText(getBaseContext(), s, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getBaseContext(), s, Toast.LENGTH_SHORT).show();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -614,6 +618,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         videoToggleButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                isVideoClose = false;
                 if (videoView.isPlaying()) {
                     videoView.pause();
                     videoToggleButton.setText(getString(R.string.video_play));
@@ -628,6 +633,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         videoCloseButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Log.d(LOGVAR, "VIDEO CLOSE PRESS");
+                isVideoClose = true;
                 videoView.pause();
                 videoView.stopPlayback();
                 videoView.suspend();
@@ -1009,6 +1015,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     }
 
     public void playingVideos(String videoURL) {
+        Log.d(TAG, "playingVideos");
         String url = mediaURL + videoURL;
         final ProgressDialog progressDialog;
         progressDialog = ProgressDialog.show(MainActivity.this, "", "Buffering video...", true);
@@ -1038,9 +1045,29 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (isVideoClose) {
+            videoView.setOnPreparedListener(null);
+        } else {
+            if (videoStopPosition != 0) {
+                videoView.seekTo(videoStopPosition);
+                videoView.start();
+            }
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        videoStopPosition = videoView.getCurrentPosition();
+        videoView.pause();
+
+    }
+
     @SuppressLint("NewApi")
     public void playVideo(String videoURL, final boolean isPlayList) {
-
 
         // Create a progressbar
         pDialog = new ProgressDialog(MainActivity.this);
@@ -1067,14 +1094,12 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mp) {
-
                 //TODO: come up with more accurate solution to hide previous video image before playback starts
                 //show the video after a short delay to allow previous video image to clear out
                 new android.os.Handler().postDelayed(
                         new Runnable() {
                             @SuppressLint("NewApi")
                             public void run() {
-
                                 pDialog.dismiss();
                                 videoLayout.setVisibility(View.VISIBLE);
                                 videoView.start();
@@ -1092,6 +1117,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             // Close the progress bar and play the video
             public void onPrepared(MediaPlayer mp) {
+
                 videoLayout.setVisibility(View.VISIBLE);
                 pDialog.dismiss();
 
@@ -1103,17 +1129,18 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         });
 
+
         videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
                 if (isPlayList && toggle.isChecked()) {
-                    Log.e(LOGVAR,".."+fileArrayList.size()+":"+indexOfVideo);
+                    Log.e(LOGVAR, ".." + fileArrayList.size() + ":" + indexOfVideo);
                     if (fileArrayList.size() == indexOfVideo) {
                         indexOfVideo = 0;
                     }
                 }
                 if (isPlayList && fileArrayList.size() > indexOfVideo) {
-                    Log.e(LOGVAR,"PlayList:"+fileArrayList.size()+":"+indexOfVideo+":"+fileArrayList.get(indexOfVideo));
+                    Log.e(LOGVAR, "PlayList:" + fileArrayList.size() + ":" + indexOfVideo + ":" + fileArrayList.get(indexOfVideo));
                     String fileLocation = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + fileArrayList.get(indexOfVideo);
 
                     Uri video = Uri.parse(fileLocation);
@@ -1135,8 +1162,9 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         showControls();
     }
 
+
     private static void showControls() {
-        //videoFFButton.setVisibility(View.VISIBLE);
+        // videoFFButton.setVisibility(View.VISIBLE);
         //videoRewButton.setVisibility(View.VISIBLE);
         videoToggleButton.setVisibility(View.VISIBLE);
         videoCloseButton.setVisibility(View.VISIBLE);
@@ -1534,7 +1562,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             @Override
             public void onClick(View v) {
 
-                startActivity(new Intent(MainActivity.this, ShowIntroActivity.class).putExtra("Key", "SignUp"));
+                startActivity(new Intent(MainActivity.this, ShowIntroActivity.class).putExtra("Key", "MainActivity"));
 
 
             }
@@ -2023,6 +2051,6 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         videoView.suspend();
         videoToggleButton.setText(getString(R.string.video_pause));
         videoLayout.setVisibility(View.INVISIBLE);
-
     }
+
 }
