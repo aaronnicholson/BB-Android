@@ -2,7 +2,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
-    android:layout_gravity="bottom"
     android:padding="10dp"
     android:id="@+id/list_item_container"
     >
@@ -11,9 +10,8 @@
     <!--ratio is .56-->
     <RelativeLayout
         android:id="@+id/rel1"
-        android:layout_width="360dp"
-        android:layout_height="202dp"
-        android:layout_alignParentBottom="true"
+        android:layout_width="@dimen/thumbnail_view_width"
+        android:layout_height="@dimen/thumbnail_view_height"
         android:visibility="visible"
         >
 
@@ -113,7 +111,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:adjustViewBounds="true"
-                android:maxWidth="20dp"
+                android:maxWidth="22dp"
                 android:src="@drawable/settings"
                 android:visibility="invisible"/>
             <TextView

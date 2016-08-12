@@ -37,7 +37,9 @@ import javax.net.ssl.X509TrustManager;
 public class DownloadAsync extends AsyncTask<String, String, String> {
 
     private static final String TAG = "DownloadAsync";
-    private static final int BYTE_SIZE = 1024 * 1024;
+    private static final int BYTE_SIZE = 512;
+    private static final int CONNECT_TIME_OUT = 5000;
+    private static final int READ_TIME_OUT = 15000;
     private Context context;
     private ElementViewHolder viewHolder;
     private ThumbnailListAdapter.ElementViewHolder elementViewHolder;
@@ -88,33 +90,11 @@ public class DownloadAsync extends AsyncTask<String, String, String> {
         HttpsURLConnection connection = null;
         URL url = null;
 
-     /*   TrustManager[] trustAllCerts = new TrustManager[]{
-                new X509TrustManager() {
-                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                        return null;
-                    }
-
-                    public void checkClientTrusted(
-                            java.security.cert.X509Certificate[] certs, String authType) {
-                    }
-
-                    public void checkServerTrusted(
-                            java.security.cert.X509Certificate[] certs, String authType) {
-                    }
-                }
-        };*/
         try {
-           /* SSLContext sc = SSLContext.getInstance("SSL");
-            sc.init(null, trustAllCerts, new java.security.SecureRandom());
-            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());*/
             url = new URL(mUrl);
             trustAllHosts();
             connection = (HttpsURLConnection) url.openConnection();
-            connection.setHostnameVerifier(DO_NOT_VERIFY);
-           /* SSLContext context = SSLContext.getInstance("SSL");
-            TrustManager[] tmlist = {new MyTrustManager()};
-            context.init(null, tmlist, null);
-            connection.setDefaultSSLSocketFactory(context.getSocketFactory());*/
+            connection.setHostnameVerifier(doNotVerifyHost);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -123,6 +103,8 @@ public class DownloadAsync extends AsyncTask<String, String, String> {
 
             // connection.setRequestProperty("Connection","Keep-Alive");
             connection.connect();
+            connection.setConnectTimeout(CONNECT_TIME_OUT);
+            connection.setReadTimeout(READ_TIME_OUT);
             File file = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), videoName);
 
             int lengthOfFile = connection.getContentLength();
@@ -199,26 +181,8 @@ public class DownloadAsync extends AsyncTask<String, String, String> {
 
     }
 
-    private static class MyTrustManager implements X509TrustManager {
 
-        @Override
-        public void checkClientTrusted(X509Certificate[] chain, String authType)
-                throws CertificateException {
-        }
-
-        @Override
-        public void checkServerTrusted(X509Certificate[] chain, String authType)
-                throws CertificateException {
-        }
-
-        @Override
-        public X509Certificate[] getAcceptedIssuers() {
-            return null;
-        }
-
-    }
-
-    final static HostnameVerifier DO_NOT_VERIFY = new HostnameVerifier() {
+    final static HostnameVerifier doNotVerifyHost = new HostnameVerifier() {
         public boolean verify(String hostname, SSLSession session) {
             return true;
         }

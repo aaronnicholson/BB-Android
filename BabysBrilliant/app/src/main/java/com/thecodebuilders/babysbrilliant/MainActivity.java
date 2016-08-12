@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     public static JSONArray soundBoards, soundBoards1;
     public ArrayList<JSONArray> jsonSets = new ArrayList<>();
 
-    public static String currentMenu = MOVIES;
+    public static String currentMenu = PURCHASED_ITEMS;
 
     public static String mediaURL = appContext.getString(R.string.media_url);
     private MediaPlayer mediaPlayer;
@@ -200,6 +200,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     private PurchasedAdapter purchasedAdapter;
 
     public ArrayList<String> fileArrayList;
+    public ArrayList<String> mediaFileNameArray;
+    public int indexOfCurrentlyPlayingVideo = 0;
     public int indexOfVideo = 1;
     private boolean isVideoClose = false;
     private int videoStopPosition = 0;
@@ -645,14 +647,57 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         videoFFButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 //TODO: Make forward func
-                showControls();
+                //showControls();
+                try {
+                    if (mediaFileNameArray != null) {
+                        String fileLocation = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/"
+                                + mediaFileNameArray.get((indexOfCurrentlyPlayingVideo + 1));
+                        if (Utils.checkFileExist(MainActivity.this, fileLocation,
+                                mediaFileNameArray.get((indexOfCurrentlyPlayingVideo + 1)))) {
+                            indexOfCurrentlyPlayingVideo = indexOfCurrentlyPlayingVideo + 1;
+                            Uri video = Uri.parse(fileLocation);
+                            videoView.setVideoURI(video);
+                            videoView.start();
+                        } else {
+                            Toast.makeText(MainActivity.this, getResources().getString(R.string.next_video_not_downloaded), Toast.LENGTH_LONG).show();
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
             }
         });
 
         videoRewButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 //TODO: Make backward func
-                showControls();
+                //showControls();
+                try {
+                    if (mediaFileNameArray != null) {
+                        if ((indexOfCurrentlyPlayingVideo - 1) != -1) {
+                            String fileLocation = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/"
+                                    + mediaFileNameArray.get((indexOfCurrentlyPlayingVideo - 1));
+                            if (Utils.checkFileExist(MainActivity.this, fileLocation,
+                                    mediaFileNameArray.get((indexOfCurrentlyPlayingVideo - 1)))) {
+                                indexOfCurrentlyPlayingVideo = indexOfCurrentlyPlayingVideo - 1;
+                                Uri video = Uri.parse(fileLocation);
+                                videoView.setVideoURI(video);
+                                videoView.start();
+                            } else {
+                                Toast.makeText(MainActivity.this, getResources().getString(R.string.previous_video_not_downloaded), Toast.LENGTH_LONG).show();
+                            }
+                        } else {
+                            String fileLocationCurrentVideo = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/"
+                                    + mediaFileNameArray.get((indexOfCurrentlyPlayingVideo));
+                            Uri video = Uri.parse(fileLocationCurrentVideo);
+                            videoView.setVideoURI(video);
+                            videoView.start();
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -1054,6 +1099,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             if (videoStopPosition != 0) {
                 videoView.seekTo(videoStopPosition);
                 videoView.start();
+                videoToggleButton.setText(getString(R.string.video_pause));
             }
         }
     }
@@ -1140,7 +1186,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                     }
                 }
                 if (isPlayList && fileArrayList.size() > indexOfVideo) {
-                    Log.e(LOGVAR, "PlayList:" + fileArrayList.size() + ":" + indexOfVideo + ":" + fileArrayList.get(indexOfVideo));
+                    Log.d(LOGVAR, "PlayList:" + fileArrayList.size() + ":" + indexOfVideo + ":" + fileArrayList.get(indexOfVideo));
                     String fileLocation = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + fileArrayList.get(indexOfVideo);
 
                     Uri video = Uri.parse(fileLocation);
@@ -1164,8 +1210,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
 
     private static void showControls() {
-        // videoFFButton.setVisibility(View.VISIBLE);
-        //videoRewButton.setVisibility(View.VISIBLE);
+        videoFFButton.setVisibility(View.VISIBLE);
+        videoRewButton.setVisibility(View.VISIBLE);
         videoToggleButton.setVisibility(View.VISIBLE);
         videoCloseButton.setVisibility(View.VISIBLE);
 
@@ -1305,6 +1351,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                         purchasedItems = purchasedItems1;
 
                         pDialog.hide();
+                        initApp();
                         purchaseJSON(response);
                     } else if (From.equalsIgnoreCase("PurchaseContent")) {
                         pDialog.dismiss();
@@ -1412,7 +1459,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         jsonSets.add(nightLights);
         jsonSets.add(soundBoards);
 
-        initApp();
+
     }
 
     private void getLocalJSON() {
@@ -1430,9 +1477,14 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     private void initApp() throws JSONException {
         //TODO: add preloader
-        currentMenu = MOVIES;
-        configureThumbnailList(jsonData.getJSONArray(currentMenu), "section");
-        toggleMenuButton(MOVIES);
+        if (purchasedItems != null) {
+            if (purchasedItems.length() == 0)
+                emptyCategory.setVisibility(View.VISIBLE);
+            else
+                emptyCategory.setVisibility(View.GONE);
+            configureThumbnailList(purchasedItems, "purchased");
+            toggleMenuButton(PURCHASED_ITEMS);
+        }
 
         //show_intro.performClick(); //TODO: for testing
     }

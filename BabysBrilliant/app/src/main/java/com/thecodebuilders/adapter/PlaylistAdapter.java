@@ -156,11 +156,14 @@ public class PlaylistAdapter extends RecyclerView.Adapter<ElementViewHolder> {
         ListItem listItem = elements.get(position);
         JSONArray jsonArray = products.get(position);
         mainActivity.fileArrayList = new ArrayList<String>();
+        mainActivity.mediaFileNameArray = new ArrayList<>();
         mainActivity.indexOfVideo = 1;
+        mainActivity.indexOfCurrentlyPlayingVideo = 0;
         for (int i = 0; i < jsonArray.length(); i++) {
             try {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                 mainActivity.fileArrayList.add(jsonObject.getString("file"));
+                mainActivity.mediaFileNameArray.add(jsonObject.getString("file"));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -170,6 +173,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<ElementViewHolder> {
         /*String fileLocation = Environment.getExternalStorageDirectory()
                 + "/" + mainActivity.getResources().getString(R.string.app_name) +
                 "/" + mainActivity.fileArrayList.get(0);*/
+        Log.d(LOGVAR,"MediaFileName:"+mainActivity.mediaFileNameArray.toString());
         String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)+"/"+ mainActivity.fileArrayList.get(0);
 
         mainActivity.playVideo(fileLocation, true);

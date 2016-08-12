@@ -3,6 +3,7 @@ package com.thecodebuilders.adapter;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Environment;
@@ -18,6 +19,7 @@ import com.thecodebuilders.babysbrilliant.ListItem;
 import com.thecodebuilders.babysbrilliant.MainActivity;
 import com.thecodebuilders.babysbrilliant.R;
 import com.thecodebuilders.classes.DownloadAsync;
+import com.thecodebuilders.classes.DownloadService;
 import com.thecodebuilders.interfaces.DownloadStatusListener;
 import com.thecodebuilders.model.Playlist;
 import com.thecodebuilders.network.VolleySingleton;
@@ -64,6 +66,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
     //Then it adds each ListItem instance to the elements ArrayList.
     private void parseListItems(int listLength) {
         elements = new ArrayList<ListItem>(listLength);
+        mainActivity.mediaFileNameArray = new ArrayList<>();
         for (int i = 0; i < listLength; i++) {
             JSONObject rawJSON;
             String name;
@@ -134,13 +137,19 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
                 imageResource = itemJSON.getString("thumb");
                 if (!itemJSON.isNull("cat")) category = itemJSON.getString("cat");
 
-                mediaFile = itemJSON.getString("file");
-                boolean isSoundBoard = false;
-                if(!itemJSON.isNull("catT"))
-                    if(purchased.equalsIgnoreCase("purchased"))
-                        isSoundBoard = itemJSON.getString("catT").equalsIgnoreCase("Soundboard");
 
-                if(!isSoundBoard ) {
+                boolean isSoundBoard = false;
+                if (!itemJSON.isNull("catT"))
+                    if (purchased.equalsIgnoreCase("purchased"))
+                        isSoundBoard = itemJSON.getString("catT").equalsIgnoreCase("Soundboard");
+                mediaFile = itemJSON.getString("file");
+                if (purchased.equalsIgnoreCase("purchased")) {
+                    if (isPurchased && !isSoundBoard)
+                        mainActivity.mediaFileNameArray.add(mediaFile);
+                } else {
+                    mainActivity.mediaFileNameArray.add(mediaFile);
+                }
+                if (!isSoundBoard) {
                     ListItem listItem = new ListItem(itemJSON, name, playInline, imageResource, mediaFile, price, category, isSection,
                             isPurchased, isPlaylistItem, isPlaylist, isFavorite, appContext, false, MainActivity.DOWNLOAD_ID);
 
@@ -241,7 +250,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
         //if it has been purchased already or free
         if (listItem.isPurchased() || listItem.getPrice().equalsIgnoreCase(priceValue)
                 || !listItem.isPurchasable()) {
-                 setLookToPurchased(viewHolder);
+            setLookToPurchased(viewHolder);
         }
 
         if (listItem.isFavorite()) {
@@ -255,10 +264,9 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
         } else {
             setLookToNotPlaylistItem(viewHolder);
         }
-        if(listItem.getCategory().equals("5") && !listItem.isSection()){
+        if (listItem.getCategory().equals("5") && !listItem.isSection()) {
             setFileDownloadedListItem(viewHolder, listItem);
-        }
-        else {
+        } else {
             if (listItem.isPurchased())
                 setFileDownloadedListItem(viewHolder, listItem);
         }
@@ -296,9 +304,11 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
 
             String videoURL = listItem.getMediaFile();
             String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + videoURL;
-            Log.e(LOGVAR,".."+listItem.getMediaFile());
+            Log.e(LOGVAR, ".." + listItem.getMediaFile() + "::" + mainActivity.mediaFileNameArray.toString());
             if (Utils.checkFileExist(mainActivity, fileLocation, videoURL)) {
                 Log.d(LOGVAR, "FILE EXISTS");
+                mainActivity.indexOfCurrentlyPlayingVideo = mainActivity.mediaFileNameArray.indexOf(listItem.getMediaFile());
+                Log.d(LOGVAR, "index:" + mainActivity.indexOfCurrentlyPlayingVideo);
                 mainActivity.playVideo(fileLocation, false);
                 //otherwise, go get it
             } else {
@@ -311,7 +321,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
             //TODO: do actual purchase round trip here
             // listItem.setIsPurchased(true);
             //  setLookToPurchased(thisViewHolder);
-            if(listItem.getCategory().equals("5") && !listItem.isSection()){
+            if (listItem.getCategory().equals("5") && !listItem.isSection()) {
                 String videoURL = listItem.getMediaFile();
                 String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + videoURL;
                 if (Utils.checkFileExist(mainActivity, fileLocation, videoURL)) {
@@ -323,8 +333,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
                     //TODO: Stop multiple downloads of the same file
                     alertForDownload(thisViewHolder, listItem, position);
                 }
-            }
-            else {
+            } else {
                 try {
                     mainActivity.addToPurchased(listItem.getRawJSON(), listItem, thisViewHolder);
                 } catch (JSONException e) {
@@ -401,7 +410,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
 
         final ListItem rowData = elements.get(position);
         configureListItemLook(viewHolder, rowData);
-        Log.d("VideosAdapter","onBindViewHolder");
+        Log.d("VideosAdapter", "onBindViewHolder");
 
         configureListItemListeners(viewHolder, position);
 
@@ -425,6 +434,9 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
                 viewHolder.downloadIcon.setVisibility(View.GONE);
                 // mainActivity.downloadVideo(viewHolder, listItem);
                 //mainActivity.downloadVideo(viewHolder, listItem);
+              /*  Intent intent = new Intent(mainActivity, DownloadService.class);
+                intent.putExtra("url", "https://s3-us-west-1.amazonaws.com/babysbrilliant-media/Gravityfinal.mp4");
+                mainActivity.startService(intent);*/
                 new DownloadAsync(appContext, viewHolder, listItem, VideosAdapter.this, position, listItem.getMediaFile()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             }
         });

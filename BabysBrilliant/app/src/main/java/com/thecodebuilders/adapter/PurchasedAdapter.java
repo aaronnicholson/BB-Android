@@ -66,6 +66,7 @@ public class PurchasedAdapter extends RecyclerView.Adapter<ElementViewHolder> {
         assetsList = listData;
         this.mainActivity = mainActivity;
         parseListItems(assetsList.size());
+        Log.d(LOGVAR, assetsList.toString());
 
     }
 

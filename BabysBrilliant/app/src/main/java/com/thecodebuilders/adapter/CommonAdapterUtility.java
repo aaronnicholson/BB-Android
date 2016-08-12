@@ -76,6 +76,7 @@ public class CommonAdapterUtility {
             imageLoader.get(mediaURL, new ImageLoader.ImageListener() {
                 @Override
                 public void onResponse(ImageLoader.ImageContainer imageContainer, boolean stillLoading) {
+                    Log.d("ImageLoader","Loading:"+stillLoading);
                     if (stillLoading) {
                         CommonAdapterUtility.showPlaceHolderImage(imageView);
                     } else {
@@ -83,6 +84,7 @@ public class CommonAdapterUtility {
                         Bitmap loadedBitmap = imageContainer.getBitmap();
                         Bitmap savedBitmap = Bitmap.createBitmap(loadedBitmap);
                         imageView.setImageBitmap(loadedBitmap);
+                        Log.d("ImageLoader", "Loading:" + stillLoading+":"+loadedBitmap);
                         CommonAdapterUtility.saveThumbToLocalFile(fileName, savedBitmap);
 
                     }
@@ -109,16 +111,19 @@ public class CommonAdapterUtility {
             InputStream stream = appContext.getAssets().open(fileName);
             Drawable drawable = Drawable.createFromStream(stream, null);
             imageView.setImageDrawable(drawable);
+            Log.d("CommonAdapterUtility","load image from assets folder");
 
             //but if it's not in there, get it from the server after displaying a placeholder
         } catch (Exception e) {
             //load the saved image and display it
             try {
                 CommonAdapterUtility.loadLocalSavedImage(fileName, imageView);
+                Log.d("CommonAdapterUtility", "load the saved image and display it");
             } catch (FileNotFoundException localNotFoundError) {
                 localNotFoundError.printStackTrace();
                 //if that's not there, then get the real image from the server
                 CommonAdapterUtility.loadImageFromServer(listItem,imageView);
+                Log.d("CommonAdapterUtility", "if that's not there, then get the real image from the server");
             }
         }
     }

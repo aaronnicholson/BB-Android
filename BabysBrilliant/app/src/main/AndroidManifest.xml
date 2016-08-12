@@ -77,6 +77,7 @@
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_show_intro" >
         </activity>
+        <service android:name="com.thecodebuilders.classes.DownloadService"></service>
 
 
     </application>

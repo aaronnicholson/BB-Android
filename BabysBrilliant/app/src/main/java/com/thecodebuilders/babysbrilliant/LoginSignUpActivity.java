@@ -110,7 +110,8 @@ public class LoginSignUpActivity extends AppCompatActivity {
                 else {
                     reset_pass.setVisibility(View.GONE);
                     progressBar.setVisibility(View.VISIBLE);
-                    getRemoteJSON(Constant.URL + "a=sup&n=" + email.getText().toString() + "&u=" + email.getText().toString() + "&p=" + passwd.getText(), email.getText().toString(), passwd.getText().toString(), "SignUp");
+                    getRemoteJSON(Constant.URL + "a=sup&n=" + email.getText().toString() + "&u="
+                            + email.getText().toString() + "&p=" + passwd.getText(), email.getText().toString(), passwd.getText().toString(), "SignUp");
                 }
             }
             if (resultCode == Activity.RESULT_CANCELED) {
@@ -128,6 +129,7 @@ public class LoginSignUpActivity extends AppCompatActivity {
                 try {
                     reset_pass.setVisibility(View.VISIBLE);
                     progressBar.setVisibility(View.GONE);
+                    Log.d(LOGVAR, "Response:"+response);
                     JSONObject result = new JSONObject(response);
                     if (result.getString("res").equalsIgnoreCase("successful")) {
 

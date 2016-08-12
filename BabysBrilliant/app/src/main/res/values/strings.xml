@@ -63,4 +63,7 @@
     <string name="empty_category_playlist_msg">This area will show playlists after you\'ve created some. To create a playlist, tap the list icon on an item after you\'ve purchased it.</string>
     <string name="empty_category_favorite_msg">This area will show your favorite items. To mark an item as a favorite, tap the star icon after you\'ve purchased it.</string>
     <string name="another_media_play_progress">Please wait another media is playing</string>
+    <string name="next_video_not_downloaded">Next video is not downloaded</string>
+    <string name="previous_video_not_downloaded">Previous video is not downloaded</string>
+
 </resources>
