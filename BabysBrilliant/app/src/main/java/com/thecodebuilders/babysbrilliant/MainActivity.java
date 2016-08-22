@@ -203,8 +203,9 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     public ArrayList<String> mediaFileNameArray;
     public int indexOfCurrentlyPlayingVideo = 0;
     public int indexOfVideo = 1;
-    private boolean isVideoClose = false;
+    public boolean isVideoClose = false;
     private int videoStopPosition = 0;
+    private  boolean isVideoPlaying = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -235,8 +236,13 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         createRawFile();
         setMenuWidth();
         initializeLayout();
-        getRemoteJSON("Main", assetsURL);
-        getRemoteJSON("Purchase", Constant.URL + "a=pH&u=" + pref.getString("user_id", ""));
+        if(Utils.isNetworkAvailable(MainActivity.this)) {
+            getRemoteJSON("Main", assetsURL);
+            getRemoteJSON("Purchase", Constant.URL + "a=pH&u=" + pref.getString("user_id", ""));
+        }
+        else {
+            Toast.makeText(this, getResources().getString(R.string.no_network), Toast.LENGTH_LONG).show();
+        }
         setUpListeners();
         setUpThumbnailList();
         setUpButtons();
@@ -623,9 +629,11 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                 isVideoClose = false;
                 if (videoView.isPlaying()) {
                     videoView.pause();
+                    isVideoPlaying = false;
                     videoToggleButton.setText(getString(R.string.video_play));
                 } else {
                     videoView.start();
+                    isVideoPlaying = true;
                     videoToggleButton.setText(getString(R.string.video_pause));
                 }
                 showControls();
@@ -1098,8 +1106,16 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         } else {
             if (videoStopPosition != 0) {
                 videoView.seekTo(videoStopPosition);
-                videoView.start();
-                videoToggleButton.setText(getString(R.string.video_pause));
+                if(isVideoPlaying) {
+                    videoView.start();
+                    videoToggleButton.setText(getString(R.string.video_pause));
+                }
+                else {
+                    videoView.setOnPreparedListener(null);
+                    videoView.pause();
+                    videoToggleButton.setText(getString(R.string.video_play));
+                }
+
             }
         }
     }

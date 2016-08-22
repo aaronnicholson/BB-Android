@@ -7,6 +7,7 @@ package com.thecodebuilders.classes;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 
@@ -20,9 +21,11 @@ import com.thecodebuilders.utility.PreferenceStorage;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.net.URLConnection;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
@@ -37,7 +40,7 @@ import javax.net.ssl.X509TrustManager;
 public class DownloadAsync extends AsyncTask<String, String, String> {
 
     private static final String TAG = "DownloadAsync";
-    private static final int BYTE_SIZE = 512;
+    private static final int BYTE_SIZE = 4096;
     private static final int CONNECT_TIME_OUT = 5000;
     private static final int READ_TIME_OUT = 15000;
     private Context context;
@@ -87,47 +90,50 @@ public class DownloadAsync extends AsyncTask<String, String, String> {
     protected String doInBackground(String... urlString) {
         InputStream input = null;
         OutputStream output = null;
-        HttpsURLConnection connection = null;
+        URLConnection connection = null;
         URL url = null;
 
-        try {
+       /* try {
             url = new URL(mUrl);
             trustAllHosts();
             connection = (HttpsURLConnection) url.openConnection();
             connection.setHostnameVerifier(doNotVerifyHost);
 
+            // connection.setRequestProperty("Connection","Keep-Alive");
+            connection.connect();
+            //connection.setConnectTimeout(CONNECT_TIME_OUT);
+            //connection.setReadTimeout(READ_TIME_OUT);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
+      */
         try {
-
-            // connection.setRequestProperty("Connection","Keep-Alive");
+            url = new URL(mUrl);
+            connection = url.openConnection();
             connection.connect();
-            connection.setConnectTimeout(CONNECT_TIME_OUT);
-            connection.setReadTimeout(READ_TIME_OUT);
-            File file = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), videoName);
 
-            int lengthOfFile = connection.getContentLength();
-            Log.d(TAG, "Length of file: " + lengthOfFile);
-            PreferenceStorage.saveFileLength(context, videoName, lengthOfFile);
+            File file = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS),  videoName);
 
-            input = new BufferedInputStream(url.openStream());
+            int fileLength = connection.getContentLength();
+            PreferenceStorage.saveFileLength(context, videoName, fileLength);
+            input = new BufferedInputStream(connection.getInputStream());
             output = new FileOutputStream(file);
 
             byte data[] = new byte[BYTE_SIZE];
-            int count = 0;
             long total = 0;
-
+            int count = 0;
             while ((count = input.read(data)) != -1) {
                 total += count;
-                publishProgress("" + (int) ((total * 100) / lengthOfFile));
+                publishProgress("" + (int) ((total * 100) / fileLength));
                 output.write(data, 0, count);
             }
 
 
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
-        } finally {
+        }
+        finally {
             try {
                 if (output != null) {
                     output.flush();
@@ -135,8 +141,6 @@ public class DownloadAsync extends AsyncTask<String, String, String> {
                 }
                 if (input != null)
                     input.close();
-                if (connection != null)
-                    connection.disconnect();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -166,17 +170,19 @@ public class DownloadAsync extends AsyncTask<String, String, String> {
 
     @Override
     protected void onPostExecute(String response) {
-        if (progress.equalsIgnoreCase("100")) {
-            if (downloadStatusListener.getClass().getSimpleName().equalsIgnoreCase("VideosAdapter")) {
-                listItem.setIsDownloading(false);
-                viewHolder.thumbnailImage.setClickable(true);
-            } else if (downloadStatusListener.getClass().getSimpleName().equalsIgnoreCase("ThumbnailListAdapter")) {
-                listItem.setIsDownloading(false);
-                // elementViewHolder.thumbnailImage.setClickable(true);
+        if(progress != null) {
+            if (progress.equalsIgnoreCase("100")) {
+                if (downloadStatusListener.getClass().getSimpleName().equalsIgnoreCase("VideosAdapter")) {
+                    listItem.setIsDownloading(false);
+                    viewHolder.thumbnailImage.setClickable(true);
+                } else if (downloadStatusListener.getClass().getSimpleName().equalsIgnoreCase("ThumbnailListAdapter")) {
+                    listItem.setIsDownloading(false);
+                    // elementViewHolder.thumbnailImage.setClickable(true);
+                }
+
+
+                downloadStatusListener.onDownloadComplete(position);
             }
-
-
-            downloadStatusListener.onDownloadComplete(position);
         }
 
     }
