@@ -666,6 +666,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                             Uri video = Uri.parse(fileLocation);
                             videoView.setVideoURI(video);
                             videoView.start();
+                            videoToggleButton.setText(getString(R.string.video_pause));
                         } else {
                             Toast.makeText(MainActivity.this, getResources().getString(R.string.next_video_not_downloaded), Toast.LENGTH_LONG).show();
                         }
@@ -692,6 +693,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                                 Uri video = Uri.parse(fileLocation);
                                 videoView.setVideoURI(video);
                                 videoView.start();
+                                videoToggleButton.setText(getString(R.string.video_pause));
                             } else {
                                 Toast.makeText(MainActivity.this, getResources().getString(R.string.previous_video_not_downloaded), Toast.LENGTH_LONG).show();
                             }
@@ -701,6 +703,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                             Uri video = Uri.parse(fileLocationCurrentVideo);
                             videoView.setVideoURI(video);
                             videoView.start();
+                            videoToggleButton.setText(getString(R.string.video_pause));
                         }
                     }
                 } catch (Exception e) {
@@ -845,7 +848,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         if (adapterType == "section") {
             SectionAdapter adapter = new SectionAdapter(listData, this);
             thumbnailList.setAdapter(adapter);
-        } else if (adapterType == "videos") {
+        } else if (adapterType == "videos" || adapterType == "favorites") {
             videoAdapter = new VideosAdapter(listData, this, "");
             thumbnailList.setAdapter(videoAdapter);
 

@@ -60,6 +60,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
     private ImageLoader imageLoader;
     public static String priceValue = "$0.00";
     private boolean isMediaPlayingDone = true;
+    private Toast toast;
 
     int listIncrement = 0; //for testing only
 
@@ -71,6 +72,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         assetsList = listData;
         this.mainActivity = mainActivity;
         parseListItems(assetsList.size());
+        toast = Toast.makeText(appContext, appContext.getResources().getString(R.string.another_media_play_progress), Toast.LENGTH_LONG);
 
     }
 
@@ -369,8 +371,16 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
             if (listItem.getCategory().contains("5") && !listItem.isSection()) {
                 if (isMediaPlayingDone)
                     playOrOpen(position, listItem, thisViewHolder);
-                else
-                    Toast.makeText(appContext, appContext.getResources().getString(R.string.another_media_play_progress), Toast.LENGTH_LONG).show();
+                else {
+                    try {
+                        if (!toast.getView().isShown())
+                            toast.show();
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    //Toast.makeText(appContext, appContext.getResources().getString(R.string.another_media_play_progress), Toast.LENGTH_LONG).show();
+                }
             } else if ((listItem.isPurchasable() && listItem.isPurchased()) || listItem.getPrice().equalsIgnoreCase(priceValue)) {
 
                 int checkAllFileExists = 0;

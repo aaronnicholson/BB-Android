@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.v7.widget.RecyclerView;
@@ -25,6 +26,9 @@ import com.thecodebuilders.model.Playlist;
 import com.thecodebuilders.network.VolleySingleton;
 import com.thecodebuilders.utility.PreferenceStorage;
 import com.thecodebuilders.utility.Utils;
+import com.thin.downloadmanager.DefaultRetryPolicy;
+import com.thin.downloadmanager.DownloadRequest;
+import com.thin.downloadmanager.ThinDownloadManager;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.json.JSONException;
@@ -439,6 +443,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
                 intent.putExtra("url", "https://s3-us-west-1.amazonaws.com/babysbrilliant-media/Gravityfinal.mp4");
                 mainActivity.startService(intent);*/
                 new DownloadAsync(appContext, viewHolder, listItem, VideosAdapter.this, position, listItem.getMediaFile()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                //download(listItem.getMediaFile());
             }
         });
         alertDialog.setNegativeButton(mainActivity.getResources().getString(R.string.cancel), null);
@@ -451,5 +456,30 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
         notifyDataSetChanged();
     }
 
+    private void download(String videoName){
+        Uri downloadUri = Uri.parse(mainActivity.getResources().getString(R.string.media_url) + videoName);
+        Uri destinationUri = Uri.parse(mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + videoName);
+        DownloadRequest downloadRequest = new DownloadRequest(downloadUri)
+                .setRetryPolicy(new DefaultRetryPolicy())
+                .setDestinationURI(destinationUri).setPriority(DownloadRequest.Priority.HIGH)
+                .setDownloadListener(new com.thin.downloadmanager.DownloadStatusListener() {
+                    @Override
+                    public void onDownloadComplete(int id) {
+                        Log.d("Download","onDownloadComplete");
+                    }
 
+                    @Override
+                    public void onDownloadFailed(int id, int errorCode, String errorMessage) {
+                        Log.d("Download","onDownloadFailed"+errorCode+":"+errorMessage);
+
+                    }
+
+                    @Override
+                    public void onProgress(int id, long totalBytes, long downloadedBytes, int progress) {
+                        Log.d("Download","onProgress"+id+":"+progress);
+                    }
+                });
+        ThinDownloadManager downloadManager = new ThinDownloadManager();
+        downloadManager.add(downloadRequest);
+    }
 }

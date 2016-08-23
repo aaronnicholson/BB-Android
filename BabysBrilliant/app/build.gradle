@@ -8,8 +8,8 @@ android {
         applicationId "com.thecodebuilders.babysbrilliant"
         minSdkVersion 16
         targetSdkVersion 22
-        versionCode 14
-        versionName "1.7.6"
+        versionCode 15
+        versionName "1.7.7"
     }
     buildTypes {
         release {
@@ -26,4 +26,5 @@ dependencies {
     compile 'com.mcxiaoke.volley:library-aar:1.0.0'
     compile 'com.google.android.gms:play-services:6.1.71'
     compile 'org.apache.commons:commons-lang3:3.0'
+    compile 'com.mani:ThinDownloadManager:1.2.5'
 }
