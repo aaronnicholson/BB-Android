@@ -5,10 +5,13 @@ package com.thecodebuilders.classes;
  */
 
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import com.thecodebuilders.adapter.ElementViewHolder;
@@ -17,6 +20,7 @@ import com.thecodebuilders.babysbrilliant.ListItem;
 import com.thecodebuilders.babysbrilliant.R;
 import com.thecodebuilders.interfaces.DownloadStatusListener;
 import com.thecodebuilders.utility.PreferenceStorage;
+import com.thecodebuilders.utility.Utils;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -32,6 +36,7 @@ import java.security.cert.X509Certificate;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
@@ -52,6 +57,7 @@ public class DownloadAsync extends AsyncTask<String, String, String> {
     private String progress;
     private DownloadStatusListener downloadStatusListener;
     private int position;
+    private Handler mHandler;
 
     public DownloadAsync(Context context, ElementViewHolder viewHolder, ListItem listItem, DownloadStatusListener listener,
                          int position, String videoName) {
@@ -61,6 +67,7 @@ public class DownloadAsync extends AsyncTask<String, String, String> {
         this.videoName = videoName;
         this.downloadStatusListener = listener;
         this.position = position;
+        mHandler = new Handler(Looper.getMainLooper());
         mUrl = context.getResources().getString(R.string.media_url) + videoName;
         if (listener.getClass().getSimpleName().equalsIgnoreCase("VideosAdapter"))
             listItem.setIsDownloading(true);
@@ -75,6 +82,7 @@ public class DownloadAsync extends AsyncTask<String, String, String> {
         this.videoName = videoName;
         this.downloadStatusListener = listener;
         this.position = position;
+        mHandler = new Handler(Looper.getMainLooper());
         mUrl = context.getResources().getString(R.string.media_url) + videoName;
         if (listener.getClass().getSimpleName().equalsIgnoreCase("ThumbnailListAdapter"))
             listItem.setIsDownloading(true);
@@ -92,6 +100,7 @@ public class DownloadAsync extends AsyncTask<String, String, String> {
         OutputStream output = null;
         URLConnection connection = null;
         URL url = null;
+        String response = null;
 
        /* try {
             url = new URL(mUrl);
@@ -113,7 +122,7 @@ public class DownloadAsync extends AsyncTask<String, String, String> {
             connection = url.openConnection();
             connection.connect();
 
-            File file = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS),  videoName);
+            File file = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), videoName);
 
             int fileLength = connection.getContentLength();
             PreferenceStorage.saveFileLength(context, videoName, fileLength);
@@ -130,10 +139,12 @@ public class DownloadAsync extends AsyncTask<String, String, String> {
             }
 
 
+        } catch (SSLException sslexception) {
+            sslexception.printStackTrace();
+            response = "SSLException";
         } catch (IOException e) {
             e.printStackTrace();
-        }
-        finally {
+        } finally {
             try {
                 if (output != null) {
                     output.flush();
@@ -146,7 +157,7 @@ public class DownloadAsync extends AsyncTask<String, String, String> {
             }
 
         }
-        return null;
+        return response;
     }
 
     @Override
@@ -170,7 +181,10 @@ public class DownloadAsync extends AsyncTask<String, String, String> {
 
     @Override
     protected void onPostExecute(String response) {
-        if(progress != null) {
+        Log.d("Res", "..." + response);
+        if (response.equalsIgnoreCase("SSLException"))
+            Utils.showNetworkErrorDialog(context);
+        if (progress != null) {
             if (progress.equalsIgnoreCase("100")) {
                 if (downloadStatusListener.getClass().getSimpleName().equalsIgnoreCase("VideosAdapter")) {
                     listItem.setIsDownloading(false);
@@ -179,11 +193,17 @@ public class DownloadAsync extends AsyncTask<String, String, String> {
                     listItem.setIsDownloading(false);
                     // elementViewHolder.thumbnailImage.setClickable(true);
                 }
-
-
-                downloadStatusListener.onDownloadComplete(position);
+            } else {
+                listItem.setIsDownloading(false);
+                viewHolder.thumbnailImage.setClickable(true);
             }
+
+        } else {
+            listItem.setIsDownloading(false);
+            viewHolder.thumbnailImage.setClickable(true);
         }
+        if (downloadStatusListener != null)
+            downloadStatusListener.onDownloadComplete(position);
 
     }
 

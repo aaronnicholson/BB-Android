@@ -26,9 +26,6 @@ import com.thecodebuilders.model.Playlist;
 import com.thecodebuilders.network.VolleySingleton;
 import com.thecodebuilders.utility.PreferenceStorage;
 import com.thecodebuilders.utility.Utils;
-import com.thin.downloadmanager.DefaultRetryPolicy;
-import com.thin.downloadmanager.DownloadRequest;
-import com.thin.downloadmanager.ThinDownloadManager;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.json.JSONException;
@@ -52,13 +49,16 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
     public String mediaURL = appContext.getString(R.string.media_url);
     public static String priceValue = "$0.00";
     private String purchased;
+    public ElementViewHolder elementViewHolder;
+    private boolean isSettingButtonTap = false;
 
-    public VideosAdapter(ArrayList listData, MainActivity mainActivity, String purchased) {
+    public VideosAdapter(ArrayList listData, MainActivity mainActivity, String purchased, boolean isSettingTaped) {
         volleySingleton = VolleySingleton.getInstance();
         imageLoader = volleySingleton.getImageLoader();
         assetsList = listData;
         this.mainActivity = mainActivity;
         this.purchased = purchased;
+        this.isSettingButtonTap = isSettingTaped;
         parseListItems(assetsList.size());
         //checkDownloadingProgress(assetsList.size());
         Log.d(LOGVAR, "VIDEO assets: " + assetsList);
@@ -207,7 +207,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
             public void onClick(View v) {
                 ListItem listItem = elements.get(position);
                 //mainActivity.downloadVideo(viewHolder, listItem);
-                new DownloadAsync(appContext, viewHolder, listItem, VideosAdapter.this, position, listItem.getMediaFile()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                new DownloadAsync(mainActivity, viewHolder, listItem, VideosAdapter.this, position, listItem.getMediaFile()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 viewHolder.progressBar.setVisibility(View.VISIBLE);
                 viewHolder.thumbnailImage.setClickable(false);
                 viewHolder.downloadIcon.setVisibility(View.GONE);
@@ -276,6 +276,11 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
         }
 
         setFileDownloadingListItem(viewHolder, listItem);
+        if(isSettingButtonTap)
+            viewHolder.thumbnailImage.setClickable(false);
+        else
+            viewHolder.thumbnailImage.setClickable(true);
+
 
         CommonAdapterUtility.setThumbnailImage(listItem, viewHolder.thumbnailImage);
 
@@ -285,13 +290,16 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
 
     private void favoritesClicked(int position, ElementViewHolder thisViewHolder) {
         ListItem listItem = elements.get(position);
+        Log.e(LOGVAR,"Favourite:"+listItem.isFavorite());
         if (listItem.isFavorite()) {
             //TODO: remove from favorites
             mainActivity.removeFromFavorites(listItem.getRawJSON());
             setLookToNotFavorite(thisViewHolder);
         } else {
+            listItem.isFavorite = true;
             mainActivity.addToFavorites(listItem.getRawJSON());
             setLookToFavorite(thisViewHolder);
+
         }
         String favoriteString = mainActivity.favoriteItems.toString();
         PreferenceStorage.saveFavourites(appContext, PreferenceStorage.FAVOURITE_SAVE, favoriteString);
@@ -418,6 +426,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
         Log.d("VideosAdapter", "onBindViewHolder");
 
         configureListItemListeners(viewHolder, position);
+        elementViewHolder = viewHolder;
 
     }
 
@@ -442,7 +451,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
               /*  Intent intent = new Intent(mainActivity, DownloadService.class);
                 intent.putExtra("url", "https://s3-us-west-1.amazonaws.com/babysbrilliant-media/Gravityfinal.mp4");
                 mainActivity.startService(intent);*/
-                new DownloadAsync(appContext, viewHolder, listItem, VideosAdapter.this, position, listItem.getMediaFile()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                new DownloadAsync(mainActivity, viewHolder, listItem, VideosAdapter.this, position, listItem.getMediaFile()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 //download(listItem.getMediaFile());
             }
         });
@@ -456,30 +465,5 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
         notifyDataSetChanged();
     }
 
-    private void download(String videoName){
-        Uri downloadUri = Uri.parse(mainActivity.getResources().getString(R.string.media_url) + videoName);
-        Uri destinationUri = Uri.parse(mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + videoName);
-        DownloadRequest downloadRequest = new DownloadRequest(downloadUri)
-                .setRetryPolicy(new DefaultRetryPolicy())
-                .setDestinationURI(destinationUri).setPriority(DownloadRequest.Priority.HIGH)
-                .setDownloadListener(new com.thin.downloadmanager.DownloadStatusListener() {
-                    @Override
-                    public void onDownloadComplete(int id) {
-                        Log.d("Download","onDownloadComplete");
-                    }
 
-                    @Override
-                    public void onDownloadFailed(int id, int errorCode, String errorMessage) {
-                        Log.d("Download","onDownloadFailed"+errorCode+":"+errorMessage);
-
-                    }
-
-                    @Override
-                    public void onProgress(int id, long totalBytes, long downloadedBytes, int progress) {
-                        Log.d("Download","onProgress"+id+":"+progress);
-                    }
-                });
-        ThinDownloadManager downloadManager = new ThinDownloadManager();
-        downloadManager.add(downloadRequest);
-    }
 }

@@ -351,6 +351,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
             mainActivity.removeFromFavorites(listItem.getRawJSON());
             setLookToNotFavorite(thisViewHolder);
         } else {
+            listItem.isFavorite = true;
             mainActivity.addToFavorites(listItem.getRawJSON());
             setLookToFavorite(thisViewHolder);
         }
@@ -669,7 +670,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
 
                                 String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + jsonObject.getString("file");
                                 if (!Utils.checkFileExist(mainActivity, fileLocation, jsonObject.getString("file"))) {
-                                    new DownloadAsync(viewHolder, listItem, ThumbnailListAdapter.this, position, jsonObject.getString("file"), appContext).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                                    new DownloadAsync(viewHolder, listItem, ThumbnailListAdapter.this, position, jsonObject.getString("file"), mainActivity).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();

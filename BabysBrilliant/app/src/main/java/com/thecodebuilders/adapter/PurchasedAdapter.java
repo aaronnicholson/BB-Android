@@ -298,6 +298,7 @@ public class PurchasedAdapter extends RecyclerView.Adapter<ElementViewHolder> {
             mainActivity.removeFromFavorites(listItem.getRawJSON());
             setLookToNotFavorite(thisViewHolder);
         } else {
+            listItem.isFavorite = true;
             mainActivity.addToFavorites(listItem.getRawJSON());
             setLookToFavorite(thisViewHolder);
         }

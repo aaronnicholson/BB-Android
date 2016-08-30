@@ -19,7 +19,7 @@ public class ListItem extends View {
     private Boolean showText = true;
     private Boolean isSection;
     private Boolean isPurchased;
-    private Boolean isFavorite;
+    public Boolean isFavorite;
     private Boolean isPlaylistItem;
     private Boolean isPlaylist;
 

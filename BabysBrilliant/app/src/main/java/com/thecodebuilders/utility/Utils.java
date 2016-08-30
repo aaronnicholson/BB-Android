@@ -107,4 +107,17 @@ public class Utils {
         builder.show();
     }
 
+    public static  void showNetworkErrorDialog(final Context context){
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
+        alertDialog.setMessage(context.getResources().getString(R.string.download_failed));
+        alertDialog.setPositiveButton(context.getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        AlertDialog builder = alertDialog.create();
+        builder.show();
+    }
+
 }

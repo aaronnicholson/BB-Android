@@ -65,5 +65,8 @@
     <string name="another_media_play_progress">Please wait another media is playing</string>
     <string name="next_video_not_downloaded">Next video is not downloaded</string>
     <string name="previous_video_not_downloaded">Previous video is not downloaded</string>
+    <string name="download_failed">Download Failed. Network is slow please try again.</string>
+    <string name="ok">Ok</string>
+
 
 </resources>
