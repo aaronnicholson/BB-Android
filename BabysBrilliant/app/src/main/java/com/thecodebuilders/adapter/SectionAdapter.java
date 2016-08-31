@@ -34,12 +34,23 @@ public class SectionAdapter extends RecyclerView.Adapter<ElementViewHolder> {
     MainActivity mainActivity;
     private VolleySingleton volleySingleton;
     private ImageLoader imageLoader;
+    private boolean isTappedSetting = true;
 
     public SectionAdapter(ArrayList listData, MainActivity mainActivity) {
         volleySingleton = VolleySingleton.getInstance();
         imageLoader = volleySingleton.getImageLoader();
         assetsList = listData;
         this.mainActivity = mainActivity;
+        parseListItems(assetsList.size());
+
+    }
+
+    public SectionAdapter(ArrayList listData, MainActivity mainActivity, boolean isSettingTapped) {
+        volleySingleton = VolleySingleton.getInstance();
+        imageLoader = volleySingleton.getImageLoader();
+        assetsList = listData;
+        this.mainActivity = mainActivity;
+        this.isTappedSetting = isSettingTapped;
         parseListItems(assetsList.size());
 
     }
@@ -93,14 +104,16 @@ public class SectionAdapter extends RecyclerView.Adapter<ElementViewHolder> {
         viewHolder.thumbnailImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                thumbnailClicked(position);
+                if (isTappedSetting)
+                    thumbnailClicked(position);
             }
         });
 
         viewHolder.previewIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                previewClicked(position);
+                if (isTappedSetting)
+                    previewClicked(position);
             }
         });
     }
@@ -118,8 +131,7 @@ public class SectionAdapter extends RecyclerView.Adapter<ElementViewHolder> {
         //for music, hide subcategory and product text background
         if (!listItem.doShowBackground()) {
             viewHolder.textBackground.setBackgroundColor(appContext.getResources().getColor(android.R.color.transparent));
-        }
-        else{
+        } else {
             viewHolder.textBackground.setBackgroundColor(appContext.getResources().getColor(R.color.red));
         }
 

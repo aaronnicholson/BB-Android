@@ -50,15 +50,27 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
     public static String priceValue = "$0.00";
     private String purchased;
     public ElementViewHolder elementViewHolder;
-    private boolean isSettingButtonTap = false;
+    private boolean isTappedSetting = true;
 
-    public VideosAdapter(ArrayList listData, MainActivity mainActivity, String purchased, boolean isSettingTaped) {
+    public VideosAdapter(ArrayList listData, MainActivity mainActivity, String purchased) {
         volleySingleton = VolleySingleton.getInstance();
         imageLoader = volleySingleton.getImageLoader();
         assetsList = listData;
         this.mainActivity = mainActivity;
         this.purchased = purchased;
-        this.isSettingButtonTap = isSettingTaped;
+        parseListItems(assetsList.size());
+        //checkDownloadingProgress(assetsList.size());
+        Log.d(LOGVAR, "VIDEO assets: " + assetsList);
+
+    }
+    public VideosAdapter(ArrayList listData, MainActivity mainActivity, String purchased,
+                         boolean isSettingTapped) {
+        volleySingleton = VolleySingleton.getInstance();
+        imageLoader = volleySingleton.getImageLoader();
+        assetsList = listData;
+        this.mainActivity = mainActivity;
+        this.isTappedSetting = isSettingTapped;
+        this.purchased = purchased;
         parseListItems(assetsList.size());
         //checkDownloadingProgress(assetsList.size());
         Log.d(LOGVAR, "VIDEO assets: " + assetsList);
@@ -173,7 +185,13 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
             @Override
             public void onClick(View view) {
                 if (!elements.get(position).getIsDownloading()) {
-                    thumbnailClicked(position, thisViewHolder);
+                    if(isTappedSetting){
+                        thumbnailClicked(position, thisViewHolder);
+                    }
+                    else{
+
+                    }
+
                 }
             }
         });
@@ -181,8 +199,10 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
         viewHolder.favoritesIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!elements.get(position).getIsDownloading())
-                    favoritesClicked(position, thisViewHolder);
+                if (!elements.get(position).getIsDownloading()) {
+                    if(isTappedSetting)
+                        favoritesClicked(position, thisViewHolder);
+                }
             }
         });
 
@@ -190,13 +210,14 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
             @Override
             public void onClick(View view) {
                 if (!elements.get(position).getIsDownloading()) {
-
-                    ListItem listItem = elements.get(position);
-                    String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + listItem.getMediaFile();
-                    if (Utils.checkFileExist(mainActivity, fileLocation, listItem.getMediaFile())) {
-                        playlistClicked(position, thisViewHolder);
-                    } else {
-                        alertForDownload(thisViewHolder, listItem, position);
+                    if(isTappedSetting) {
+                        ListItem listItem = elements.get(position);
+                        String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + listItem.getMediaFile();
+                        if (Utils.checkFileExist(mainActivity, fileLocation, listItem.getMediaFile())) {
+                            playlistClicked(position, thisViewHolder);
+                        } else {
+                            alertForDownload(thisViewHolder, listItem, position);
+                        }
                     }
                 }
 
@@ -205,12 +226,14 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
         viewHolder.downloadIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ListItem listItem = elements.get(position);
-                //mainActivity.downloadVideo(viewHolder, listItem);
-                new DownloadAsync(mainActivity, viewHolder, listItem, VideosAdapter.this, position, listItem.getMediaFile()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                viewHolder.progressBar.setVisibility(View.VISIBLE);
-                viewHolder.thumbnailImage.setClickable(false);
-                viewHolder.downloadIcon.setVisibility(View.GONE);
+                if(isTappedSetting) {
+                    ListItem listItem = elements.get(position);
+                    //mainActivity.downloadVideo(viewHolder, listItem);
+                    new DownloadAsync(mainActivity, viewHolder, listItem, VideosAdapter.this, position, listItem.getMediaFile()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                    viewHolder.progressBar.setVisibility(View.VISIBLE);
+                    viewHolder.thumbnailImage.setClickable(false);
+                    viewHolder.downloadIcon.setVisibility(View.GONE);
+                }
             }
         });
 
@@ -274,15 +297,16 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
             if (listItem.isPurchased())
                 setFileDownloadedListItem(viewHolder, listItem);
         }
-
         setFileDownloadingListItem(viewHolder, listItem);
-        if(isSettingButtonTap)
-            viewHolder.thumbnailImage.setClickable(false);
-        else
-            viewHolder.thumbnailImage.setClickable(true);
-
 
         CommonAdapterUtility.setThumbnailImage(listItem, viewHolder.thumbnailImage);
+        /*if(isCalledSettingOpen.equalsIgnoreCase("Yes")){
+            Log.d("Call",".."+isViewClickable);
+            if(isViewClickable)
+                viewHolder.thumbnailImage.setClickable(true);
+            else
+                viewHolder.thumbnailImage.setClickable(false);
+        }*/
 
         viewHolder.itemView.setTag(listItem);
         viewHolder.progressBar.setTag(listItem);
@@ -312,13 +336,16 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
 
     private void thumbnailClicked(int position, ElementViewHolder thisViewHolder) {
         ListItem listItem = elements.get(position);
-        mainActivity.isVideoClose = false;
+
         if ((listItem.isPurchasable() && listItem.isPurchased()) || listItem.getPrice().equalsIgnoreCase(priceValue)) {
 
             String videoURL = listItem.getMediaFile();
             String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + videoURL;
             Log.e(LOGVAR, ".." + listItem.getMediaFile() + "::" + mainActivity.mediaFileNameArray.toString());
             if (Utils.checkFileExist(mainActivity, fileLocation, videoURL)) {
+                //when playing video and we minimize the app and again open that time setOnPreparedListener set null
+                //because of that set false to videoClose
+                mainActivity.isVideoClose = false;
                 Log.d(LOGVAR, "FILE EXISTS");
                 mainActivity.indexOfCurrentlyPlayingVideo = mainActivity.mediaFileNameArray.indexOf(listItem.getMediaFile());
                 Log.d(LOGVAR, "index:" + mainActivity.indexOfCurrentlyPlayingVideo);
@@ -427,7 +454,6 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
 
         configureListItemListeners(viewHolder, position);
         elementViewHolder = viewHolder;
-
     }
 
     @Override

@@ -37,11 +37,23 @@ public class SoundBoardsAdapter extends RecyclerView.Adapter<SoundBoardsAdapter.
     MainActivity mainActivity;
     private VolleySingleton volleySingleton;
     private ImageLoader imageLoader;
+    private boolean isTappedSetting = true;
+
 
     public SoundBoardsAdapter(ArrayList listData, MainActivity mainActivity) {
         volleySingleton = VolleySingleton.getInstance();
         imageLoader = volleySingleton.getImageLoader();
         assetsList = listData;
+        this.mainActivity = mainActivity;
+        parseListItems(assetsList.size());
+
+    }
+
+    public SoundBoardsAdapter(ArrayList listData, MainActivity mainActivity, boolean isSettingTap) {
+        volleySingleton = VolleySingleton.getInstance();
+        imageLoader = volleySingleton.getImageLoader();
+        assetsList = listData;
+        this.isTappedSetting = isSettingTap;
         this.mainActivity = mainActivity;
         parseListItems(assetsList.size());
 
@@ -53,7 +65,7 @@ public class SoundBoardsAdapter extends RecyclerView.Adapter<SoundBoardsAdapter.
     private void parseListItems(int listLength) {
         elements = new ArrayList<ListItem>(listLength);
         products = new ArrayList<JSONArray>();
-        Log.d(LOGVAR,"Assets:"+assetsList);
+        Log.d(LOGVAR, "Assets:" + assetsList);
         for (int i = 0; i < listLength; i++) {
             JSONObject rawJSON;
             String name;
@@ -77,9 +89,9 @@ public class SoundBoardsAdapter extends RecyclerView.Adapter<SoundBoardsAdapter.
                 JSONArray subcategories = itemJSON.getJSONArray("subSubCategories");
                 //if (!itemJSON.isNull("products"))
                 //for(int j = 0; j < subcategories.length(); j++) {
-                    //JSONObject object = subcategories.getJSONObject(j);
-                    products.add(itemJSON.getJSONArray("subSubCategories"));
-               // }
+                //JSONObject object = subcategories.getJSONObject(j);
+                products.add(itemJSON.getJSONArray("subSubCategories"));
+                // }
 
                 mediaFile = itemJSON.getString("preview");
 
@@ -99,14 +111,16 @@ public class SoundBoardsAdapter extends RecyclerView.Adapter<SoundBoardsAdapter.
         viewHolder.thumbnailImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                thumbnailClicked(position, thisViewHolder);
+                if (isTappedSetting)
+                    thumbnailClicked(position, thisViewHolder);
             }
         });
 
         viewHolder.previewIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                previewClicked(position);
+                if (isTappedSetting)
+                    previewClicked(position);
             }
         });
     }
@@ -145,7 +159,8 @@ public class SoundBoardsAdapter extends RecyclerView.Adapter<SoundBoardsAdapter.
 
     private void previewClicked(int position) {
         ListItem listItem = elements.get(position);
-        if (!listItem.getMediaFile().equals("")) mainActivity.playVideo(listItem.getMediaFile(), false);
+        if (!listItem.getMediaFile().equals(""))
+            mainActivity.playVideo(listItem.getMediaFile(), false);
     }
 
     private void thumbnailClicked(int position, ElementViewHolder thisViewHolder) {

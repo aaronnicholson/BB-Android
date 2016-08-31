@@ -65,12 +65,24 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
     int listIncrement = 0; //for testing only
 
     private MediaPlayer mediaPlayer;
+    private boolean isTappedSettings = true;
 
     public ThumbnailListAdapter(ArrayList listData, MainActivity mainActivity) {
         volleySingleton = VolleySingleton.getInstance();
         imageLoader = volleySingleton.getImageLoader();
         assetsList = listData;
         this.mainActivity = mainActivity;
+        parseListItems(assetsList.size());
+        toast = Toast.makeText(appContext, appContext.getResources().getString(R.string.another_media_play_progress), Toast.LENGTH_LONG);
+
+    }
+
+    public ThumbnailListAdapter(ArrayList listData, MainActivity mainActivity, boolean isTappedSettings) {
+        volleySingleton = VolleySingleton.getInstance();
+        imageLoader = volleySingleton.getImageLoader();
+        assetsList = listData;
+        this.mainActivity = mainActivity;
+        this.isTappedSettings = isTappedSettings;
         parseListItems(assetsList.size());
         toast = Toast.makeText(appContext, appContext.getResources().getString(R.string.another_media_play_progress), Toast.LENGTH_LONG);
 
@@ -203,28 +215,32 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         viewHolder.thumbnailImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                thumbnailClicked(position, thisViewHolder);
+                if (isTappedSettings)
+                    thumbnailClicked(position, thisViewHolder);
             }
         });
 
         viewHolder.favoritesIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                favoritesClicked(position, thisViewHolder);
+                if (isTappedSettings)
+                    favoritesClicked(position, thisViewHolder);
             }
         });
 
         viewHolder.previewIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                previewClicked(position);
+                if (isTappedSettings)
+                    previewClicked(position);
             }
         });
 
         viewHolder.playlistIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                playlistClicked(position, thisViewHolder);
+                if (isTappedSettings)
+                    playlistClicked(position, thisViewHolder);
             }
         });
 

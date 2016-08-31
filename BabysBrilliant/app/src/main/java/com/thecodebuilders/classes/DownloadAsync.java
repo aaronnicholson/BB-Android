@@ -182,8 +182,10 @@ public class DownloadAsync extends AsyncTask<String, String, String> {
     @Override
     protected void onPostExecute(String response) {
         Log.d("Res", "..." + response);
-        if (response.equalsIgnoreCase("SSLException"))
-            Utils.showNetworkErrorDialog(context);
+        if(response != null) {
+            if (response.equalsIgnoreCase("SSLException"))
+                Utils.showNetworkErrorDialog(context);
+        }
         if (progress != null) {
             if (progress.equalsIgnoreCase("100")) {
                 if (downloadStatusListener.getClass().getSimpleName().equalsIgnoreCase("VideosAdapter")) {

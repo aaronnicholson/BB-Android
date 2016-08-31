@@ -209,6 +209,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     public boolean isVideoClose = false;
     private int videoStopPosition = 0;
     private boolean isVideoPlaying = true;
+    private ArrayList listData;
+    private String adapterType;
 
 
     @Override
@@ -370,7 +372,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
                 if (data.getStringExtra("Key").equalsIgnoreCase("setting")) {
 
-                    //viewClickable(false);
+                    viewClickable(false);
                     includedSettingLayout_frame.setVisibility(View.VISIBLE);
                     includedSettingLayout.setVisibility(View.VISIBLE);
                    /* final Dialog dialog = new Dialog(MainActivity.this);
@@ -498,7 +500,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                         emptyCategory.setVisibility(View.GONE);
 
                     Log.d(LOGVAR, "FavouriteItems:" + favoriteItems);
-                    configureThumbnailList(favoriteItems, "videos", false);
+                    configureThumbnailList(favoriteItems, "videos");
                     currentMenu = FAVORITE_ITEMS;
                     toggleMenuButton(currentMenu);
                 }
@@ -543,7 +545,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                         emptyCategory.setText(getResources().getString(R.string.empty_category_playlist_msg));
                     } else
                         emptyCategory.setVisibility(View.GONE);
-                    configureThumbnailList(playlistItems, "playlists",false);
+                    configureThumbnailList(playlistItems, "playlists");
 
                     currentMenu = PLAYLISTS;
                     toggleMenuButton(currentMenu);
@@ -835,11 +837,11 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         } catch (Exception e) {
             e.printStackTrace();
         }
-        configureThumbnailList(listData, adapterType, false);
+        configureThumbnailList(listData, adapterType);
     }
 
     //overloaded version for passing ArrayLists directly
-    public void configureThumbnailList(ArrayList listData, String adapterType, boolean isSettingTapped) {
+    public void configureThumbnailList(ArrayList listData, String adapterType) {
 
         // set the thumbnail list adapter so it will display the items
         // TODO: I could change what kind of adapter is used depending on the type of list we want,
@@ -851,14 +853,15 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         // These should be based on an interface or a superclass to keep them consistent.
 
         //TODO: base this on the "cat" setting on the objects?
-
+        this.listData = listData;
+        this.adapterType = adapterType;
         Log.d(LOGVAR, "adapterType: " + adapterType);
 
         if (adapterType == "section") {
             SectionAdapter sectionAdapter = new SectionAdapter(listData, this);
             thumbnailList.setAdapter(sectionAdapter);
         } else if (adapterType == "videos" || adapterType == "favorites") {
-            videoAdapter = new VideosAdapter(listData, this, "", isSettingTapped);
+            videoAdapter = new VideosAdapter(listData, this, "");
             thumbnailList.setAdapter(videoAdapter);
 
         } else if (adapterType == "playlists") {
@@ -868,7 +871,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             PlaylistItemAdapter adapter = new PlaylistItemAdapter(listData, this);
             thumbnailList.setAdapter(adapter);
         } else if (adapterType == "purchased") {
-            VideosAdapter purchasedVideosAdapter = new VideosAdapter(listData, this, "purchased", isSettingTapped);
+            VideosAdapter purchasedVideosAdapter = new VideosAdapter(listData, this, "purchased");
             thumbnailList.setAdapter(purchasedVideosAdapter);
         }
        /* else if (adapterType == "favorites") {
@@ -1113,6 +1116,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     @Override
     protected void onResume() {
         super.onResume();
+        Log.d(TAG," IsVideo"+isVideoClose);
         if (isVideoClose) {
             videoView.setOnPreparedListener(null);
         } else {
@@ -1629,6 +1633,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         close_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                viewClickable(true);
                 includedSettingLayout_frame.setVisibility(View.INVISIBLE);
                 includedSettingLayout.setVisibility(View.INVISIBLE);
             }
@@ -2149,9 +2154,30 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         hearingImpairedButton.setClickable(isClickable);
         settings.setClickable(isClickable);
 
+        if (adapterType == "section") {
+            SectionAdapter sectionAdapter = new SectionAdapter(listData, this, isClickable);
+            thumbnailList.setAdapter(sectionAdapter);
+        } else if (adapterType == "videos" || adapterType == "favorites") {
+            videoAdapter = new VideosAdapter(listData, this, "", isClickable);
+            thumbnailList.setAdapter(videoAdapter);
 
-        videoAdapter.elementViewHolder.thumbnailImage.setClickable(false);
-
+        } else if (adapterType == "playlists") {
+            PlaylistAdapter playlistAdapter = new PlaylistAdapter(listData, this, isClickable);
+            thumbnailList.setAdapter(playlistAdapter);
+        } else if (adapterType == "playlistItems") {
+            PlaylistItemAdapter adapter = new PlaylistItemAdapter(listData, this, isClickable);
+            thumbnailList.setAdapter(adapter);
+        } else if (adapterType == "purchased") {
+            VideosAdapter purchasedVideosAdapter = new VideosAdapter(listData, this, "purchased", isClickable);
+            thumbnailList.setAdapter(purchasedVideosAdapter);
+        }
+        else if (adapterType == "soundBoards") {
+            SoundBoardsAdapter soundBoardsAdapter = new SoundBoardsAdapter(listData, this, isClickable);
+            thumbnailList.setAdapter(soundBoardsAdapter);
+        } else {
+            ThumbnailListAdapter thumbnailListAdapter = new ThumbnailListAdapter(listData, this, isClickable);
+            thumbnailList.setAdapter(thumbnailListAdapter);
+        }
     }
 
 }
