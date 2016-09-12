@@ -296,6 +296,7 @@ public class PurchasedAdapter extends RecyclerView.Adapter<ElementViewHolder> {
         if (listItem.isFavorite()) {
             //TODO: remove from favorites
             mainActivity.removeFromFavorites(listItem.getRawJSON());
+            listItem.isFavorite = false;
             setLookToNotFavorite(thisViewHolder);
         } else {
             listItem.isFavorite = true;

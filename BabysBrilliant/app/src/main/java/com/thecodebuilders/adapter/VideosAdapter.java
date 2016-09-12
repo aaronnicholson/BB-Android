@@ -318,6 +318,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
         if (listItem.isFavorite()) {
             //TODO: remove from favorites
             mainActivity.removeFromFavorites(listItem.getRawJSON());
+            listItem.isFavorite = false;
             setLookToNotFavorite(thisViewHolder);
         } else {
             listItem.isFavorite = true;
