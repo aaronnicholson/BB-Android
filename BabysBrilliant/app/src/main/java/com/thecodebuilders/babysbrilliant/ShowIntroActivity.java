@@ -79,19 +79,19 @@ public class ShowIntroActivity extends AppCompatActivity {
                 intro_settings.clearColorFilter();
 
 
-                if(position==2 || position ==3) {
+                if(position==2 ) {
                     intro_playlists.setVisibility(View.VISIBLE);
                     intro_playlists.setColorFilter(Color.RED);
                 }
 
-                if(position==4) {
+                if(position==3) {
                     intro_playlists.setVisibility(View.VISIBLE);
                     intro_favorites.setVisibility(View.VISIBLE);
                     intro_favorites.setColorFilter(Color.RED);
 
                 }
 
-                if(position==5) {
+                if(position==4) {
                     intro_playlists.setVisibility(View.VISIBLE);
                     intro_favorites.setVisibility(View.VISIBLE);
                     intro_music.setVisibility(View.VISIBLE);
@@ -105,7 +105,7 @@ public class ShowIntroActivity extends AppCompatActivity {
                     intro_audiobooks.setColorFilter(Color.RED);
 
                 }
-                if(position==6 || position==7) {
+                if(position==5 || position==6) {
                     intro_playlists.setVisibility(View.VISIBLE);
                     intro_favorites.setVisibility(View.VISIBLE);
                     intro_music.setVisibility(View.VISIBLE);
@@ -115,7 +115,7 @@ public class ShowIntroActivity extends AppCompatActivity {
 
 
                 }
-                if(position==8) {
+                if(position==7) {
                         intro_playlists.setVisibility(View.VISIBLE);
                         intro_favorites.setVisibility(View.VISIBLE);
                         intro_music.setVisibility(View.VISIBLE);
@@ -128,7 +128,7 @@ public class ShowIntroActivity extends AppCompatActivity {
 
 
                 }
-                if(position==9) {
+                if(position==8) {
                         intro_playlists.setVisibility(View.VISIBLE);
                         intro_favorites.setVisibility(View.VISIBLE);
                         intro_music.setVisibility(View.VISIBLE);
@@ -140,7 +140,7 @@ public class ShowIntroActivity extends AppCompatActivity {
 
                         intro_hearingimpaired.setColorFilter(Color.RED);
                 }
-                if(position==10) {
+                if(position==9) {
                         intro_playlists.setVisibility(View.VISIBLE);
                         intro_favorites.setVisibility(View.VISIBLE);
                         intro_music.setVisibility(View.VISIBLE);
@@ -187,7 +187,6 @@ public class ShowIntroActivity extends AppCompatActivity {
                 R.layout.intro_2,
                 R.layout.intro_3,
                 R.layout.intro_4,
-                R.layout.intro_5,
                 R.layout.intro_6,
                 R.layout.intro_7,
                 R.layout.intro_8,
