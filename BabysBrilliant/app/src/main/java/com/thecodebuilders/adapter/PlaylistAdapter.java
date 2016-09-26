@@ -38,11 +38,21 @@ public class PlaylistAdapter extends RecyclerView.Adapter<ElementViewHolder> {
     ArrayList<JSONObject> assetsList;
     MainActivity mainActivity;
     private VolleySingleton volleySingleton;
+    private boolean isTappedSetting = true;
 
 
     public PlaylistAdapter(ArrayList listData, MainActivity mainActivity) {
         volleySingleton = VolleySingleton.getInstance();
         assetsList = listData;
+        this.mainActivity = mainActivity;
+        parseListItems(assetsList.size());
+
+    }
+
+    public PlaylistAdapter(ArrayList listData, MainActivity mainActivity, boolean isTappedSetting) {
+        volleySingleton = VolleySingleton.getInstance();
+        assetsList = listData;
+        this.isTappedSetting = isTappedSetting;
         this.mainActivity = mainActivity;
         parseListItems(assetsList.size());
 
@@ -54,7 +64,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<ElementViewHolder> {
     private void parseListItems(int listLength) {
         elements = new ArrayList<ListItem>(listLength);
         products = new ArrayList<JSONArray>();
-        PreferenceStorage.savePlaylist(appContext,assetsList.toString());
+        PreferenceStorage.savePlaylist(appContext, assetsList.toString());
         for (int i = 0; i < listLength; i++) {
             String name;
             Boolean playInline = false;
@@ -73,8 +83,8 @@ public class PlaylistAdapter extends RecyclerView.Adapter<ElementViewHolder> {
 
 
                 name = StringEscapeUtils.unescapeJava(itemJSON.getString("name"));
-                    if (!itemJSON.isNull("products"))
-                        products.add(itemJSON.getJSONArray("products"));
+                if (!itemJSON.isNull("products"))
+                    products.add(itemJSON.getJSONArray("products"));
 
                 imageResource = itemJSON.getString("thumb");
                 if (!itemJSON.isNull("cat")) category = itemJSON.getString("cat");
@@ -103,7 +113,8 @@ public class PlaylistAdapter extends RecyclerView.Adapter<ElementViewHolder> {
         viewHolder.thumbnailImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                thumbnailClicked(position, thisViewHolder);
+                if (isTappedSetting)
+                    thumbnailClicked(position, thisViewHolder);
             }
         });
         viewHolder.deletePlaylistIcon.setOnClickListener(new View.OnClickListener() {
@@ -112,14 +123,16 @@ public class PlaylistAdapter extends RecyclerView.Adapter<ElementViewHolder> {
 
                 /*Intent mainIntent1 = new Intent(mainIntent, ParentalChallengeScreen.class);
                 mainIntent.putExtra("Key", "fav");*/
-                mainActivity.startActivityForResult(new Intent(mainActivity, ParentalChallengeScreen.class).putExtra("Key", "PlayListAdapter").putExtra("pos", position), 1);
+                if (isTappedSetting)
+                    mainActivity.startActivityForResult(new Intent(mainActivity, ParentalChallengeScreen.class).putExtra("Key", "PlayListAdapter").putExtra("pos", position), 1);
                 // mainActivity.removePlaylist(position);
             }
         });
         viewHolder.editPlaylistIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                editClicked(position);
+                if (isTappedSetting)
+                    editClicked(position);
             }
         });
 
@@ -156,11 +169,14 @@ public class PlaylistAdapter extends RecyclerView.Adapter<ElementViewHolder> {
         ListItem listItem = elements.get(position);
         JSONArray jsonArray = products.get(position);
         mainActivity.fileArrayList = new ArrayList<String>();
+        mainActivity.mediaFileNameArray = new ArrayList<>();
         mainActivity.indexOfVideo = 1;
+        mainActivity.indexOfCurrentlyPlayingVideo = 0;
         for (int i = 0; i < jsonArray.length(); i++) {
             try {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                 mainActivity.fileArrayList.add(jsonObject.getString("file"));
+                mainActivity.mediaFileNameArray.add(jsonObject.getString("file"));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -170,8 +186,9 @@ public class PlaylistAdapter extends RecyclerView.Adapter<ElementViewHolder> {
         /*String fileLocation = Environment.getExternalStorageDirectory()
                 + "/" + mainActivity.getResources().getString(R.string.app_name) +
                 "/" + mainActivity.fileArrayList.get(0);*/
-        String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)+"/"+ mainActivity.fileArrayList.get(0);
-
+        Log.d(LOGVAR, "MediaFileName:" + mainActivity.mediaFileNameArray.toString());
+        String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + mainActivity.fileArrayList.get(0);
+        mainActivity.isVideoClose = false;
         mainActivity.playVideo(fileLocation, true);
 
         //TODO: play playlist
@@ -179,7 +196,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<ElementViewHolder> {
     }
 
     private void loopPlayList() {
-        Log.d(LOGVAR,"loopPlayList");
+        Log.d(LOGVAR, "loopPlayList");
         long time = 900000;
 
         if (mainActivity.checked1.isChecked()) {
@@ -204,7 +221,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<ElementViewHolder> {
     }
 
     private void handlerDelayed(long time) {
-        Log.d(LOGVAR,"handlerDelayed"+time);
+        Log.d(LOGVAR, "handlerDelayed" + time);
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override

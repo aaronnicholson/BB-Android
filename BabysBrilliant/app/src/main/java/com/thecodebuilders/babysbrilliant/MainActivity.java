@@ -3,6 +3,7 @@ package com.thecodebuilders.babysbrilliant;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -25,7 +26,9 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.webkit.WebView;
@@ -130,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     public static JSONArray soundBoards, soundBoards1;
     public ArrayList<JSONArray> jsonSets = new ArrayList<>();
 
-    public static String currentMenu = MOVIES;
+    public static String currentMenu = PURCHASED_ITEMS;
 
     public static String mediaURL = appContext.getString(R.string.media_url);
     private MediaPlayer mediaPlayer;
@@ -200,13 +203,22 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     private PurchasedAdapter purchasedAdapter;
 
     public ArrayList<String> fileArrayList;
+    public ArrayList<String> mediaFileNameArray;
+    public int indexOfCurrentlyPlayingVideo = 0;
     public int indexOfVideo = 1;
+    public boolean isVideoClose = false;
+    private int videoStopPosition = 0;
+    private boolean isVideoPlaying = true;
+    private ArrayList listData;
+    private String adapterType;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Log.d(TAG, "onCreate");
         assetsURL = Constant.URL + "a=pDBstandard";
         customizeDialog = new CustomizeDialog(MainActivity.this);
         pref = getApplicationContext().getSharedPreferences("BabyBrilliantPref", MODE_PRIVATE);
@@ -230,8 +242,12 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         createRawFile();
         setMenuWidth();
         initializeLayout();
-        getRemoteJSON("Main", assetsURL);
-        getRemoteJSON("Purchase", Constant.URL + "a=pH&u=" + pref.getString("user_id", ""));
+        if (Utils.isNetworkAvailable(MainActivity.this)) {
+            getRemoteJSON("Main", assetsURL);
+            getRemoteJSON("Purchase", Constant.URL + "a=pH&u=" + pref.getString("user_id", ""));
+        } else {
+            Toast.makeText(this, getResources().getString(R.string.no_network), Toast.LENGTH_LONG).show();
+        }
         setUpListeners();
         setUpThumbnailList();
         setUpButtons();
@@ -273,6 +289,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     }
 
+
     public void createRawFile() {
 
         //  File file = new File(Environment.getExternalStorageDirectory() + File.separator + "raw.txt");
@@ -313,7 +330,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
             }
             InputRead.close();
-            Toast.makeText(getBaseContext(), s, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getBaseContext(), s, Toast.LENGTH_SHORT).show();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -355,9 +372,15 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
                 if (data.getStringExtra("Key").equalsIgnoreCase("setting")) {
 
-
+                    viewClickable(false);
                     includedSettingLayout_frame.setVisibility(View.VISIBLE);
                     includedSettingLayout.setVisibility(View.VISIBLE);
+                   /* final Dialog dialog = new Dialog(MainActivity.this);
+                    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                    // Include dialog.xml file
+                    dialog.setContentView(R.layout.settings);
+                    dialog.setCancelable(false);
+                    dialog.show();*/
 
                 } else if (data.getStringExtra("Key").equalsIgnoreCase("contact_support")) {
 
@@ -614,11 +637,14 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         videoToggleButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                isVideoClose = false;
                 if (videoView.isPlaying()) {
                     videoView.pause();
+                    isVideoPlaying = false;
                     videoToggleButton.setText(getString(R.string.video_play));
                 } else {
                     videoView.start();
+                    isVideoPlaying = true;
                     videoToggleButton.setText(getString(R.string.video_pause));
                 }
                 showControls();
@@ -628,6 +654,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         videoCloseButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Log.d(LOGVAR, "VIDEO CLOSE PRESS");
+                isVideoClose = true;
                 videoView.pause();
                 videoView.stopPlayback();
                 videoView.suspend();
@@ -639,14 +666,60 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         videoFFButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 //TODO: Make forward func
-                showControls();
+                //showControls();
+                try {
+                    if (mediaFileNameArray != null) {
+                        String fileLocation = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/"
+                                + mediaFileNameArray.get((indexOfCurrentlyPlayingVideo + 1));
+                        if (Utils.checkFileExist(MainActivity.this, fileLocation,
+                                mediaFileNameArray.get((indexOfCurrentlyPlayingVideo + 1)))) {
+                            indexOfCurrentlyPlayingVideo = indexOfCurrentlyPlayingVideo + 1;
+                            Uri video = Uri.parse(fileLocation);
+                            videoView.setVideoURI(video);
+                            videoView.start();
+                            videoToggleButton.setText(getString(R.string.video_pause));
+                        } else {
+                            Toast.makeText(MainActivity.this, getResources().getString(R.string.next_video_not_downloaded), Toast.LENGTH_LONG).show();
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
             }
         });
 
         videoRewButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 //TODO: Make backward func
-                showControls();
+                //showControls();
+                try {
+                    if (mediaFileNameArray != null) {
+                        if ((indexOfCurrentlyPlayingVideo - 1) != -1) {
+                            String fileLocation = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/"
+                                    + mediaFileNameArray.get((indexOfCurrentlyPlayingVideo - 1));
+                            if (Utils.checkFileExist(MainActivity.this, fileLocation,
+                                    mediaFileNameArray.get((indexOfCurrentlyPlayingVideo - 1)))) {
+                                indexOfCurrentlyPlayingVideo = indexOfCurrentlyPlayingVideo - 1;
+                                Uri video = Uri.parse(fileLocation);
+                                videoView.setVideoURI(video);
+                                videoView.start();
+                                videoToggleButton.setText(getString(R.string.video_pause));
+                            } else {
+                                Toast.makeText(MainActivity.this, getResources().getString(R.string.previous_video_not_downloaded), Toast.LENGTH_LONG).show();
+                            }
+                        } else {
+                            String fileLocationCurrentVideo = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/"
+                                    + mediaFileNameArray.get((indexOfCurrentlyPlayingVideo));
+                            Uri video = Uri.parse(fileLocationCurrentVideo);
+                            videoView.setVideoURI(video);
+                            videoView.start();
+                            videoToggleButton.setText(getString(R.string.video_pause));
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -780,36 +853,37 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         // These should be based on an interface or a superclass to keep them consistent.
 
         //TODO: base this on the "cat" setting on the objects?
-
+        this.listData = listData;
+        this.adapterType = adapterType;
         Log.d(LOGVAR, "adapterType: " + adapterType);
 
         if (adapterType == "section") {
-            SectionAdapter adapter = new SectionAdapter(listData, this);
-            thumbnailList.setAdapter(adapter);
-        } else if (adapterType == "videos") {
+            SectionAdapter sectionAdapter = new SectionAdapter(listData, this);
+            thumbnailList.setAdapter(sectionAdapter);
+        } else if (adapterType == "videos" || adapterType == "favorites") {
             videoAdapter = new VideosAdapter(listData, this, "");
             thumbnailList.setAdapter(videoAdapter);
 
         } else if (adapterType == "playlists") {
-            PlaylistAdapter adapter = new PlaylistAdapter(listData, this);
-            thumbnailList.setAdapter(adapter);
+            PlaylistAdapter playlistAdapter = new PlaylistAdapter(listData, this);
+            thumbnailList.setAdapter(playlistAdapter);
         } else if (adapterType == "playlistItems") {
             PlaylistItemAdapter adapter = new PlaylistItemAdapter(listData, this);
             thumbnailList.setAdapter(adapter);
         } else if (adapterType == "purchased") {
-            VideosAdapter purchasedAdapter = new VideosAdapter(listData, this, "purchased");
-            thumbnailList.setAdapter(purchasedAdapter);
+            VideosAdapter purchasedVideosAdapter = new VideosAdapter(listData, this, "purchased");
+            thumbnailList.setAdapter(purchasedVideosAdapter);
         }
        /* else if (adapterType == "favorites") {
             FavoritesAdapter adapter = new FavoritesAdapter(listData, this);
             thumbnailList.setAdapter(adapter);
         } */
         else if (adapterType == "soundBoards") {
-            SoundBoardsAdapter adapter = new SoundBoardsAdapter(listData, this);
-            thumbnailList.setAdapter(adapter);
+            SoundBoardsAdapter soundBoardsAdapter = new SoundBoardsAdapter(listData, this);
+            thumbnailList.setAdapter(soundBoardsAdapter);
         } else {
-            ThumbnailListAdapter adapter = new ThumbnailListAdapter(listData, this);
-            thumbnailList.setAdapter(adapter);
+            ThumbnailListAdapter thumbnailListAdapter = new ThumbnailListAdapter(listData, this);
+            thumbnailList.setAdapter(thumbnailListAdapter);
         }
 
     }
@@ -1009,6 +1083,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     }
 
     public void playingVideos(String videoURL) {
+        Log.d(TAG, "playingVideos");
         String url = mediaURL + videoURL;
         final ProgressDialog progressDialog;
         progressDialog = ProgressDialog.show(MainActivity.this, "", "Buffering video...", true);
@@ -1038,9 +1113,38 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d(TAG," IsVideo"+isVideoClose);
+        if (isVideoClose) {
+            videoView.setOnPreparedListener(null);
+        } else {
+            if (videoStopPosition != 0) {
+                videoView.seekTo(videoStopPosition);
+                if (isVideoPlaying) {
+                    videoView.start();
+                    videoToggleButton.setText(getString(R.string.video_pause));
+                } else {
+                    videoView.setOnPreparedListener(null);
+                    videoView.pause();
+                    videoToggleButton.setText(getString(R.string.video_play));
+                }
+
+            }
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        videoStopPosition = videoView.getCurrentPosition();
+        videoView.pause();
+
+    }
+
     @SuppressLint("NewApi")
     public void playVideo(String videoURL, final boolean isPlayList) {
-
 
         // Create a progressbar
         pDialog = new ProgressDialog(MainActivity.this);
@@ -1067,14 +1171,12 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mp) {
-
                 //TODO: come up with more accurate solution to hide previous video image before playback starts
                 //show the video after a short delay to allow previous video image to clear out
                 new android.os.Handler().postDelayed(
                         new Runnable() {
                             @SuppressLint("NewApi")
                             public void run() {
-
                                 pDialog.dismiss();
                                 videoLayout.setVisibility(View.VISIBLE);
                                 videoView.start();
@@ -1092,6 +1194,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             // Close the progress bar and play the video
             public void onPrepared(MediaPlayer mp) {
+
                 videoLayout.setVisibility(View.VISIBLE);
                 pDialog.dismiss();
 
@@ -1103,17 +1206,18 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
         });
 
+
         videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
                 if (isPlayList && toggle.isChecked()) {
-                    Log.e(LOGVAR,".."+fileArrayList.size()+":"+indexOfVideo);
+                    Log.e(LOGVAR, ".." + fileArrayList.size() + ":" + indexOfVideo);
                     if (fileArrayList.size() == indexOfVideo) {
                         indexOfVideo = 0;
                     }
                 }
                 if (isPlayList && fileArrayList.size() > indexOfVideo) {
-                    Log.e(LOGVAR,"PlayList:"+fileArrayList.size()+":"+indexOfVideo+":"+fileArrayList.get(indexOfVideo));
+                    Log.d(LOGVAR, "PlayList:" + fileArrayList.size() + ":" + indexOfVideo + ":" + fileArrayList.get(indexOfVideo));
                     String fileLocation = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + fileArrayList.get(indexOfVideo);
 
                     Uri video = Uri.parse(fileLocation);
@@ -1135,9 +1239,10 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         showControls();
     }
 
+
     private static void showControls() {
-        //videoFFButton.setVisibility(View.VISIBLE);
-        //videoRewButton.setVisibility(View.VISIBLE);
+        videoFFButton.setVisibility(View.VISIBLE);
+        videoRewButton.setVisibility(View.VISIBLE);
         videoToggleButton.setVisibility(View.VISIBLE);
         videoCloseButton.setVisibility(View.VISIBLE);
 
@@ -1277,6 +1382,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                         purchasedItems = purchasedItems1;
 
                         pDialog.hide();
+                        initApp();
                         purchaseJSON(response);
                     } else if (From.equalsIgnoreCase("PurchaseContent")) {
                         pDialog.dismiss();
@@ -1384,7 +1490,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         jsonSets.add(nightLights);
         jsonSets.add(soundBoards);
 
-        initApp();
+
     }
 
     private void getLocalJSON() {
@@ -1402,9 +1508,14 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     private void initApp() throws JSONException {
         //TODO: add preloader
-        currentMenu = MOVIES;
-        configureThumbnailList(jsonData.getJSONArray(currentMenu), "section");
-        toggleMenuButton(MOVIES);
+        if (purchasedItems != null) {
+            if (purchasedItems.length() == 0)
+                emptyCategory.setVisibility(View.VISIBLE);
+            else
+                emptyCategory.setVisibility(View.GONE);
+            configureThumbnailList(purchasedItems, "purchased");
+            toggleMenuButton(PURCHASED_ITEMS);
+        }
 
         //show_intro.performClick(); //TODO: for testing
     }
@@ -1522,6 +1633,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         close_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                viewClickable(true);
                 includedSettingLayout_frame.setVisibility(View.INVISIBLE);
                 includedSettingLayout.setVisibility(View.INVISIBLE);
             }
@@ -1534,7 +1646,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             @Override
             public void onClick(View v) {
 
-                startActivity(new Intent(MainActivity.this, ShowIntroActivity.class).putExtra("Key", "SignUp"));
+                startActivity(new Intent(MainActivity.this, ShowIntroActivity.class).putExtra("Key", "MainActivity"));
 
 
             }
@@ -2023,6 +2135,49 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         videoView.suspend();
         videoToggleButton.setText(getString(R.string.video_pause));
         videoLayout.setVisibility(View.INVISIBLE);
-
     }
+
+    private void viewClickable(boolean isClickable) {
+     /*   private SectionAdapter sectionAdapter;
+        private VideosAdapter purchasedVideosAdapter;
+        private PlaylistAdapter playlistAdapter;
+        private SoundBoardsAdapter soundBoardsAdapter;
+        private ThumbnailListAdapter thumbnailListAdapter;*/
+        homeButton.setClickable(isClickable);
+        playListButton.setClickable(isClickable);
+        favoritesButton.setClickable(isClickable);
+        moviesButton.setClickable(isClickable);
+        musicButton.setClickable(isClickable);
+        nightLightsButton.setClickable(isClickable);
+        audioBooksButton.setClickable(isClickable);
+        soundBoardsButton.setClickable(isClickable);
+        hearingImpairedButton.setClickable(isClickable);
+        settings.setClickable(isClickable);
+
+        if (adapterType == "section") {
+            SectionAdapter sectionAdapter = new SectionAdapter(listData, this, isClickable);
+            thumbnailList.setAdapter(sectionAdapter);
+        } else if (adapterType == "videos" || adapterType == "favorites") {
+            videoAdapter = new VideosAdapter(listData, this, "", isClickable);
+            thumbnailList.setAdapter(videoAdapter);
+
+        } else if (adapterType == "playlists") {
+            PlaylistAdapter playlistAdapter = new PlaylistAdapter(listData, this, isClickable);
+            thumbnailList.setAdapter(playlistAdapter);
+        } else if (adapterType == "playlistItems") {
+            PlaylistItemAdapter adapter = new PlaylistItemAdapter(listData, this, isClickable);
+            thumbnailList.setAdapter(adapter);
+        } else if (adapterType == "purchased") {
+            VideosAdapter purchasedVideosAdapter = new VideosAdapter(listData, this, "purchased", isClickable);
+            thumbnailList.setAdapter(purchasedVideosAdapter);
+        }
+        else if (adapterType == "soundBoards") {
+            SoundBoardsAdapter soundBoardsAdapter = new SoundBoardsAdapter(listData, this, isClickable);
+            thumbnailList.setAdapter(soundBoardsAdapter);
+        } else {
+            ThumbnailListAdapter thumbnailListAdapter = new ThumbnailListAdapter(listData, this, isClickable);
+            thumbnailList.setAdapter(thumbnailListAdapter);
+        }
+    }
+
 }

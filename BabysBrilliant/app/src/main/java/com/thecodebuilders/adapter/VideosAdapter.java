@@ -3,7 +3,9 @@ package com.thecodebuilders.adapter;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.v7.widget.RecyclerView;
@@ -18,6 +20,7 @@ import com.thecodebuilders.babysbrilliant.ListItem;
 import com.thecodebuilders.babysbrilliant.MainActivity;
 import com.thecodebuilders.babysbrilliant.R;
 import com.thecodebuilders.classes.DownloadAsync;
+import com.thecodebuilders.classes.DownloadService;
 import com.thecodebuilders.interfaces.DownloadStatusListener;
 import com.thecodebuilders.model.Playlist;
 import com.thecodebuilders.network.VolleySingleton;
@@ -46,6 +49,8 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
     public String mediaURL = appContext.getString(R.string.media_url);
     public static String priceValue = "$0.00";
     private String purchased;
+    public ElementViewHolder elementViewHolder;
+    private boolean isTappedSetting = true;
 
     public VideosAdapter(ArrayList listData, MainActivity mainActivity, String purchased) {
         volleySingleton = VolleySingleton.getInstance();
@@ -58,12 +63,26 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
         Log.d(LOGVAR, "VIDEO assets: " + assetsList);
 
     }
+    public VideosAdapter(ArrayList listData, MainActivity mainActivity, String purchased,
+                         boolean isSettingTapped) {
+        volleySingleton = VolleySingleton.getInstance();
+        imageLoader = volleySingleton.getImageLoader();
+        assetsList = listData;
+        this.mainActivity = mainActivity;
+        this.isTappedSetting = isSettingTapped;
+        this.purchased = purchased;
+        parseListItems(assetsList.size());
+        //checkDownloadingProgress(assetsList.size());
+        Log.d(LOGVAR, "VIDEO assets: " + assetsList);
+
+    }
 
     //This gets the data ready for the adapter to use in order to set up the view for each list item.
     //It takes the data from the ArrayList that is passed in and parses it into the ListItem class.
     //Then it adds each ListItem instance to the elements ArrayList.
     private void parseListItems(int listLength) {
         elements = new ArrayList<ListItem>(listLength);
+        mainActivity.mediaFileNameArray = new ArrayList<>();
         for (int i = 0; i < listLength; i++) {
             JSONObject rawJSON;
             String name;
@@ -134,13 +153,19 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
                 imageResource = itemJSON.getString("thumb");
                 if (!itemJSON.isNull("cat")) category = itemJSON.getString("cat");
 
-                mediaFile = itemJSON.getString("file");
-                boolean isSoundBoard = false;
-                if(!itemJSON.isNull("catT"))
-                    if(purchased.equalsIgnoreCase("purchased"))
-                        isSoundBoard = itemJSON.getString("catT").equalsIgnoreCase("Soundboard");
 
-                if(!isSoundBoard ) {
+                boolean isSoundBoard = false;
+                if (!itemJSON.isNull("catT"))
+                    if (purchased.equalsIgnoreCase("purchased"))
+                        isSoundBoard = itemJSON.getString("catT").equalsIgnoreCase("Soundboard");
+                mediaFile = itemJSON.getString("file");
+                if (purchased.equalsIgnoreCase("purchased")) {
+                    if (isPurchased && !isSoundBoard)
+                        mainActivity.mediaFileNameArray.add(mediaFile);
+                } else {
+                    mainActivity.mediaFileNameArray.add(mediaFile);
+                }
+                if (!isSoundBoard) {
                     ListItem listItem = new ListItem(itemJSON, name, playInline, imageResource, mediaFile, price, category, isSection,
                             isPurchased, isPlaylistItem, isPlaylist, isFavorite, appContext, false, MainActivity.DOWNLOAD_ID);
 
@@ -160,7 +185,13 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
             @Override
             public void onClick(View view) {
                 if (!elements.get(position).getIsDownloading()) {
-                    thumbnailClicked(position, thisViewHolder);
+                    if(isTappedSetting){
+                        thumbnailClicked(position, thisViewHolder);
+                    }
+                    else{
+
+                    }
+
                 }
             }
         });
@@ -168,8 +199,10 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
         viewHolder.favoritesIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!elements.get(position).getIsDownloading())
-                    favoritesClicked(position, thisViewHolder);
+                if (!elements.get(position).getIsDownloading()) {
+                    if(isTappedSetting)
+                        favoritesClicked(position, thisViewHolder);
+                }
             }
         });
 
@@ -177,13 +210,14 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
             @Override
             public void onClick(View view) {
                 if (!elements.get(position).getIsDownloading()) {
-
-                    ListItem listItem = elements.get(position);
-                    String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + listItem.getMediaFile();
-                    if (Utils.checkFileExist(mainActivity, fileLocation, listItem.getMediaFile())) {
-                        playlistClicked(position, thisViewHolder);
-                    } else {
-                        alertForDownload(thisViewHolder, listItem, position);
+                    if(isTappedSetting) {
+                        ListItem listItem = elements.get(position);
+                        String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + listItem.getMediaFile();
+                        if (Utils.checkFileExist(mainActivity, fileLocation, listItem.getMediaFile())) {
+                            playlistClicked(position, thisViewHolder);
+                        } else {
+                            alertForDownload(thisViewHolder, listItem, position);
+                        }
                     }
                 }
 
@@ -192,12 +226,14 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
         viewHolder.downloadIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ListItem listItem = elements.get(position);
-                //mainActivity.downloadVideo(viewHolder, listItem);
-                new DownloadAsync(appContext, viewHolder, listItem, VideosAdapter.this, position, listItem.getMediaFile()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                viewHolder.progressBar.setVisibility(View.VISIBLE);
-                viewHolder.thumbnailImage.setClickable(false);
-                viewHolder.downloadIcon.setVisibility(View.GONE);
+                if(isTappedSetting) {
+                    ListItem listItem = elements.get(position);
+                    //mainActivity.downloadVideo(viewHolder, listItem);
+                    new DownloadAsync(mainActivity, viewHolder, listItem, VideosAdapter.this, position, listItem.getMediaFile()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                    viewHolder.progressBar.setVisibility(View.VISIBLE);
+                    viewHolder.thumbnailImage.setClickable(false);
+                    viewHolder.downloadIcon.setVisibility(View.GONE);
+                }
             }
         });
 
@@ -241,7 +277,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
         //if it has been purchased already or free
         if (listItem.isPurchased() || listItem.getPrice().equalsIgnoreCase(priceValue)
                 || !listItem.isPurchasable()) {
-                 setLookToPurchased(viewHolder);
+            setLookToPurchased(viewHolder);
         }
 
         if (listItem.isFavorite()) {
@@ -255,17 +291,22 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
         } else {
             setLookToNotPlaylistItem(viewHolder);
         }
-        if(listItem.getCategory().equals("5") && !listItem.isSection()){
+        if (listItem.getCategory().equals("5") && !listItem.isSection()) {
             setFileDownloadedListItem(viewHolder, listItem);
-        }
-        else {
+        } else {
             if (listItem.isPurchased())
                 setFileDownloadedListItem(viewHolder, listItem);
         }
-
         setFileDownloadingListItem(viewHolder, listItem);
 
         CommonAdapterUtility.setThumbnailImage(listItem, viewHolder.thumbnailImage);
+        /*if(isCalledSettingOpen.equalsIgnoreCase("Yes")){
+            Log.d("Call",".."+isViewClickable);
+            if(isViewClickable)
+                viewHolder.thumbnailImage.setClickable(true);
+            else
+                viewHolder.thumbnailImage.setClickable(false);
+        }*/
 
         viewHolder.itemView.setTag(listItem);
         viewHolder.progressBar.setTag(listItem);
@@ -273,13 +314,17 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
 
     private void favoritesClicked(int position, ElementViewHolder thisViewHolder) {
         ListItem listItem = elements.get(position);
+        Log.e(LOGVAR,"Favourite:"+listItem.isFavorite());
         if (listItem.isFavorite()) {
             //TODO: remove from favorites
             mainActivity.removeFromFavorites(listItem.getRawJSON());
+            listItem.isFavorite = false;
             setLookToNotFavorite(thisViewHolder);
         } else {
+            listItem.isFavorite = true;
             mainActivity.addToFavorites(listItem.getRawJSON());
             setLookToFavorite(thisViewHolder);
+
         }
         String favoriteString = mainActivity.favoriteItems.toString();
         PreferenceStorage.saveFavourites(appContext, PreferenceStorage.FAVOURITE_SAVE, favoriteString);
@@ -292,13 +337,19 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
 
     private void thumbnailClicked(int position, ElementViewHolder thisViewHolder) {
         ListItem listItem = elements.get(position);
+
         if ((listItem.isPurchasable() && listItem.isPurchased()) || listItem.getPrice().equalsIgnoreCase(priceValue)) {
 
             String videoURL = listItem.getMediaFile();
             String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + videoURL;
-            Log.e(LOGVAR,".."+listItem.getMediaFile());
+            Log.e(LOGVAR, ".." + listItem.getMediaFile() + "::" + mainActivity.mediaFileNameArray.toString());
             if (Utils.checkFileExist(mainActivity, fileLocation, videoURL)) {
+                //when playing video and we minimize the app and again open that time setOnPreparedListener set null
+                //because of that set false to videoClose
+                mainActivity.isVideoClose = false;
                 Log.d(LOGVAR, "FILE EXISTS");
+                mainActivity.indexOfCurrentlyPlayingVideo = mainActivity.mediaFileNameArray.indexOf(listItem.getMediaFile());
+                Log.d(LOGVAR, "index:" + mainActivity.indexOfCurrentlyPlayingVideo);
                 mainActivity.playVideo(fileLocation, false);
                 //otherwise, go get it
             } else {
@@ -311,7 +362,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
             //TODO: do actual purchase round trip here
             // listItem.setIsPurchased(true);
             //  setLookToPurchased(thisViewHolder);
-            if(listItem.getCategory().equals("5") && !listItem.isSection()){
+            if (listItem.getCategory().equals("5") && !listItem.isSection()) {
                 String videoURL = listItem.getMediaFile();
                 String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + videoURL;
                 if (Utils.checkFileExist(mainActivity, fileLocation, videoURL)) {
@@ -323,8 +374,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
                     //TODO: Stop multiple downloads of the same file
                     alertForDownload(thisViewHolder, listItem, position);
                 }
-            }
-            else {
+            } else {
                 try {
                     mainActivity.addToPurchased(listItem.getRawJSON(), listItem, thisViewHolder);
                 } catch (JSONException e) {
@@ -401,9 +451,10 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
 
         final ListItem rowData = elements.get(position);
         configureListItemLook(viewHolder, rowData);
+        Log.d("VideosAdapter", "onBindViewHolder");
 
         configureListItemListeners(viewHolder, position);
-
+        elementViewHolder = viewHolder;
     }
 
     @Override
@@ -423,7 +474,12 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
                 viewHolder.thumbnailImage.setClickable(false);
                 viewHolder.downloadIcon.setVisibility(View.GONE);
                 // mainActivity.downloadVideo(viewHolder, listItem);
-                new DownloadAsync(appContext, viewHolder, listItem, VideosAdapter.this, position, listItem.getMediaFile()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                //mainActivity.downloadVideo(viewHolder, listItem);
+              /*  Intent intent = new Intent(mainActivity, DownloadService.class);
+                intent.putExtra("url", "https://s3-us-west-1.amazonaws.com/babysbrilliant-media/Gravityfinal.mp4");
+                mainActivity.startService(intent);*/
+                new DownloadAsync(mainActivity, viewHolder, listItem, VideosAdapter.this, position, listItem.getMediaFile()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                //download(listItem.getMediaFile());
             }
         });
         alertDialog.setNegativeButton(mainActivity.getResources().getString(R.string.cancel), null);
@@ -435,4 +491,6 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
     public void onDownloadComplete(int position) {
         notifyDataSetChanged();
     }
+
+
 }

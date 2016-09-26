@@ -21,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.android.volley.toolbox.ImageLoader;
@@ -59,10 +60,12 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
     private ImageLoader imageLoader;
     public static String priceValue = "$0.00";
     private boolean isMediaPlayingDone = true;
+    private Toast toast;
 
     int listIncrement = 0; //for testing only
 
     private MediaPlayer mediaPlayer;
+    private boolean isTappedSettings = true;
 
     public ThumbnailListAdapter(ArrayList listData, MainActivity mainActivity) {
         volleySingleton = VolleySingleton.getInstance();
@@ -70,6 +73,18 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         assetsList = listData;
         this.mainActivity = mainActivity;
         parseListItems(assetsList.size());
+        toast = Toast.makeText(appContext, appContext.getResources().getString(R.string.another_media_play_progress), Toast.LENGTH_LONG);
+
+    }
+
+    public ThumbnailListAdapter(ArrayList listData, MainActivity mainActivity, boolean isTappedSettings) {
+        volleySingleton = VolleySingleton.getInstance();
+        imageLoader = volleySingleton.getImageLoader();
+        assetsList = listData;
+        this.mainActivity = mainActivity;
+        this.isTappedSettings = isTappedSettings;
+        parseListItems(assetsList.size());
+        toast = Toast.makeText(appContext, appContext.getResources().getString(R.string.another_media_play_progress), Toast.LENGTH_LONG);
 
     }
 
@@ -200,28 +215,32 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         viewHolder.thumbnailImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                thumbnailClicked(position, thisViewHolder);
+                if (isTappedSettings)
+                    thumbnailClicked(position, thisViewHolder);
             }
         });
 
         viewHolder.favoritesIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                favoritesClicked(position, thisViewHolder);
+                if (isTappedSettings)
+                    favoritesClicked(position, thisViewHolder);
             }
         });
 
         viewHolder.previewIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                previewClicked(position);
+                if (isTappedSettings)
+                    previewClicked(position);
             }
         });
 
         viewHolder.playlistIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                playlistClicked(position, thisViewHolder);
+                if (isTappedSettings)
+                    playlistClicked(position, thisViewHolder);
             }
         });
 
@@ -346,8 +365,10 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         if (listItem.isFavorite()) {
             //TODO: remove from favorites
             mainActivity.removeFromFavorites(listItem.getRawJSON());
+            listItem.isFavorite = false;
             setLookToNotFavorite(thisViewHolder);
         } else {
+            listItem.isFavorite = true;
             mainActivity.addToFavorites(listItem.getRawJSON());
             setLookToFavorite(thisViewHolder);
         }
@@ -368,6 +389,16 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
             if (listItem.getCategory().contains("5") && !listItem.isSection()) {
                 if (isMediaPlayingDone)
                     playOrOpen(position, listItem, thisViewHolder);
+                else {
+                    try {
+                        if (!toast.getView().isShown())
+                            toast.show();
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    //Toast.makeText(appContext, appContext.getResources().getString(R.string.another_media_play_progress), Toast.LENGTH_LONG).show();
+                }
             } else if ((listItem.isPurchasable() && listItem.isPurchased()) || listItem.getPrice().equalsIgnoreCase(priceValue)) {
 
                 int checkAllFileExists = 0;
@@ -481,8 +512,6 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
     public void playInlineVideo(String videoURL, final ElementViewHolder viewHolder, int position) {
         Log.d(LOGVAR, "play inline video");
         ListItem listItem = elements.get(position);
-        Object s = viewHolder.thumbnailImage.getTag().equals("0");
-        String url = "https://s3-us-west-1.amazonaws.com/babysbrilliant-media/SoundboardCow2.mp4";
 
         String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + listItem.getMediaFile();
 
@@ -491,8 +520,6 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         isMediaPlayingDone = false;
         mediaPlayer = new MediaPlayer();
         try {
-            Log.d(LOGVAR, "set data source");
-
             mediaPlayer.setDataSource(fileLocation); //this triggers the listener, which plays the video
 
         } catch (IOException e) {
@@ -660,7 +687,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
 
                                 String fileLocation = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + jsonObject.getString("file");
                                 if (!Utils.checkFileExist(mainActivity, fileLocation, jsonObject.getString("file"))) {
-                                    new DownloadAsync(viewHolder, listItem, ThumbnailListAdapter.this, position, jsonObject.getString("file"), appContext).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                                    new DownloadAsync(viewHolder, listItem, ThumbnailListAdapter.this, position, jsonObject.getString("file"), mainActivity).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();

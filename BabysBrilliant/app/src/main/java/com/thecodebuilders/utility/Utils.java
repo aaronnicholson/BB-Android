@@ -1,12 +1,16 @@
 package com.thecodebuilders.utility;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.DisplayMetrics;
 import android.util.Log;
+
+import com.thecodebuilders.babysbrilliant.R;
 
 import java.io.File;
 
@@ -87,6 +91,33 @@ public class Utils {
             e.printStackTrace();
         }
         return false;
+    }
+    
+    public static  void showErrorDialog(final Context context, final String errorString){
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
+        alertDialog.setTitle(context.getResources().getString(R.string.error_message_title));
+        alertDialog.setMessage(errorString);
+        alertDialog.setPositiveButton(context.getResources().getString(R.string.download), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        AlertDialog builder = alertDialog.create();
+        builder.show();
+    }
+
+    public static  void showNetworkErrorDialog(final Context context){
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
+        alertDialog.setMessage(context.getResources().getString(R.string.download_failed));
+        alertDialog.setPositiveButton(context.getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        AlertDialog builder = alertDialog.create();
+        builder.show();
     }
 
 }

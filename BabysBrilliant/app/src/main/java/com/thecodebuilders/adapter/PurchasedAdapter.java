@@ -66,6 +66,7 @@ public class PurchasedAdapter extends RecyclerView.Adapter<ElementViewHolder> {
         assetsList = listData;
         this.mainActivity = mainActivity;
         parseListItems(assetsList.size());
+        Log.d(LOGVAR, assetsList.toString());
 
     }
 
@@ -295,8 +296,10 @@ public class PurchasedAdapter extends RecyclerView.Adapter<ElementViewHolder> {
         if (listItem.isFavorite()) {
             //TODO: remove from favorites
             mainActivity.removeFromFavorites(listItem.getRawJSON());
+            listItem.isFavorite = false;
             setLookToNotFavorite(thisViewHolder);
         } else {
+            listItem.isFavorite = true;
             mainActivity.addToFavorites(listItem.getRawJSON());
             setLookToFavorite(thisViewHolder);
         }

@@ -33,11 +33,20 @@ public class PlaylistItemAdapter extends RecyclerView.Adapter<ElementViewHolder>
     ArrayList<JSONObject> assetsList;
     MainActivity mainActivity;
     private VolleySingleton volleySingleton;
+    private boolean isTappedSetting = true;
 
     public PlaylistItemAdapter(ArrayList listData, MainActivity mainActivity) {
         volleySingleton = VolleySingleton.getInstance();
         assetsList = listData;
         this.mainActivity = mainActivity;
+        parseListItems(assetsList.size());
+
+    }
+    public PlaylistItemAdapter(ArrayList listData, MainActivity mainActivity, boolean isTappedSettings) {
+        volleySingleton = VolleySingleton.getInstance();
+        assetsList = listData;
+        this.mainActivity = mainActivity;
+        this.isTappedSetting = isTappedSettings;
         parseListItems(assetsList.size());
 
     }
@@ -94,12 +103,14 @@ public class PlaylistItemAdapter extends RecyclerView.Adapter<ElementViewHolder>
         viewHolder.thumbnailImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(isTappedSetting)
                 thumbnailClicked(position, thisViewHolder);
             }
         });
         viewHolder.deletePlaylistItemIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(isTappedSetting)
                 mainActivity.startActivityForResult(new Intent(mainActivity, ParentalChallengeScreen.class).putExtra("Key", "PlayListItemAdapter").putExtra("pos", position), 1);
                 //  mainActivity.removeItemFromPlaylist(position);
             }
