@@ -67,6 +67,6 @@
     <string name="previous_video_not_downloaded">Previous video is not downloaded</string>
     <string name="download_failed">Download Failed. Network is slow please try again.</string>
     <string name="ok">Ok</string>
-
+    <string name="preview_not_available">Preview not available</string>
 
 </resources>

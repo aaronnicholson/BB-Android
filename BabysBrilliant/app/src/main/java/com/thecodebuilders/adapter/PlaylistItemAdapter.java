@@ -87,7 +87,7 @@ public class PlaylistItemAdapter extends RecyclerView.Adapter<ElementViewHolder>
                 }
 
                 ListItem listItem = new ListItem(itemJSON, name, playInline, imageResource, mediaFile, price, category, isSection, isPurchased,
-                        isPlaylistItem, isPlaylist, isFavorite, appContext, false, MainActivity.DOWNLOAD_ID);
+                        isPlaylistItem, isPlaylist, isFavorite, appContext, false, MainActivity.DOWNLOAD_ID, mediaFile);
 
                 elements.add(listItem);//TODO: make image dynamic
             } catch (Throwable t) {

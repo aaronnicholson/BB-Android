@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.thecodebuilders.application.ApplicationContextProvider;
@@ -31,6 +32,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.annotation.Target;
 import java.util.ArrayList;
 
 
@@ -96,6 +98,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
             Boolean isSection = false;
             Boolean isPlaylistItem = false;
             Boolean isPlaylist = false;
+            String previewFile = "";
 
             try {
                 JSONObject itemJSON = assetsList.get(i);
@@ -159,6 +162,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
                     if (purchased.equalsIgnoreCase("purchased"))
                         isSoundBoard = itemJSON.getString("catT").equalsIgnoreCase("Soundboard");
                 mediaFile = itemJSON.getString("file");
+                previewFile = itemJSON.getString("preview");
                 if (purchased.equalsIgnoreCase("purchased")) {
                     if (isPurchased && !isSoundBoard)
                         mainActivity.mediaFileNameArray.add(mediaFile);
@@ -167,7 +171,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
                 }
                 if (!isSoundBoard) {
                     ListItem listItem = new ListItem(itemJSON, name, playInline, imageResource, mediaFile, price, category, isSection,
-                            isPurchased, isPlaylistItem, isPlaylist, isFavorite, appContext, false, MainActivity.DOWNLOAD_ID);
+                            isPurchased, isPlaylistItem, isPlaylist, isFavorite, appContext, false, MainActivity.DOWNLOAD_ID, previewFile);
 
                     elements.add(listItem);//TODO: make image dynamic
                 }
@@ -189,6 +193,7 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
                         thumbnailClicked(position, thisViewHolder);
                     }
                     else{
+
 
                     }
 
@@ -237,9 +242,23 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
             }
         });
 
-
+        viewHolder.previewIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (isTappedSetting)
+                    previewClicked(position);
+            }
+        });
     }
-
+    private void previewClicked(int position) {
+        ListItem listItem = elements.get(position);
+        Log.d("MediaFile",".."+listItem.getPreviewFile());
+        if (!listItem.getMediaFile().equals(""))
+            mainActivity.playingVideos(listItem.getPreviewFile());
+        else
+            Toast.makeText(mainActivity, mainActivity.getResources().getString(R.string.preview_not_available),
+                    Toast.LENGTH_LONG).show();
+    }
     private void configureListItemLook(final ElementViewHolder viewHolder, final ListItem listItem) {
 
         viewHolder.videoView.setVisibility(View.INVISIBLE);
@@ -310,6 +329,12 @@ public class VideosAdapter extends RecyclerView.Adapter<ElementViewHolder> imple
 
         viewHolder.itemView.setTag(listItem);
         viewHolder.progressBar.setTag(listItem);
+
+        viewHolder.previewIcon.setTypeface(mainActivity.fontAwesome);
+        if (listItem.isPurchased())
+            viewHolder.previewIcon.setVisibility(View.INVISIBLE);
+        else
+            viewHolder.previewIcon.setVisibility(View.VISIBLE);
     }
 
     private void favoritesClicked(int position, ElementViewHolder thisViewHolder) {

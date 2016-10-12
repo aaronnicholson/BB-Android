@@ -39,6 +39,7 @@ import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.MediaController;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -1085,12 +1086,14 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     public void playingVideos(String videoURL) {
         Log.d(TAG, "playingVideos");
         String url = mediaURL + videoURL;
+        final ProgressBar progressBar = (ProgressBar) findViewById(R.id.video_progress_bar);
         final ProgressDialog progressDialog;
         progressDialog = ProgressDialog.show(MainActivity.this, "", "Buffering video...", true);
         progressDialog.setCancelable(false);
+        progressBar.setVisibility(View.VISIBLE);
         // String url = "https://s3-us-west-1.amazonaws.com/babysbrilliant-media/SoundboardCow2.mp4";
 
-        try {
+       /* try {
             getWindow().setFormat(PixelFormat.TRANSLUCENT);
             MediaController mediaController = new MediaController(MainActivity.this);
             mediaController.setAnchorView(videoView);
@@ -1103,14 +1106,61 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
                 public void onPrepared(MediaPlayer mp) {
                     progressDialog.dismiss();
+                    videoLayout.setVisibility(View.VISIBLE);
                     videoView.start();
+                    videoView.setAlpha(1);
+                    //showControls();
                 }
             });
         } catch (Exception e) {
             //progressDialog.dismiss();
             System.out.println("Video Play Error :" + e.toString());
             finish();
+        }*/
+
+
+        try {
+            // Start the MediaController
+            MediaController mediacontroller = new MediaController(
+                    MainActivity.this);
+            mediacontroller.setAnchorView(videoView);
+            // Get the URL from String VideoURL
+            Uri video = Uri.parse(url);
+            videoView.setMediaController(mediacontroller);
+            videoView.setVideoURI(video);
+
+        } catch (Exception e) {
+            Log.e("Error", e.getMessage());
+            e.printStackTrace();
         }
+
+        videoView.requestFocus();
+        videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            // Close the progress bar and play the video
+            public void onPrepared(MediaPlayer mp) {
+                progressDialog.dismiss();
+                videoLayout.setVisibility(View.VISIBLE);
+                videoView.start();
+                videoView.setAlpha(1);
+                mp.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
+                    @Override
+                    public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
+                        progressBar.setVisibility(View.GONE);
+                    }
+                });
+            }
+        });
+        videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                videoView.pause();
+                videoView.stopPlayback();
+                videoView.suspend();
+                //videoToggleButton.setText(getString(R.string.video_pause));
+                videoLayout.setVisibility(View.INVISIBLE);
+            }
+        });
+
     }
 
     @Override

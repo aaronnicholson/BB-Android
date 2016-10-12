@@ -28,10 +28,13 @@ public class ListItem extends View {
     private JSONObject rawJSON;
     private Boolean isDownloading;
     private Long downloadId;
+    private String previewFile;
 
-    public ListItem(JSONObject rawJSON, String title, Boolean playInline, String imageResource, String mediaFile, String price, String category,
+    public ListItem(JSONObject rawJSON, String title, Boolean playInline, String imageResource,
+                    String mediaFile, String price, String category,
                     Boolean isSection, Boolean isPurchased, Boolean isPlaylistItem, Boolean isPlaylist,
-                    Boolean isFavorite, Context context, Boolean isDownloading, Long downloadId ) {
+                    Boolean isFavorite, Context context, Boolean isDownloading, Long downloadId,
+                    String preViewFile) {
         super(context);
         this.rawJSON = rawJSON;
         this.title = title;
@@ -47,6 +50,7 @@ public class ListItem extends View {
         this.isPlaylist = isPlaylist;
         this.isDownloading = isDownloading;
         this.downloadId = downloadId;
+        this.previewFile = preViewFile;
 
         setIsPurchasable();
 
@@ -162,8 +166,18 @@ public class ListItem extends View {
         return showText;
     }
 
+    public String getPreviewFile() {
+        return previewFile;
+    }
+
+    public void setPreviewFile(String previewFile) {
+        this.previewFile = previewFile;
+    }
+
     @Override
     public String toString() {
         return title;
     }
+
+
 }
