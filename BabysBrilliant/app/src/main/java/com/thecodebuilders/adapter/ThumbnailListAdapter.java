@@ -94,6 +94,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
     private void parseListItems(int listLength) {
         elements = new ArrayList<ListItem>(listLength);
         products = new ArrayList<JSONArray>();
+        mainActivity.previewFileNameArray = new ArrayList<>();
         Log.d(LOGVAR, "Thumbnail:" + assetsList.toString());
         for (int i = 0; i < listLength; i++) {
             JSONObject rawJSON;
@@ -191,7 +192,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
                 } else if (!itemJSON.isNull("preview")) {
                     mediaFile = itemJSON.getString("preview");
                 }
-
+                mainActivity.previewFileNameArray.add(mediaFile);
                 //isPlaylist
 //                if (!itemJSON.isNull("isPlaylist") && itemJSON.getString("isPlaylist").equals("true")) {
 //                    isPlaylist = true;
@@ -305,7 +306,7 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
         }
 
         //TODO: Add check for null string of file name
-        if (listItem.isSection() && !listItem.isPurchasable()) {
+        if (listItem.isSection() || !listItem.isPurchased()) {
             viewHolder.previewIcon.setVisibility(View.VISIBLE);
         } else {
             viewHolder.previewIcon.setVisibility(View.INVISIBLE);
@@ -355,8 +356,13 @@ public class ThumbnailListAdapter extends RecyclerView.Adapter<ThumbnailListAdap
 
     private void previewClicked(int position) {
         ListItem listItem = elements.get(position);
-        if (!listItem.getMediaFile().equals(""))
-            mainActivity.playVideo(listItem.getMediaFile(), false);
+        if (!listItem.getPreviewFile().equals("")) {
+            mainActivity.isVideoClose = false;
+            mainActivity.playingVideos(listItem.getPreviewFile());
+        }
+        else
+            Toast.makeText(mainActivity, mainActivity.getResources()
+                    .getString(R.string.preview_not_available), Toast.LENGTH_LONG).show();
     }
 
     private void favoritesClicked(int position, ElementViewHolder thisViewHolder) {

@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.thecodebuilders.application.ApplicationContextProvider;
@@ -65,6 +66,7 @@ public class SoundBoardsAdapter extends RecyclerView.Adapter<SoundBoardsAdapter.
     private void parseListItems(int listLength) {
         elements = new ArrayList<ListItem>(listLength);
         products = new ArrayList<JSONArray>();
+        mainActivity.previewFileNameArray = new ArrayList<>();
         Log.d(LOGVAR, "Assets:" + assetsList);
         for (int i = 0; i < listLength; i++) {
             JSONObject rawJSON;
@@ -94,6 +96,7 @@ public class SoundBoardsAdapter extends RecyclerView.Adapter<SoundBoardsAdapter.
                 // }
 
                 mediaFile = itemJSON.getString("preview");
+                mainActivity.previewFileNameArray.add(mediaFile);
 
                 ListItem listItem = new ListItem(rawJSON, name, playInline, imageResource, mediaFile, price, category, isSection,
                         isPurchased, isPlaylistItem, isPlaylist, isFavorite, appContext, false, MainActivity.DOWNLOAD_ID, mediaFile);
@@ -144,7 +147,7 @@ public class SoundBoardsAdapter extends RecyclerView.Adapter<SoundBoardsAdapter.
         viewHolder.titleText.setTextSize(16);
 
         //TODO: Add check for null string of file name
-        if (listItem.isSection() && !listItem.isPurchasable()) {
+        if (listItem.isSection()) {
             viewHolder.previewIcon.setVisibility(View.VISIBLE);
         } else {
             viewHolder.previewIcon.setVisibility(View.INVISIBLE);
@@ -159,8 +162,14 @@ public class SoundBoardsAdapter extends RecyclerView.Adapter<SoundBoardsAdapter.
 
     private void previewClicked(int position) {
         ListItem listItem = elements.get(position);
-        if (!listItem.getMediaFile().equals(""))
-            mainActivity.playVideo(listItem.getMediaFile(), false);
+        mainActivity.indexOfCurrentlyPreviewVideo = mainActivity.previewFileNameArray.indexOf(listItem.getPreviewFile());
+        if (!listItem.getPreviewFile().equals("")) {
+            mainActivity.isVideoClose = false;
+            mainActivity.playingVideos(listItem.getPreviewFile());
+        }
+        else
+            Toast.makeText(mainActivity, mainActivity.getResources()
+                    .getString(R.string.preview_not_available), Toast.LENGTH_LONG).show();
     }
 
     private void thumbnailClicked(int position, ElementViewHolder thisViewHolder) {

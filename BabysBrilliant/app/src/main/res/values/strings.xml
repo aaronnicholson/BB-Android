@@ -68,5 +68,6 @@
     <string name="download_failed">Download Failed. Network is slow please try again.</string>
     <string name="ok">Ok</string>
     <string name="preview_not_available">Preview not available</string>
+    <string name="preview_not_available_next_video">Preview not available of next video</string>
 
 </resources>

@@ -3,14 +3,12 @@ package com.thecodebuilders.babysbrilliant;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.graphics.PixelFormat;
 import android.graphics.Typeface;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -26,9 +24,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.webkit.WebView;
@@ -206,12 +202,16 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     public ArrayList<String> fileArrayList;
     public ArrayList<String> mediaFileNameArray;
     public int indexOfCurrentlyPlayingVideo = 0;
+    public ArrayList<String> previewFileNameArray;
+    public int indexOfCurrentlyPreviewVideo = 0;
     public int indexOfVideo = 1;
     public boolean isVideoClose = false;
     private int videoStopPosition = 0;
     private boolean isVideoPlaying = true;
     private ArrayList listData;
     private String adapterType;
+    private boolean isVideoPreviewStart = false;
+    private ProgressBar videoBufferProgressBar;
 
 
     @Override
@@ -237,7 +237,6 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                     Log.d(LOGVAR, "In-app Billing is set up OK");
             }
         });
-
         animationBlink = AnimationUtils.loadAnimation(MainActivity.this, R.anim.blink);
         animationBlink.setAnimationListener(this);
         createRawFile();
@@ -287,7 +286,6 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             }
 
         }
-
     }
 
 
@@ -448,10 +446,9 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
                     try {
                         ITEM_SKU = productJSON.getString("SKU");
-                    } catch (JSONException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    Log.e(LOGVAR, "ITEM_SKU:" + ITEM_SKU);
                     mHelper.launchPurchaseFlow(MainActivity.this, ITEM_SKU, 10001,
                             mPurchaseFinishedListener, "mypurchasetoken");
                 } else {
@@ -655,6 +652,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         videoCloseButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Log.d(LOGVAR, "VIDEO CLOSE PRESS");
+                videoBufferProgressBar.setVisibility(View.INVISIBLE);
                 isVideoClose = true;
                 videoView.pause();
                 videoView.stopPlayback();
@@ -669,18 +667,31 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                 //TODO: Make forward func
                 //showControls();
                 try {
-                    if (mediaFileNameArray != null) {
-                        String fileLocation = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/"
-                                + mediaFileNameArray.get((indexOfCurrentlyPlayingVideo + 1));
-                        if (Utils.checkFileExist(MainActivity.this, fileLocation,
-                                mediaFileNameArray.get((indexOfCurrentlyPlayingVideo + 1)))) {
-                            indexOfCurrentlyPlayingVideo = indexOfCurrentlyPlayingVideo + 1;
-                            Uri video = Uri.parse(fileLocation);
-                            videoView.setVideoURI(video);
-                            videoView.start();
-                            videoToggleButton.setText(getString(R.string.video_pause));
-                        } else {
-                            Toast.makeText(MainActivity.this, getResources().getString(R.string.next_video_not_downloaded), Toast.LENGTH_LONG).show();
+                    if (isVideoPreviewStart) {
+                        if (previewFileNameArray != null) {
+                            String previewFileName = previewFileNameArray.get(indexOfCurrentlyPreviewVideo + 1);
+                            if (!previewFileName.equalsIgnoreCase("")) {
+                                indexOfCurrentlyPreviewVideo = indexOfCurrentlyPreviewVideo + 1;
+                                playingVideos(previewFileName);
+                            } else {
+                                Toast.makeText(MainActivity.this, getResources().getString(R.string.preview_not_available),
+                                        Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    } else {
+                        if (mediaFileNameArray != null) {
+                            String fileLocation = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/"
+                                    + mediaFileNameArray.get((indexOfCurrentlyPlayingVideo + 1));
+                            if (Utils.checkFileExist(MainActivity.this, fileLocation,
+                                    mediaFileNameArray.get((indexOfCurrentlyPlayingVideo + 1)))) {
+                                indexOfCurrentlyPlayingVideo = indexOfCurrentlyPlayingVideo + 1;
+                                Uri video = Uri.parse(fileLocation);
+                                videoView.setVideoURI(video);
+                                videoView.start();
+                                videoToggleButton.setText(getString(R.string.video_pause));
+                            } else {
+                                Toast.makeText(MainActivity.this, getResources().getString(R.string.next_video_not_downloaded), Toast.LENGTH_LONG).show();
+                            }
                         }
                     }
                 } catch (Exception e) {
@@ -695,27 +706,44 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                 //TODO: Make backward func
                 //showControls();
                 try {
-                    if (mediaFileNameArray != null) {
-                        if ((indexOfCurrentlyPlayingVideo - 1) != -1) {
-                            String fileLocation = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/"
-                                    + mediaFileNameArray.get((indexOfCurrentlyPlayingVideo - 1));
-                            if (Utils.checkFileExist(MainActivity.this, fileLocation,
-                                    mediaFileNameArray.get((indexOfCurrentlyPlayingVideo - 1)))) {
-                                indexOfCurrentlyPlayingVideo = indexOfCurrentlyPlayingVideo - 1;
-                                Uri video = Uri.parse(fileLocation);
+                    if (isVideoPreviewStart) {
+                        if (previewFileNameArray != null) {
+                            if ((indexOfCurrentlyPreviewVideo - 1) != -1) {
+                                String previewFileName = previewFileNameArray.get(indexOfCurrentlyPreviewVideo - 1);
+                                if (!previewFileName.equalsIgnoreCase("")) {
+                                    indexOfCurrentlyPreviewVideo = indexOfCurrentlyPreviewVideo - 1;
+                                    playingVideos(previewFileName);
+                                } else {
+                                    Toast.makeText(MainActivity.this, getResources().getString(R.string.preview_not_available_next_video),
+                                            Toast.LENGTH_LONG).show();
+                                }
+                            } else {
+                                videoView.seekTo(0);
+                            }
+                        }
+                    } else {
+                        if (mediaFileNameArray != null) {
+                            if ((indexOfCurrentlyPlayingVideo - 1) != -1) {
+                                String fileLocation = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/"
+                                        + mediaFileNameArray.get((indexOfCurrentlyPlayingVideo - 1));
+                                if (Utils.checkFileExist(MainActivity.this, fileLocation,
+                                        mediaFileNameArray.get((indexOfCurrentlyPlayingVideo - 1)))) {
+                                    indexOfCurrentlyPlayingVideo = indexOfCurrentlyPlayingVideo - 1;
+                                    Uri video = Uri.parse(fileLocation);
+                                    videoView.setVideoURI(video);
+                                    videoView.start();
+                                    videoToggleButton.setText(getString(R.string.video_pause));
+                                } else {
+                                    Toast.makeText(MainActivity.this, getResources().getString(R.string.previous_video_not_downloaded), Toast.LENGTH_LONG).show();
+                                }
+                            } else {
+                                String fileLocationCurrentVideo = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/"
+                                        + mediaFileNameArray.get((indexOfCurrentlyPlayingVideo));
+                                Uri video = Uri.parse(fileLocationCurrentVideo);
                                 videoView.setVideoURI(video);
                                 videoView.start();
                                 videoToggleButton.setText(getString(R.string.video_pause));
-                            } else {
-                                Toast.makeText(MainActivity.this, getResources().getString(R.string.previous_video_not_downloaded), Toast.LENGTH_LONG).show();
                             }
-                        } else {
-                            String fileLocationCurrentVideo = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/"
-                                    + mediaFileNameArray.get((indexOfCurrentlyPlayingVideo));
-                            Uri video = Uri.parse(fileLocationCurrentVideo);
-                            videoView.setVideoURI(video);
-                            videoView.start();
-                            videoToggleButton.setText(getString(R.string.video_pause));
                         }
                     }
                 } catch (Exception e) {
@@ -937,7 +965,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                     e.printStackTrace();
                 }
                 purchaseDone();
-                //   consumeItem();
+                //consumeItem();
             }
 
         }
@@ -977,8 +1005,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             if (result.isFailure()) {
                 // Handle failure
             } else {
-                //mHelper.consumeAsync(inventory.getPurchase(Constant.TEST_ITEM_SKU),
-                //   mConsumeFinishedListener);
+                // mHelper.consumeAsync(inventory.getPurchase(ITEM_SKU),
+                //mConsumeFinishedListener);
             }
         }
     };
@@ -1085,55 +1113,34 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     public void playingVideos(String videoURL) {
         Log.d(TAG, "playingVideos");
+        isVideoPreviewStart = true;
         String url = mediaURL + videoURL;
-        final ProgressBar progressBar = (ProgressBar) findViewById(R.id.video_progress_bar);
         final ProgressDialog progressDialog;
         progressDialog = ProgressDialog.show(MainActivity.this, "", "Buffering video...", true);
         progressDialog.setCancelable(false);
-        progressBar.setVisibility(View.VISIBLE);
-        // String url = "https://s3-us-west-1.amazonaws.com/babysbrilliant-media/SoundboardCow2.mp4";
-
-       /* try {
-            getWindow().setFormat(PixelFormat.TRANSLUCENT);
-            MediaController mediaController = new MediaController(MainActivity.this);
-            mediaController.setAnchorView(videoView);
-
-            Uri video = Uri.parse(url);
-            videoView.setMediaController(mediaController);
-            videoView.setVideoURI(video);
-            videoView.requestFocus();
-            videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-
-                public void onPrepared(MediaPlayer mp) {
-                    progressDialog.dismiss();
-                    videoLayout.setVisibility(View.VISIBLE);
-                    videoView.start();
-                    videoView.setAlpha(1);
-                    //showControls();
-                }
-            });
-        } catch (Exception e) {
-            //progressDialog.dismiss();
-            System.out.println("Video Play Error :" + e.toString());
-            finish();
-        }*/
-
-
+        videoBufferProgressBar.setVisibility(View.VISIBLE);
         try {
-            // Start the MediaController
-            MediaController mediacontroller = new MediaController(
-                    MainActivity.this);
-            mediacontroller.setAnchorView(videoView);
+
             // Get the URL from String VideoURL
             Uri video = Uri.parse(url);
-            videoView.setMediaController(mediacontroller);
             videoView.setVideoURI(video);
 
         } catch (Exception e) {
             Log.e("Error", e.getMessage());
+            if (progressDialog.isShowing())
+                progressDialog.dismiss();
+            videoBufferProgressBar.setVisibility(View.INVISIBLE);
             e.printStackTrace();
         }
-
+        videoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+            @Override
+            public boolean onError(MediaPlayer mp, int what, int extra) {
+                if (progressDialog.isShowing())
+                    progressDialog.dismiss();
+                videoBufferProgressBar.setVisibility(View.INVISIBLE);
+                return false;
+            }
+        });
         videoView.requestFocus();
         videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             // Close the progress bar and play the video
@@ -1145,7 +1152,19 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
                 mp.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
                     @Override
                     public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
-                        progressBar.setVisibility(View.GONE);
+                        videoBufferProgressBar.setVisibility(View.GONE);
+                    }
+                });
+                mp.setOnInfoListener(new MediaPlayer.OnInfoListener() {
+                    @Override
+                    public boolean onInfo(MediaPlayer mp, int what, int extra) {
+                        if (what == MediaPlayer.MEDIA_INFO_BUFFERING_START) {
+                            videoBufferProgressBar.setVisibility(View.VISIBLE);
+                        }
+                        if (what == MediaPlayer.MEDIA_INFO_BUFFERING_END) {
+                            videoBufferProgressBar.setVisibility(View.INVISIBLE);
+                        }
+                        return false;
                     }
                 });
             }
@@ -1166,17 +1185,37 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d(TAG," IsVideo"+isVideoClose);
         if (isVideoClose) {
             videoView.setOnPreparedListener(null);
         } else {
             if (videoStopPosition != 0) {
                 videoView.seekTo(videoStopPosition);
+                if (isVideoPreviewStart)
+                    videoBufferProgressBar.setVisibility(View.VISIBLE);
                 if (isVideoPlaying) {
                     videoView.start();
                     videoToggleButton.setText(getString(R.string.video_pause));
                 } else {
                     videoView.setOnPreparedListener(null);
+                    if(isVideoPreviewStart){
+                        videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                            // Close the progress bar and play the video
+                            public void onPrepared(MediaPlayer mp) {
+                                mp.setOnInfoListener(new MediaPlayer.OnInfoListener() {
+                                    @Override
+                                    public boolean onInfo(MediaPlayer mp, int what, int extra) {
+                                        if (what == MediaPlayer.MEDIA_INFO_BUFFERING_START) {
+                                            videoBufferProgressBar.setVisibility(View.VISIBLE);
+                                        }
+                                        if (what == MediaPlayer.MEDIA_INFO_BUFFERING_END) {
+                                            videoBufferProgressBar.setVisibility(View.INVISIBLE);
+                                        }
+                                        return false;
+                                    }
+                                });
+                            }
+                        });
+                    }
                     videoView.pause();
                     videoToggleButton.setText(getString(R.string.video_play));
                 }
@@ -1195,7 +1234,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
 
     @SuppressLint("NewApi")
     public void playVideo(String videoURL, final boolean isPlayList) {
-
+        isVideoPreviewStart = false;
         // Create a progressbar
         pDialog = new ProgressDialog(MainActivity.this);
         // Set progressbar title
@@ -1261,13 +1300,11 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
             @Override
             public void onCompletion(MediaPlayer mp) {
                 if (isPlayList && toggle.isChecked()) {
-                    Log.e(LOGVAR, ".." + fileArrayList.size() + ":" + indexOfVideo);
                     if (fileArrayList.size() == indexOfVideo) {
                         indexOfVideo = 0;
                     }
                 }
                 if (isPlayList && fileArrayList.size() > indexOfVideo) {
-                    Log.d(LOGVAR, "PlayList:" + fileArrayList.size() + ":" + indexOfVideo + ":" + fileArrayList.get(indexOfVideo));
                     String fileLocation = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + fileArrayList.get(indexOfVideo);
 
                     Uri video = Uri.parse(fileLocation);
@@ -1679,7 +1716,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         videoRewButton.setTypeface(MainActivity.fontAwesome);
         sectionTitle.setTypeface(MainActivity.proximaBold);
         emptyCategory.setTypeface(MainActivity.proximaBold);
-
+        videoBufferProgressBar = (ProgressBar) findViewById(R.id.video_progress_bar);
         close_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -2220,8 +2257,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistChooser.P
         } else if (adapterType == "purchased") {
             VideosAdapter purchasedVideosAdapter = new VideosAdapter(listData, this, "purchased", isClickable);
             thumbnailList.setAdapter(purchasedVideosAdapter);
-        }
-        else if (adapterType == "soundBoards") {
+        } else if (adapterType == "soundBoards") {
             SoundBoardsAdapter soundBoardsAdapter = new SoundBoardsAdapter(listData, this, isClickable);
             thumbnailList.setAdapter(soundBoardsAdapter);
         } else {

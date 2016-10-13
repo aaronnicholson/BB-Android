@@ -62,6 +62,7 @@ public class SectionAdapter extends RecyclerView.Adapter<ElementViewHolder> {
     private void parseListItems(int listLength) {
         elements = new ArrayList<ListItem>(listLength);
         products = new ArrayList<JSONArray>();
+        mainActivity.previewFileNameArray = new ArrayList<>();
         Log.d(LOGVAR, "Assets:" + assetsList);
         for (int i = 0; i < listLength; i++) {
             JSONObject rawJSON;
@@ -88,7 +89,7 @@ public class SectionAdapter extends RecyclerView.Adapter<ElementViewHolder> {
                     products.add(itemJSON.getJSONArray("products"));
 
                 mediaFile = itemJSON.getString("preview");
-
+                mainActivity.previewFileNameArray.add(mediaFile);
                 ListItem listItem = new ListItem(rawJSON, name, playInline, imageResource, mediaFile, price, category, isSection,
                         isPurchased, isPlaylistItem, isPlaylist, isFavorite, appContext, false, MainActivity.DOWNLOAD_ID, mediaFile);
 
@@ -154,8 +155,11 @@ public class SectionAdapter extends RecyclerView.Adapter<ElementViewHolder> {
 
     private void previewClicked(int position) {
         ListItem listItem = elements.get(position);
-        if (!listItem.getMediaFile().equals(""))
+        mainActivity.indexOfCurrentlyPreviewVideo = mainActivity.previewFileNameArray.indexOf(listItem.getMediaFile());
+        if (!listItem.getMediaFile().equals("")) {
+            mainActivity.isVideoClose = false;
             mainActivity.playingVideos(listItem.getMediaFile());
+        }
         else
             Toast.makeText(mainActivity, mainActivity.getResources().getString(R.string.preview_not_available),
                     Toast.LENGTH_LONG).show();
